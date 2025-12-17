@@ -1,0 +1,537 @@
+synth litmus test for ppo: [R];po;[XLr];rmw;[XSc];po;[W]
+ppo [<class 'src.slide.synth.memory_relation.R'>, <class 'src.slide.synth.memory_relation.Po'>, <class 'src.slide.synth.memory_relation.Lr'>, <class 'src.slide.synth.memory_relation.Rmw'>, <class 'src.slide.synth.memory_relation.Sc'>, <class 'src.slide.synth.memory_relation.Po'>, <class 'src.slide.synth.memory_relation.W'>]
+new_ppo [<class 'src.slide.synth.memory_relation.R'>, <class 'src.slide.synth.memory_relation.Po'>, <class 'src.slide.synth.memory_relation.Lr'>, <class 'src.slide.synth.memory_relation.Rmw'>, <class 'src.slide.synth.memory_relation.Sc'>, <class 'src.slide.synth.memory_relation.Po'>, <class 'src.slide.synth.memory_relation.W'>]
+start
+[rfe]
+[coe, W, rfi]
+[coe, W, fenceD]
+[coe, W, fenceS]
+[coe, W, po]
+[coe, W, po-loc]
+[rfe, R, fenceD]
+[rfe, R, fenceS]
+[rfe, R, po]
+[rfe, R, po-loc]
+[rfe, R, addrS]
+[rfe, R, addrD]
+[rfe, R, dataD]
+[rfe, R, dataS]
+[rfe, R, ctrlD]
+[rfe, R, ctrlS]
+[fre, W, rfi]
+[fre, W, fenceD]
+[fre, W, fenceS]
+[fre, W, po]
+[fre, W, po-loc]
+end
+[coe]
+[rfe]
+[coi, W, coe]
+[fenceD, W, coe]
+[fenceS, W, coe]
+[po, W, coe]
+[po-loc, W, coe]
+[coi, W, rfe]
+[fenceD, W, rfe]
+[fenceS, W, rfe]
+[po, W, rfe]
+[po-loc, W, rfe]
+[rfi, R, fre]
+[fenceD, R, fre]
+[fenceS, R, fre]
+[po, R, fre]
+[po-loc, R, fre]
+([rfe], [coe], [W])
+([rfe], [rfe], [R])
+([rfe], [coi, W, coe], [W])
+([rfe], [fenceD, W, coe], [W])
+([rfe], [fenceS, W, coe], [W])
+([rfe], [po, W, coe], [W])
+([rfe], [po-loc, W, coe], [W])
+([rfe], [coi, W, rfe], [R])
+([rfe], [fenceD, W, rfe], [R])
+([rfe], [fenceS, W, rfe], [R])
+([rfe], [po, W, rfe], [R])
+([rfe], [po-loc, W, rfe], [R])
+([rfe], [rfi, R, fre], [W])
+([rfe], [fenceD, R, fre], [W])
+([rfe], [fenceS, R, fre], [W])
+([rfe], [po, R, fre], [W])
+([rfe], [po-loc, R, fre], [W])
+([coe, W, rfi], [coe], [W])
+([coe, W, rfi], [rfe], [R])
+([coe, W, rfi], [coi, W, coe], [W])
+([coe, W, rfi], [fenceD, W, coe], [W])
+([coe, W, rfi], [fenceS, W, coe], [W])
+([coe, W, rfi], [po, W, coe], [W])
+([coe, W, rfi], [po-loc, W, coe], [W])
+([coe, W, rfi], [coi, W, rfe], [R])
+([coe, W, rfi], [fenceD, W, rfe], [R])
+([coe, W, rfi], [fenceS, W, rfe], [R])
+([coe, W, rfi], [po, W, rfe], [R])
+([coe, W, rfi], [po-loc, W, rfe], [R])
+([coe, W, rfi], [rfi, R, fre], [W])
+([coe, W, rfi], [fenceD, R, fre], [W])
+([coe, W, rfi], [fenceS, R, fre], [W])
+([coe, W, rfi], [po, R, fre], [W])
+([coe, W, rfi], [po-loc, R, fre], [W])
+([coe, W, fenceD], [coe], [W])
+([coe, W, fenceD], [rfe], [R])
+([coe, W, fenceD], [coi, W, coe], [W])
+([coe, W, fenceD], [fenceD, W, coe], [W])
+([coe, W, fenceD], [fenceS, W, coe], [W])
+([coe, W, fenceD], [po, W, coe], [W])
+([coe, W, fenceD], [po-loc, W, coe], [W])
+([coe, W, fenceD], [coi, W, rfe], [R])
+([coe, W, fenceD], [fenceD, W, rfe], [R])
+([coe, W, fenceD], [fenceS, W, rfe], [R])
+([coe, W, fenceD], [po, W, rfe], [R])
+([coe, W, fenceD], [po-loc, W, rfe], [R])
+([coe, W, fenceD], [rfi, R, fre], [W])
+([coe, W, fenceD], [fenceD, R, fre], [W])
+([coe, W, fenceD], [fenceS, R, fre], [W])
+([coe, W, fenceD], [po, R, fre], [W])
+([coe, W, fenceD], [po-loc, R, fre], [W])
+([coe, W, fenceS], [coe], [W])
+([coe, W, fenceS], [rfe], [R])
+([coe, W, fenceS], [coi, W, coe], [W])
+([coe, W, fenceS], [fenceD, W, coe], [W])
+([coe, W, fenceS], [fenceS, W, coe], [W])
+([coe, W, fenceS], [po, W, coe], [W])
+([coe, W, fenceS], [po-loc, W, coe], [W])
+([coe, W, fenceS], [coi, W, rfe], [R])
+([coe, W, fenceS], [fenceD, W, rfe], [R])
+([coe, W, fenceS], [fenceS, W, rfe], [R])
+([coe, W, fenceS], [po, W, rfe], [R])
+([coe, W, fenceS], [po-loc, W, rfe], [R])
+([coe, W, fenceS], [rfi, R, fre], [W])
+([coe, W, fenceS], [fenceD, R, fre], [W])
+([coe, W, fenceS], [fenceS, R, fre], [W])
+([coe, W, fenceS], [po, R, fre], [W])
+([coe, W, fenceS], [po-loc, R, fre], [W])
+([coe, W, po], [coe], [W])
+([coe, W, po], [rfe], [R])
+([coe, W, po], [coi, W, coe], [W])
+([coe, W, po], [fenceD, W, coe], [W])
+([coe, W, po], [fenceS, W, coe], [W])
+([coe, W, po], [po, W, coe], [W])
+([coe, W, po], [po-loc, W, coe], [W])
+([coe, W, po], [coi, W, rfe], [R])
+([coe, W, po], [fenceD, W, rfe], [R])
+([coe, W, po], [fenceS, W, rfe], [R])
+([coe, W, po], [po, W, rfe], [R])
+([coe, W, po], [po-loc, W, rfe], [R])
+([coe, W, po], [rfi, R, fre], [W])
+([coe, W, po], [fenceD, R, fre], [W])
+([coe, W, po], [fenceS, R, fre], [W])
+([coe, W, po], [po, R, fre], [W])
+([coe, W, po], [po-loc, R, fre], [W])
+([coe, W, po-loc], [coe], [W])
+([coe, W, po-loc], [rfe], [R])
+([coe, W, po-loc], [coi, W, coe], [W])
+([coe, W, po-loc], [fenceD, W, coe], [W])
+([coe, W, po-loc], [fenceS, W, coe], [W])
+([coe, W, po-loc], [po, W, coe], [W])
+([coe, W, po-loc], [po-loc, W, coe], [W])
+([coe, W, po-loc], [coi, W, rfe], [R])
+([coe, W, po-loc], [fenceD, W, rfe], [R])
+([coe, W, po-loc], [fenceS, W, rfe], [R])
+([coe, W, po-loc], [po, W, rfe], [R])
+([coe, W, po-loc], [po-loc, W, rfe], [R])
+([coe, W, po-loc], [rfi, R, fre], [W])
+([coe, W, po-loc], [fenceD, R, fre], [W])
+([coe, W, po-loc], [fenceS, R, fre], [W])
+([coe, W, po-loc], [po, R, fre], [W])
+([coe, W, po-loc], [po-loc, R, fre], [W])
+([rfe, R, fenceD], [coe], [W])
+([rfe, R, fenceD], [rfe], [R])
+([rfe, R, fenceD], [coi, W, coe], [W])
+([rfe, R, fenceD], [fenceD, W, coe], [W])
+([rfe, R, fenceD], [fenceS, W, coe], [W])
+([rfe, R, fenceD], [po, W, coe], [W])
+([rfe, R, fenceD], [po-loc, W, coe], [W])
+([rfe, R, fenceD], [coi, W, rfe], [R])
+([rfe, R, fenceD], [fenceD, W, rfe], [R])
+([rfe, R, fenceD], [fenceS, W, rfe], [R])
+([rfe, R, fenceD], [po, W, rfe], [R])
+([rfe, R, fenceD], [po-loc, W, rfe], [R])
+([rfe, R, fenceD], [rfi, R, fre], [W])
+([rfe, R, fenceD], [fenceD, R, fre], [W])
+([rfe, R, fenceD], [fenceS, R, fre], [W])
+([rfe, R, fenceD], [po, R, fre], [W])
+([rfe, R, fenceD], [po-loc, R, fre], [W])
+([rfe, R, fenceS], [coe], [W])
+([rfe, R, fenceS], [rfe], [R])
+([rfe, R, fenceS], [coi, W, coe], [W])
+([rfe, R, fenceS], [fenceD, W, coe], [W])
+([rfe, R, fenceS], [fenceS, W, coe], [W])
+([rfe, R, fenceS], [po, W, coe], [W])
+([rfe, R, fenceS], [po-loc, W, coe], [W])
+([rfe, R, fenceS], [coi, W, rfe], [R])
+([rfe, R, fenceS], [fenceD, W, rfe], [R])
+([rfe, R, fenceS], [fenceS, W, rfe], [R])
+([rfe, R, fenceS], [po, W, rfe], [R])
+([rfe, R, fenceS], [po-loc, W, rfe], [R])
+([rfe, R, fenceS], [rfi, R, fre], [W])
+([rfe, R, fenceS], [fenceD, R, fre], [W])
+([rfe, R, fenceS], [fenceS, R, fre], [W])
+([rfe, R, fenceS], [po, R, fre], [W])
+([rfe, R, fenceS], [po-loc, R, fre], [W])
+([rfe, R, po], [coe], [W])
+([rfe, R, po], [rfe], [R])
+([rfe, R, po], [coi, W, coe], [W])
+([rfe, R, po], [fenceD, W, coe], [W])
+([rfe, R, po], [fenceS, W, coe], [W])
+([rfe, R, po], [po, W, coe], [W])
+([rfe, R, po], [po-loc, W, coe], [W])
+([rfe, R, po], [coi, W, rfe], [R])
+([rfe, R, po], [fenceD, W, rfe], [R])
+([rfe, R, po], [fenceS, W, rfe], [R])
+([rfe, R, po], [po, W, rfe], [R])
+([rfe, R, po], [po-loc, W, rfe], [R])
+([rfe, R, po], [rfi, R, fre], [W])
+([rfe, R, po], [fenceD, R, fre], [W])
+([rfe, R, po], [fenceS, R, fre], [W])
+([rfe, R, po], [po, R, fre], [W])
+([rfe, R, po], [po-loc, R, fre], [W])
+([rfe, R, po-loc], [coe], [W])
+([rfe, R, po-loc], [rfe], [R])
+([rfe, R, po-loc], [coi, W, coe], [W])
+([rfe, R, po-loc], [fenceD, W, coe], [W])
+([rfe, R, po-loc], [fenceS, W, coe], [W])
+([rfe, R, po-loc], [po, W, coe], [W])
+([rfe, R, po-loc], [po-loc, W, coe], [W])
+([rfe, R, po-loc], [coi, W, rfe], [R])
+([rfe, R, po-loc], [fenceD, W, rfe], [R])
+([rfe, R, po-loc], [fenceS, W, rfe], [R])
+([rfe, R, po-loc], [po, W, rfe], [R])
+([rfe, R, po-loc], [po-loc, W, rfe], [R])
+([rfe, R, po-loc], [rfi, R, fre], [W])
+([rfe, R, po-loc], [fenceD, R, fre], [W])
+([rfe, R, po-loc], [fenceS, R, fre], [W])
+([rfe, R, po-loc], [po, R, fre], [W])
+([rfe, R, po-loc], [po-loc, R, fre], [W])
+([rfe, R, addrS], [coe], [W])
+([rfe, R, addrS], [rfe], [R])
+([rfe, R, addrS], [coi, W, coe], [W])
+([rfe, R, addrS], [fenceD, W, coe], [W])
+([rfe, R, addrS], [fenceS, W, coe], [W])
+([rfe, R, addrS], [po, W, coe], [W])
+([rfe, R, addrS], [po-loc, W, coe], [W])
+([rfe, R, addrS], [coi, W, rfe], [R])
+([rfe, R, addrS], [fenceD, W, rfe], [R])
+([rfe, R, addrS], [fenceS, W, rfe], [R])
+([rfe, R, addrS], [po, W, rfe], [R])
+([rfe, R, addrS], [po-loc, W, rfe], [R])
+([rfe, R, addrS], [rfi, R, fre], [W])
+([rfe, R, addrS], [fenceD, R, fre], [W])
+([rfe, R, addrS], [fenceS, R, fre], [W])
+([rfe, R, addrS], [po, R, fre], [W])
+([rfe, R, addrS], [po-loc, R, fre], [W])
+([rfe, R, addrD], [coe], [W])
+([rfe, R, addrD], [rfe], [R])
+([rfe, R, addrD], [coi, W, coe], [W])
+([rfe, R, addrD], [fenceD, W, coe], [W])
+([rfe, R, addrD], [fenceS, W, coe], [W])
+([rfe, R, addrD], [po, W, coe], [W])
+([rfe, R, addrD], [po-loc, W, coe], [W])
+([rfe, R, addrD], [coi, W, rfe], [R])
+([rfe, R, addrD], [fenceD, W, rfe], [R])
+([rfe, R, addrD], [fenceS, W, rfe], [R])
+([rfe, R, addrD], [po, W, rfe], [R])
+([rfe, R, addrD], [po-loc, W, rfe], [R])
+([rfe, R, addrD], [rfi, R, fre], [W])
+([rfe, R, addrD], [fenceD, R, fre], [W])
+([rfe, R, addrD], [fenceS, R, fre], [W])
+([rfe, R, addrD], [po, R, fre], [W])
+([rfe, R, addrD], [po-loc, R, fre], [W])
+([rfe, R, dataD], [coe], [W])
+([rfe, R, dataD], [rfe], [R])
+([rfe, R, dataD], [coi, W, coe], [W])
+([rfe, R, dataD], [fenceD, W, coe], [W])
+([rfe, R, dataD], [fenceS, W, coe], [W])
+([rfe, R, dataD], [po, W, coe], [W])
+([rfe, R, dataD], [po-loc, W, coe], [W])
+([rfe, R, dataD], [coi, W, rfe], [R])
+([rfe, R, dataD], [fenceD, W, rfe], [R])
+([rfe, R, dataD], [fenceS, W, rfe], [R])
+([rfe, R, dataD], [po, W, rfe], [R])
+([rfe, R, dataD], [po-loc, W, rfe], [R])
+([rfe, R, dataD], [rfi, R, fre], [W])
+([rfe, R, dataD], [fenceD, R, fre], [W])
+([rfe, R, dataD], [fenceS, R, fre], [W])
+([rfe, R, dataD], [po, R, fre], [W])
+([rfe, R, dataD], [po-loc, R, fre], [W])
+([rfe, R, dataS], [coe], [W])
+([rfe, R, dataS], [rfe], [R])
+([rfe, R, dataS], [coi, W, coe], [W])
+([rfe, R, dataS], [fenceD, W, coe], [W])
+([rfe, R, dataS], [fenceS, W, coe], [W])
+([rfe, R, dataS], [po, W, coe], [W])
+([rfe, R, dataS], [po-loc, W, coe], [W])
+([rfe, R, dataS], [coi, W, rfe], [R])
+([rfe, R, dataS], [fenceD, W, rfe], [R])
+([rfe, R, dataS], [fenceS, W, rfe], [R])
+([rfe, R, dataS], [po, W, rfe], [R])
+([rfe, R, dataS], [po-loc, W, rfe], [R])
+([rfe, R, dataS], [rfi, R, fre], [W])
+([rfe, R, dataS], [fenceD, R, fre], [W])
+([rfe, R, dataS], [fenceS, R, fre], [W])
+([rfe, R, dataS], [po, R, fre], [W])
+([rfe, R, dataS], [po-loc, R, fre], [W])
+([rfe, R, ctrlD], [coe], [W])
+([rfe, R, ctrlD], [rfe], [R])
+([rfe, R, ctrlD], [coi, W, coe], [W])
+([rfe, R, ctrlD], [fenceD, W, coe], [W])
+([rfe, R, ctrlD], [fenceS, W, coe], [W])
+([rfe, R, ctrlD], [po, W, coe], [W])
+([rfe, R, ctrlD], [po-loc, W, coe], [W])
+([rfe, R, ctrlD], [coi, W, rfe], [R])
+([rfe, R, ctrlD], [fenceD, W, rfe], [R])
+([rfe, R, ctrlD], [fenceS, W, rfe], [R])
+([rfe, R, ctrlD], [po, W, rfe], [R])
+([rfe, R, ctrlD], [po-loc, W, rfe], [R])
+([rfe, R, ctrlD], [rfi, R, fre], [W])
+([rfe, R, ctrlD], [fenceD, R, fre], [W])
+([rfe, R, ctrlD], [fenceS, R, fre], [W])
+([rfe, R, ctrlD], [po, R, fre], [W])
+([rfe, R, ctrlD], [po-loc, R, fre], [W])
+([rfe, R, ctrlS], [coe], [W])
+([rfe, R, ctrlS], [rfe], [R])
+([rfe, R, ctrlS], [coi, W, coe], [W])
+([rfe, R, ctrlS], [fenceD, W, coe], [W])
+([rfe, R, ctrlS], [fenceS, W, coe], [W])
+([rfe, R, ctrlS], [po, W, coe], [W])
+([rfe, R, ctrlS], [po-loc, W, coe], [W])
+([rfe, R, ctrlS], [coi, W, rfe], [R])
+([rfe, R, ctrlS], [fenceD, W, rfe], [R])
+([rfe, R, ctrlS], [fenceS, W, rfe], [R])
+([rfe, R, ctrlS], [po, W, rfe], [R])
+([rfe, R, ctrlS], [po-loc, W, rfe], [R])
+([rfe, R, ctrlS], [rfi, R, fre], [W])
+([rfe, R, ctrlS], [fenceD, R, fre], [W])
+([rfe, R, ctrlS], [fenceS, R, fre], [W])
+([rfe, R, ctrlS], [po, R, fre], [W])
+([rfe, R, ctrlS], [po-loc, R, fre], [W])
+([fre, W, rfi], [coe], [W])
+([fre, W, rfi], [rfe], [R])
+([fre, W, rfi], [coi, W, coe], [W])
+([fre, W, rfi], [fenceD, W, coe], [W])
+([fre, W, rfi], [fenceS, W, coe], [W])
+([fre, W, rfi], [po, W, coe], [W])
+([fre, W, rfi], [po-loc, W, coe], [W])
+([fre, W, rfi], [coi, W, rfe], [R])
+([fre, W, rfi], [fenceD, W, rfe], [R])
+([fre, W, rfi], [fenceS, W, rfe], [R])
+([fre, W, rfi], [po, W, rfe], [R])
+([fre, W, rfi], [po-loc, W, rfe], [R])
+([fre, W, rfi], [rfi, R, fre], [W])
+([fre, W, rfi], [fenceD, R, fre], [W])
+([fre, W, rfi], [fenceS, R, fre], [W])
+([fre, W, rfi], [po, R, fre], [W])
+([fre, W, rfi], [po-loc, R, fre], [W])
+([fre, W, fenceD], [coe], [W])
+([fre, W, fenceD], [rfe], [R])
+([fre, W, fenceD], [coi, W, coe], [W])
+([fre, W, fenceD], [fenceD, W, coe], [W])
+([fre, W, fenceD], [fenceS, W, coe], [W])
+([fre, W, fenceD], [po, W, coe], [W])
+([fre, W, fenceD], [po-loc, W, coe], [W])
+([fre, W, fenceD], [coi, W, rfe], [R])
+([fre, W, fenceD], [fenceD, W, rfe], [R])
+([fre, W, fenceD], [fenceS, W, rfe], [R])
+([fre, W, fenceD], [po, W, rfe], [R])
+([fre, W, fenceD], [po-loc, W, rfe], [R])
+([fre, W, fenceD], [rfi, R, fre], [W])
+([fre, W, fenceD], [fenceD, R, fre], [W])
+([fre, W, fenceD], [fenceS, R, fre], [W])
+([fre, W, fenceD], [po, R, fre], [W])
+([fre, W, fenceD], [po-loc, R, fre], [W])
+([fre, W, fenceS], [coe], [W])
+([fre, W, fenceS], [rfe], [R])
+([fre, W, fenceS], [coi, W, coe], [W])
+([fre, W, fenceS], [fenceD, W, coe], [W])
+([fre, W, fenceS], [fenceS, W, coe], [W])
+([fre, W, fenceS], [po, W, coe], [W])
+([fre, W, fenceS], [po-loc, W, coe], [W])
+([fre, W, fenceS], [coi, W, rfe], [R])
+([fre, W, fenceS], [fenceD, W, rfe], [R])
+([fre, W, fenceS], [fenceS, W, rfe], [R])
+([fre, W, fenceS], [po, W, rfe], [R])
+([fre, W, fenceS], [po-loc, W, rfe], [R])
+([fre, W, fenceS], [rfi, R, fre], [W])
+([fre, W, fenceS], [fenceD, R, fre], [W])
+([fre, W, fenceS], [fenceS, R, fre], [W])
+([fre, W, fenceS], [po, R, fre], [W])
+([fre, W, fenceS], [po-loc, R, fre], [W])
+([fre, W, po], [coe], [W])
+([fre, W, po], [rfe], [R])
+([fre, W, po], [coi, W, coe], [W])
+([fre, W, po], [fenceD, W, coe], [W])
+([fre, W, po], [fenceS, W, coe], [W])
+([fre, W, po], [po, W, coe], [W])
+([fre, W, po], [po-loc, W, coe], [W])
+([fre, W, po], [coi, W, rfe], [R])
+([fre, W, po], [fenceD, W, rfe], [R])
+([fre, W, po], [fenceS, W, rfe], [R])
+([fre, W, po], [po, W, rfe], [R])
+([fre, W, po], [po-loc, W, rfe], [R])
+([fre, W, po], [rfi, R, fre], [W])
+([fre, W, po], [fenceD, R, fre], [W])
+([fre, W, po], [fenceS, R, fre], [W])
+([fre, W, po], [po, R, fre], [W])
+([fre, W, po], [po-loc, R, fre], [W])
+([fre, W, po-loc], [coe], [W])
+([fre, W, po-loc], [rfe], [R])
+([fre, W, po-loc], [coi, W, coe], [W])
+([fre, W, po-loc], [fenceD, W, coe], [W])
+([fre, W, po-loc], [fenceS, W, coe], [W])
+([fre, W, po-loc], [po, W, coe], [W])
+([fre, W, po-loc], [po-loc, W, coe], [W])
+([fre, W, po-loc], [coi, W, rfe], [R])
+([fre, W, po-loc], [fenceD, W, rfe], [R])
+([fre, W, po-loc], [fenceS, W, rfe], [R])
+([fre, W, po-loc], [po, W, rfe], [R])
+([fre, W, po-loc], [po-loc, W, rfe], [R])
+([fre, W, po-loc], [rfi, R, fre], [W])
+([fre, W, po-loc], [fenceD, R, fre], [W])
+([fre, W, po-loc], [fenceS, R, fre], [W])
+([fre, W, po-loc], [po, R, fre], [W])
+([fre, W, po-loc], [po-loc, R, fre], [W])
+check legal [R, po, XLr, rmw, XSc, po, W, coe, W, fenceD, W, rfe]
+check legal pass [R, po, XLr, rmw, XSc, po, W, coe, W, fenceD, W, rfe]
+use herd check start before pass transform PodRR PosRW PodWW Coe Fence.rw.rwdWW Rfe
+diyone7 cmd: eval $(opam env);diyone7 -arch RISC-V -obs local -name /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test PodRR PosRW PodWW Coe Fence.rw.rwdWW Rfe
+{0:x6=x; 0:x8=y; 0:x11=z; 1:x6=z; 1:x8=x}
+          P0          |         P1           ;
+<0x00> lw x5, 0(x6)   | <0x00> ori x5, x0, 2 ;
+<0x04> lw x7, 0(x8)   | <0x04> sw x5, 0(x6)  ;
+<0x08> ori x9, x0, 1  | <0x08> fence rw, rw  ;
+<0x0C> sw x9, 0(x8)   | <0x0C> ori x7, x0, 1 ;
+<0x10> ori x10, x0, 1 | <0x10> sw x7, 0(x8)  ;
+<0x14> sw x10, 0(x11) |                      ;
+<0x18> lw x12, 0(x11) |                      ;
+
+QType.Exists (0:x12==2 and 0:x5==1)
+
+thread insts
+[<0x00> lw x5, 0(x6), <0x04> lw x7, 0(x8), <0x08> ori x9, x0, 1, <0x0C> sw x9, 0(x8), <0x10> ori x10, x0, 1, <0x14> sw x10, 0(x11), <0x18> lw x12, 0(x11)]
+[<0x00> ori x5, x0, 2, <0x04> sw x5, 0(x6), <0x08> fence rw, rw, <0x0C> ori x7, x0, 1, <0x10> sw x7, 0(x8)]
+cycle:  [R];po;[R];po-loc;[W];po;[W];coe;[W];fencerel(Fence.rw.rw);[W];rfe
+thread_list: 
+[R, po, R, po-loc, W, po, W]
+[W, fenceD, W]
+connect list:
+coe
+rfe
+check ppo [R, po, R, po-loc, W, po, W] is match [<0x00> lw x5, 0(x6), <0x04> lw x7, 0(x8), <0x08> ori x9, x0, 1, <0x0C> sw x9, 0(x8), <0x10> ori x10, x0, 1, <0x14> sw x10, 0(x11), <0x18> lw x12, 0(x11)]
+thread mem list [0, 1, 3, 5, 6]
+thread ppo :[R, po, R, po-loc, W, po, W],num:4
+<0x00> lw x5, 0(x6) lw
+<0x04> lw x7, 0(x8) lw
+<0x08> ori x9, x0, 1 ori
+<0x0C> sw x9, 0(x8) sw
+<0x10> ori x10, x0, 1 ori
+<0x14> sw x10, 0(x11) sw
+<0x18> lw x12, 0(x11) lw
+check relation: R, pre_inst: <0x00> lw x5, 0(x6)
+relation_flag: True
+binary_relation: po, pre_inst: <0x00> lw x5, 0(x6), midden_insts: None, after_inst: <0x04> lw x7, 0(x8)
+binary_flag: True
+check relation: R, pre_inst: <0x04> lw x7, 0(x8)
+relation_flag: True
+binary_relation: po-loc, pre_inst: <0x04> lw x7, 0(x8), midden_insts: [<0x08> ori x9, x0, 1], after_inst: <0x0C> sw x9, 0(x8)
+binary_flag: True
+check relation: W, pre_inst: <0x0C> sw x9, 0(x8)
+relation_flag: True
+binary_relation: po, pre_inst: <0x0C> sw x9, 0(x8), midden_insts: [<0x10> ori x10, x0, 1], after_inst: <0x14> sw x10, 0(x11)
+binary_flag: True
+check relation: W, pre_inst: <0x14> sw x10, 0(x11)
+relation_flag: True
+ppo [R, po, R, po-loc, W, po, W] match [<0x00> lw x5, 0(x6), <0x04> lw x7, 0(x8), <0x08> ori x9, x0, 1, <0x0C> sw x9, 0(x8), <0x10> ori x10, x0, 1, <0x14> sw x10, 0(x11), <0x18> lw x12, 0(x11)]
+check ppo [R, po, R, po-loc, W, po, W] is match [<0x00> ori x5, x0, 2, <0x04> sw x5, 0(x6), <0x08> fence rw, rw, <0x0C> ori x7, x0, 1, <0x10> sw x7, 0(x8)]
+thread mem list [1, 4]
+thread ppo :[R, po, R, po-loc, W, po, W],num:4
+check ppo [W, fenceD, W] is match [<0x00> lw x5, 0(x6), <0x04> lw x7, 0(x8), <0x08> ori x9, x0, 1, <0x0C> sw x9, 0(x8), <0x10> ori x10, x0, 1, <0x14> sw x10, 0(x11), <0x18> lw x12, 0(x11)]
+thread mem list [0, 1, 3, 5, 6]
+thread ppo :[W, fenceD, W],num:2
+check ppo [W, fenceD, W] is match [<0x00> ori x5, x0, 2, <0x04> sw x5, 0(x6), <0x08> fence rw, rw, <0x0C> ori x7, x0, 1, <0x10> sw x7, 0(x8)]
+thread mem list [1, 4]
+thread ppo :[W, fenceD, W],num:2
+<0x00> ori x5, x0, 2 ori
+<0x04> sw x5, 0(x6) sw
+<0x08> fence rw, rw fence
+<0x0C> ori x7, x0, 1 ori
+<0x10> sw x7, 0(x8) sw
+check relation: W, pre_inst: <0x04> sw x5, 0(x6)
+relation_flag: True
+binary_relation: fenceD, pre_inst: <0x04> sw x5, 0(x6), midden_insts: [<0x08> fence rw, rw, <0x0C> ori x7, x0, 1], after_inst: <0x10> sw x7, 0(x8)
+binary_flag: True
+check relation: W, pre_inst: <0x10> sw x7, 0(x8)
+relation_flag: True
+ppo [W, fenceD, W] match [<0x00> ori x5, x0, 2, <0x04> sw x5, 0(x6), <0x08> fence rw, rw, <0x0C> ori x7, x0, 1, <0x10> sw x7, 0(x8)]
+thread_pair_list {0: [0], 1: [1]}
+init_conds {(0, x6): 'x', (0, x8): 'y', (0, x11): 'z', (1, x6): 'z', (1, x8): 'x'}
+ppo 1 match thread list[1]
+4
+<0x14> sw x10, 0(x11) <0x04> sw x5, 0(x6) coe
+same address_flag: True
+(0, [0, 1])
+ppo 0 match thread list[0]
+2
+<0x10> sw x7, 0(x8) <0x00> lw x5, 0(x6) rfe
+same address_flag: True
+match [0, 1]
+match success: [0, 1]
+inject_list [0,1,lr.w x7, 0(x8), 0,1,lr.w x9, 0(x8), 0,3,sc.w x13, x9, (x8)]
+inject_list []
+1 <0x04> lw x7, 0(x8)
+3 <0x0C> sw x9, 0(x8)
+--------------------------locations
+
+/home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test.litmus
+mutate new litmus
+RISCV /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test
+ {0:x6=x; 0:x8=y; 0:x11=z; 1:x6=z; 1:x8=x; }
+        P0         |      P1       ;
+lw x5, 0(x6)       | ori x5, x0, 2 ;
+lr.w x7, 0(x8)     | sw x5, 0(x6)  ;
+ori x9, x0, 1      | fence rw, rw  ;
+sc.w x13, x9, (x8) | ori x7, x0, 1 ;
+ori x10, x0, 1     | sw x7, 0(x8)  ;
+sw x10, 0(x11)     |               ;
+lw x12, 0(x11)     |               ;
+
+exists (0:x12=2 /\ 0:x5=1) /\ 0:x13=1
+
+RISCV /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test
+ {0:x6=x; 0:x8=y; 0:x11=z; 1:x6=z; 1:x8=x; }
+        P0         |      P1       ;
+lw x5, 0(x6)       | ori x5, x0, 2 ;
+lr.w x7, 0(x8)     | sw x5, 0(x6)  ;
+ori x9, x0, 1      | fence rw, rw  ;
+sc.w x13, x9, (x8) | ori x7, x0, 1 ;
+ori x10, x0, 1     | sw x7, 0(x8)  ;
+sw x10, 0(x11)     |               ;
+lw x12, 0(x11)     |               ;
+
+exists (0:x12=2 /\ 0:x5=1) /\ 0:x13=1
+
+use herd check start after pass transform PodRR PosRW PodWW Coe Fence.rw.rwdWW Rfe
+[R];po;[XLr];rmw;[XSc];po;[W];coe;[W];fencerel(Fence.rw.rw);[W];rfe
+[R];po;[XLr];rmw;[XSc];po;[W]
+PodRR PosRW PodWW Coe Fence.rw.rwdWW Rfe
+R_po_XLr_rmw_XSc_po_W_PodRR_PosRW_PodWW_Coe_Fence_rw_rwdWW_Rfe
+RISCV /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test
+ {0:x6=x; 0:x8=y; 0:x11=z; 1:x6=z; 1:x8=x; }
+        P0         |      P1       ;
+lw x5, 0(x6)       | ori x5, x0, 2 ;
+lr.w x7, 0(x8)     | sw x5, 0(x6)  ;
+ori x9, x0, 1      | fence rw, rw  ;
+sc.w x13, x9, (x8) | ori x7, x0, 1 ;
+ori x10, x0, 1     | sw x7, 0(x8)  ;
+sw x10, 0(x11)     |               ;
+lw x12, 0(x11)     |               ;
+
+exists (0:x12=2 /\ 0:x5=1) /\ 0:x13=1
+

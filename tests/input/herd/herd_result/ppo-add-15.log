@@ -1,0 +1,16 @@
+[INFO] cmd: herd7 /home/whq/Desktop/slide/src/slide/../output/test_ppo/15/new_test_0_15.litmus -model /home/whq/Desktop/slide/src/slide/../../tests/input/CAT/change/riscv-add-ppo-15.cat, time cost: 4.76837158203125e-06
+
+Test /home/whq/Desktop/slide/src/slide/../output/test_ppo/15/new_test_0_15 Allowed
+States 3
+0:x5=0; 0:x11=1; 0:x13=0;
+0:x5=0; 0:x11=1; 0:x13=1;
+0:x5=1; 0:x11=1; 0:x13=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (0:x5=1 /\ 0:x11=1 /\ 0:x13=0)
+Observation /home/whq/Desktop/slide/src/slide/../output/test_ppo/15/new_test_0_15 Never 0 3
+Time /home/whq/Desktop/slide/src/slide/../output/test_ppo/15/new_test_0_15 0.02
+Hash=45e762c9e0ce8838008dc8beb7bb0c5f
+
+[INFO] total time cost: 0.041775

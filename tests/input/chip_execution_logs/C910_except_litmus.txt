@@ -1,0 +1,4 @@
+CoWR
+LB+fence.r.rw+data-po
+LB+fri-rfi-addr+fri-rfi-ctrl
+RSW

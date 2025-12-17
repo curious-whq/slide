@@ -1,0 +1,63 @@
+Wed Apr  9 18:08:09 2025
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Results for /home/sipeed/riscv/RWC_2/RWC_1.litmus %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+RISCV RWC
+{0:x5=1; 2:x5=1; 0:x6=x; 1:x6=x; 1:x8=y; 2:x6=y; 2:x8=x;}
+ P0          | P1          | P2          ;
+ sd x5,0(x6) | ld x5,0(x6) | lw x0,0(x6) ;
+             | ld x7,0(x8) | sd x5,0(x6) ;
+             |             | ld x7,0(x8) ;
+
+exists (1:x5=1 /\ 1:x7=0 /\ 2:x7=0)
+Generated assembler
+#START _litmus_P2
+	lw x0,0(a5)
+	sd t1,0(a5)
+	ld a1,0(a4)
+#START _litmus_P0
+	sd a7,0(a5)
+#START _litmus_P1
+	ld a1,0(a5)
+	ld a0,0(a4)
+Test RWC Allowed
+Histogram (8 states)
+181219:>1:x5=0; 1:x7=0; 2:x7=0;
+7765  *>1:x5=1; 1:x7=0; 2:x7=0;
+140204:>1:x5=0; 1:x7=1; 2:x7=0;
+181112:>1:x5=1; 1:x7=1; 2:x7=0;
+211688:>1:x5=0; 1:x7=0; 2:x7=1;
+141210:>1:x5=1; 1:x7=0; 2:x7=1;
+521   :>1:x5=0; 1:x7=1; 2:x7=1;
+136281:>1:x5=1; 1:x7=1; 2:x7=1;
+Ok
+
+Witnesses
+Positive: 7765, Negative: 992235
+Condition exists (1:x5=1 /\ 1:x7=0 /\ 2:x7=0) is validated
+Hash=a7cc9757da77b1f258138774c397cde6
+Observation RWC Sometimes 7765 992235
+Time RWC 34.80
+Revision exported, version 7.56
+Command line: litmus7 -carch RISCV -limit true -mem direct -p 0,1 -barrier userfence -stride 1 -size_of_test 100 -number_of_run 10 -driver C -gcc gcc -ccopts -O2 -linkopt -static -smtmode seq -smt 2 -avail 4 /home/sipeed/riscv/RWC_2/RWC_1.litmus -o /home/sipeed/riscv/RWC_2
+Parameters
+#define SIZE_OF_TEST 100
+#define NUMBER_OF_RUN 10
+#define AVAIL 4
+#define STRIDE 1
+#define MAX_LOOP 0
+/* gcc options: -Wall -std=gnu99 -O2 -pthread */
+/* gcc link options: -static */
+/* barrier: userfence */
+/* launch: changing */
+/* affinity: none */
+/* procs: {0,1} */
+/* alloc: dynamic */
+/* memory: direct */
+/* stride: 1 */
+/* safer: write */
+/* preload: random */
+/* speedcheck: no */
+/* proc used: 4 */
+Command: /home/sipeed/riscv/RWC_2/run.exe -r 10000
+Wed Apr  9 18:08:44 2025

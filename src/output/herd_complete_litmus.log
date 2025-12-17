@@ -1,0 +1,273 @@
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/complete_litmus/litmus_test_6.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 3.814697265625e-06
+
+Test /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Allowed
+States 4
+0:x9=1; 1:x9=1;
+0:x9=1; 1:x9=2;
+0:x9=2; 1:x9=1;
+0:x9=2; 1:x9=2;
+Ok
+Witnesses
+Positive: 1 Negative: 6
+Condition exists (0:x9=2 /\ 1:x9=2)
+Observation /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Sometimes 1 6
+Time /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test 0.01
+Hash=04a7d76758a3c6c34d94404f0802bcc0
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/complete_litmus/litmus_test_11.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 2.1457672119140625e-06
+
+Test /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Allowed
+States 4
+0:x9=1; 1:x9=1;
+0:x9=1; 1:x9=2;
+0:x9=2; 1:x9=1;
+0:x9=2; 1:x9=2;
+Ok
+Witnesses
+Positive: 1 Negative: 6
+Condition exists (0:x9=2 /\ 1:x9=2)
+Observation /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Sometimes 1 6
+Time /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test 0.01
+Hash=ba274a39989eca8e99e3eefbc42373aa
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/complete_litmus/litmus_test_14.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 2.1457672119140625e-06
+
+Test /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Allowed
+States 4
+0:x5=0; 0:x7=0;
+0:x5=0; 0:x7=1;
+0:x5=1; 0:x7=0;
+0:x5=1; 0:x7=1;
+Ok
+Witnesses
+Positive: 1 Negative: 3
+Condition exists (0:x5=1 /\ 0:x7=0)
+Observation /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Sometimes 1 3
+Time /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test 0.00
+Hash=29a9b3b45d82f66ff1ea430f8b694b83
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/complete_litmus/litmus_test_9.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.430511474609375e-06
+
+Test /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Allowed
+States 4
+0:x7=0; 1:x9=1;
+0:x7=0; 1:x9=2;
+0:x7=1; 1:x9=1;
+0:x7=1; 1:x9=2;
+Ok
+Witnesses
+Positive: 1 Negative: 5
+Condition exists (0:x7=0 /\ 1:x9=2)
+Observation /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Sometimes 1 5
+Time /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test 0.00
+Hash=c73289b2bee8a1054dbfa18bd89b3348
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/complete_litmus/litmus_test_10.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 2.6226043701171875e-06
+
+Test /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Allowed
+States 4
+0:x9=1; 1:x9=1;
+0:x9=1; 1:x9=2;
+0:x9=2; 1:x9=1;
+0:x9=2; 1:x9=2;
+Ok
+Witnesses
+Positive: 1 Negative: 8
+Condition exists (0:x9=2 /\ 1:x9=2)
+Observation /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Sometimes 1 8
+Time /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test 0.01
+Hash=46aa06f95f2c3fbf4ce4fcc4bc909489
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/complete_litmus/litmus_test_7.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 3.0994415283203125e-06
+
+Test /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Allowed
+States 4
+0:x7=0; 1:x9=1;
+0:x7=0; 1:x9=2;
+0:x7=1; 1:x9=1;
+0:x7=1; 1:x9=2;
+Ok
+Witnesses
+Positive: 1 Negative: 5
+Condition exists (0:x7=0 /\ 1:x9=2)
+Observation /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Sometimes 1 5
+Time /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test 0.01
+Hash=c73289b2bee8a1054dbfa18bd89b3348
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/complete_litmus/litmus_test_12.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 2.86102294921875e-06
+
+Test /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Allowed
+States 4
+0:x5=0; 0:x7=0;
+0:x5=0; 0:x7=1;
+0:x5=1; 0:x7=0;
+0:x5=1; 0:x7=1;
+Ok
+Witnesses
+Positive: 1 Negative: 3
+Condition exists (0:x5=1 /\ 0:x7=0)
+Observation /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Sometimes 1 3
+Time /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test 0.00
+Hash=66fd3f056ba4a1901d8ace508c671510
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/complete_litmus/litmus_test_2.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.430511474609375e-06
+
+Test /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Allowed
+States 4
+0:x5=0; 0:x7=0;
+0:x5=0; 0:x7=1;
+0:x5=1; 0:x7=0;
+0:x5=1; 0:x7=1;
+Ok
+Witnesses
+Positive: 1 Negative: 3
+Condition exists (0:x5=1 /\ 0:x7=0)
+Observation /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Sometimes 1 3
+Time /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test 0.00
+Hash=5d90668079c98e62a581e7f9547116c1
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/complete_litmus/litmus_test_1.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.430511474609375e-06
+
+Test /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Allowed
+States 4
+0:x5=0; 0:x7=0;
+0:x5=0; 0:x7=1;
+0:x5=1; 0:x7=0;
+0:x5=1; 0:x7=1;
+Ok
+Witnesses
+Positive: 1 Negative: 3
+Condition exists (0:x5=1 /\ 0:x7=0)
+Observation /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Sometimes 1 3
+Time /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test 0.00
+Hash=a09c47016681466910d4268e25890637
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/complete_litmus/litmus_test_17.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.430511474609375e-06
+
+Test /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Allowed
+States 4
+0:x5=0; 0:x7=0;
+0:x5=0; 0:x7=1;
+0:x5=1; 0:x7=0;
+0:x5=1; 0:x7=1;
+Ok
+Witnesses
+Positive: 1 Negative: 3
+Condition exists (0:x5=1 /\ 0:x7=0)
+Observation /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Sometimes 1 3
+Time /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test 0.00
+Hash=99951ee8d9ca0cda22bc13059aa1e06f
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/complete_litmus/litmus_test_15.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.9073486328125e-06
+
+Test /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Allowed
+States 4
+0:x5=0; 0:x10=1;
+0:x5=0; 0:x10=2;
+0:x5=1; 0:x10=1;
+0:x5=1; 0:x10=2;
+Ok
+Witnesses
+Positive: 1 Negative: 5
+Condition exists (0:x10=2 /\ 0:x5=1)
+Observation /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Sometimes 1 5
+Time /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test 0.00
+Hash=afc325070fb99a337f45b78a5337e3a8
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/complete_litmus/litmus_test_4.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 2.1457672119140625e-06
+
+Test /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Allowed
+States 4
+0:x5=0; 0:x9=1;
+0:x5=0; 0:x9=2;
+0:x5=1; 0:x9=1;
+0:x5=1; 0:x9=2;
+Ok
+Witnesses
+Positive: 1 Negative: 4
+Condition exists (0:x9=2 /\ 0:x5=1)
+Observation /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Sometimes 1 4
+Time /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test 0.00
+Hash=ec607c7a456f46a037ee820d166600a7
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/complete_litmus/litmus_test_13.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.6689300537109375e-06
+
+Test /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Allowed
+States 4
+0:x5=0; 0:x9=1;
+0:x5=0; 0:x9=2;
+0:x5=1; 0:x9=1;
+0:x5=1; 0:x9=2;
+Ok
+Witnesses
+Positive: 1 Negative: 5
+Condition exists (0:x9=2 /\ 0:x5=1)
+Observation /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Sometimes 1 5
+Time /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test 0.00
+Hash=eae8f214d54fee470187c49188b9890f
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/complete_litmus/litmus_test_3.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 2.1457672119140625e-06
+
+Test /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Allowed
+States 4
+0:x5=0; 0:x9=1;
+0:x5=0; 0:x9=2;
+0:x5=1; 0:x9=1;
+0:x5=1; 0:x9=2;
+Ok
+Witnesses
+Positive: 1 Negative: 5
+Condition exists (0:x9=2 /\ 0:x5=1)
+Observation /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Sometimes 1 5
+Time /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test 0.00
+Hash=724496f1b7d3d0f35c50f3d29e5457fe
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/complete_litmus/litmus_test_8.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 2.384185791015625e-06
+
+Test /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Allowed
+States 4
+0:x9=1; 1:x9=1;
+0:x9=1; 1:x9=2;
+0:x9=2; 1:x9=1;
+0:x9=2; 1:x9=2;
+Ok
+Witnesses
+Positive: 1 Negative: 8
+Condition exists (0:x9=2 /\ 1:x9=2)
+Observation /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Sometimes 1 8
+Time /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test 0.01
+Hash=46aa06f95f2c3fbf4ce4fcc4bc909489
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/complete_litmus/litmus_test_16.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 2.384185791015625e-06
+
+Test /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Allowed
+States 4
+0:x5=0; 0:x7=0;
+0:x5=0; 0:x7=1;
+0:x5=1; 0:x7=0;
+0:x5=1; 0:x7=1;
+Ok
+Witnesses
+Positive: 1 Negative: 3
+Condition exists (0:x5=1 /\ 0:x7=0)
+Observation /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Sometimes 1 3
+Time /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test 0.00
+Hash=3bcb6378208f50585e060c71eb8e1368
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/complete_litmus/litmus_test_5.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 2.1457672119140625e-06
+
+Test /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Allowed
+States 4
+0:x5=0; 0:x9=1;
+0:x5=0; 0:x9=2;
+0:x5=1; 0:x9=1;
+0:x5=1; 0:x9=2;
+Ok
+Witnesses
+Positive: 1 Negative: 5
+Condition exists (0:x9=2 /\ 0:x5=1)
+Observation /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test Sometimes 1 5
+Time /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test 0.01
+Hash=db322325726adac58749c7607881eb2c
+
+[INFO] total time cost: 0.531665

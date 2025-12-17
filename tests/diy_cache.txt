@@ -1,0 +1,5008 @@
+new litmus test
+[R];po;[W]
+R_po_W_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_W_PodRW_Coe_Fence_rw_rwdWW_Rfe
+"PodRW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Rf
+Orig=PodRW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ lw x5,0(x6) | ori x5,x0,2 ;
+ ori x7,x0,1 | sw x5,0(x6) ;
+ sw x7,0(x8) | fence rw,rw ;
+ lw x9,0(x8) | ori x7,x0,1 ;
+             | sw x7,0(x8) ;
+exists (0:x9=2 /\ 0:x5=1)
+
+new litmus test
+[R];po;[R];po;[W]
+R_po_R_po_W_PodRR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_R_po_W_PodRR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+"PodRR PodRW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=PodRR PodRW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x10=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,2 ;
+ lw x7,0(x8)   | sw x5,0(x6) ;
+ ori x9,x0,1   | fence rw,rw ;
+ sw x9,0(x10)  | ori x7,x0,1 ;
+ lw x11,0(x10) | sw x7,0(x8) ;
+exists (0:x11=2 /\ 0:x5=1)
+
+new litmus test
+[R];addr;[R];po;[W]
+R_addr_R_po_W_DpAddrdR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_R_po_W_DpAddrdR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdR PodRW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdR PodRW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x12=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,2 ;
+ xor x7,x5,x5  | sw x5,0(x6) ;
+ add x10,x9,x7 | fence rw,rw ;
+ lw x8,0(x10)  | ori x7,x0,1 ;
+ ori x11,x0,1  | sw x7,0(x8) ;
+ sw x11,0(x12) |             ;
+ lw x13,0(x12) |             ;
+exists (0:x13=2 /\ 0:x5=1)
+
+new litmus test
+[R];po;[W];po;[W]
+R_po_W_po_W_PodRW_PodWW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_W_po_W_PodRW_PodWW_Coe_Fence_rw_rwdWW_Rfe
+"PodRW PodWW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=PodRW PodWW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x10=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,2 ;
+ ori x7,x0,1   | sw x5,0(x6) ;
+ sw x7,0(x8)   | fence rw,rw ;
+ ori x9,x0,1   | ori x7,x0,1 ;
+ sw x9,0(x10)  | sw x7,0(x8) ;
+ lw x11,0(x10) |             ;
+exists (0:x11=2 /\ 0:x5=1)
+
+new litmus test
+[R];po;[R]
+R_po_R_PodRR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_po_R_PodRR_Fre_Fence_rw_rwdWW_Rfe
+"PodRR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Rf
+Orig=PodRR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ lw x5,0(x6) | ori x5,x0,1 ;
+ lw x7,0(x8) | sw x5,0(x6) ;
+             | fence rw,rw ;
+             | ori x7,x0,1 ;
+             | sw x7,0(x8) ;
+exists (0:x5=1 /\ 0:x7=0)
+
+new litmus test
+[W];po;[R]
+W_po_R_PodWR_Fre_Fence_rw_rwdWW_Coe
+RISCV W_po_R_PodWR_Fre_Fence_rw_rwdWW_Coe
+"PodWR Fre Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Co
+Orig=PodWR Fre Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ ori x5,x0,2 | ori x5,x0,1 ;
+ sw x5,0(x6) | sw x5,0(x6) ;
+ lw x7,0(x8) | fence rw,rw ;
+             | ori x7,x0,1 ;
+             | sw x7,0(x8) ;
+             | lw x9,0(x8) ;
+exists (0:x7=0 /\ 1:x9=2)
+
+new litmus test
+[W];po;[W]
+W_po_W_PodWW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_po_W_PodWW_Coe_Fence_rw_rwdWW_Coe
+"PodWW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=PodWW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ ori x5,x0,2 | ori x5,x0,2 ;
+ sw x5,0(x6) | sw x5,0(x6) ;
+ ori x7,x0,1 | fence rw,rw ;
+ sw x7,0(x8) | ori x7,x0,1 ;
+ lw x9,0(x8) | sw x7,0(x8) ;
+             | lw x9,0(x8) ;
+exists (0:x9=2 /\ 1:x9=2)
+
+new litmus test
+[W];po-loc;[R]
+W_po_loc_R_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_po_loc_R_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Coe
+"PosWR DpAddrdW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=PosWR DpAddrdW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x10=y;
+1:x6=y; 1:x8=x;
+}
+ P0             | P1          ;
+ ori x5,x0,2    | ori x5,x0,2 ;
+ sw x5,0(x6)    | sw x5,0(x6) ;
+ lw x7,0(x6)    | fence rw,rw ;
+ xor x8,x7,x7   | ori x7,x0,1 ;
+ ori x9,x0,1    | sw x7,0(x8) ;
+ add x11,x10,x8 | lw x9,0(x8) ;
+ sw x9,0(x11)   |             ;
+ lw x12,0(x10)  |             ;
+exists (0:x12=2 /\ 1:x9=2)
+
+new litmus test
+[R];po;[W];po;[R]
+R_po_W_po_R_PodRW_PodWR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_po_W_po_R_PodRW_PodWR_Fre_Fence_rw_rwdWW_Rfe
+"PodRW PodWR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=PodRW PodWR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x10=z;
+1:x6=z; 1:x8=x;
+}
+ P0           | P1          ;
+ lw x5,0(x6)  | ori x5,x0,1 ;
+ ori x7,x0,1  | sw x5,0(x6) ;
+ sw x7,0(x8)  | fence rw,rw ;
+ lw x9,0(x10) | ori x7,x0,1 ;
+              | sw x7,0(x8) ;
+exists (0:x5=1 /\ 0:x9=0)
+
+new litmus test
+[W];po;[R];po;[W]
+W_po_R_po_W_PodWR_PodRW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_po_R_po_W_PodWR_PodRW_Coe_Fence_rw_rwdWW_Coe
+"PodWR PodRW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Co
+Orig=PodWR PodRW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x8=y; 0:x10=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ ori x5,x0,2   | ori x5,x0,2 ;
+ sw x5,0(x6)   | sw x5,0(x6) ;
+ lw x7,0(x8)   | fence rw,rw ;
+ ori x9,x0,1   | ori x7,x0,1 ;
+ sw x9,0(x10)  | sw x7,0(x8) ;
+ lw x11,0(x10) | lw x9,0(x8) ;
+exists (0:x11=2 /\ 1:x9=2)
+
+new litmus test
+[R];po;[W];rfi;[R]
+R_po_W_rfi_R_PodRW_Rfi_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_po_W_rfi_R_PodRW_Rfi_Fre_Fence_rw_rwdWW_Rfe
+"PodRW Rfi Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Rf
+Orig=PodRW Rfi Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0           | P1          ;
+ lw x5,0(x6)  | ori x5,x0,2 ;
+ ori x7,x0,1  | sw x5,0(x6) ;
+ sw x7,0(x8)  | fence rw,rw ;
+ lw x9,0(x8)  | ori x7,x0,1 ;
+ lw x10,0(x8) | sw x7,0(x8) ;
+exists (0:x10=2 /\ 0:x5=1 /\ 0:x9=1)
+
+new litmus test
+[W];rfi;[R];po;[W]
+W_rfi_R_po_W_Rfi_PodRW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_rfi_R_po_W_Rfi_PodRW_Coe_Fence_rw_rwdWW_Coe
+"Rfi PodRW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=Rfi PodRW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x9=y;
+1:x6=y; 1:x8=x;
+}
+ P0           | P1          ;
+ ori x5,x0,2  | ori x5,x0,2 ;
+ sw x5,0(x6)  | sw x5,0(x6) ;
+ lw x7,0(x6)  | fence rw,rw ;
+ ori x8,x0,1  | ori x7,x0,1 ;
+ sw x8,0(x9)  | sw x7,0(x8) ;
+ lw x10,0(x9) | lw x9,0(x8) ;
+exists (0:x10=2 /\ 0:x7=2 /\ 1:x9=2)
+
+new litmus test
+[R];data;[W];po;[R]
+R_data_W_po_R_DpDatadW_PodWR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_po_R_DpDatadW_PodWR_Fre_Fence_rw_rwdWW_Rfe
+"DpDatadW PodWR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=DpDatadW PodWR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x10=z;
+1:x6=z; 1:x8=x;
+}
+ P0           | P1          ;
+ lw x5,0(x6)  | ori x5,x0,1 ;
+ xor x7,x5,x5 | sw x5,0(x6) ;
+ ori x7,x7,1  | fence rw,rw ;
+ sw x7,0(x8)  | ori x7,x0,1 ;
+ lw x9,0(x10) | sw x7,0(x8) ;
+exists (0:x5=1 /\ 0:x9=0)
+
+new litmus test
+[R];data;[W];po;[W]
+R_data_W_po_W_DpDatadW_PodWW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_po_W_DpDatadW_PodWW_Coe_Fence_rw_rwdWW_Rfe
+"DpDatadW PodWW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpDatadW PodWW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x10=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,2 ;
+ xor x7,x5,x5  | sw x5,0(x6) ;
+ ori x7,x7,1   | fence rw,rw ;
+ sw x7,0(x8)   | ori x7,x0,1 ;
+ ori x9,x0,1   | sw x7,0(x8) ;
+ sw x9,0(x10)  |             ;
+ lw x11,0(x10) |             ;
+exists (0:x11=2 /\ 0:x5=1)
+
+new litmus test
+[R];po;[R];addr;[W]
+R_po_R_addr_W_PodRR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_R_addr_W_PodRR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"PodRR DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=PodRR DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0             | P1          ;
+ lw x5,0(x6)    | ori x5,x0,2 ;
+ lw x7,0(x8)    | sw x5,0(x6) ;
+ xor x9,x7,x7   | fence rw,rw ;
+ ori x10,x0,1   | ori x7,x0,1 ;
+ add x12,x11,x9 | sw x7,0(x8) ;
+ sw x10,0(x12)  |             ;
+ lw x13,0(x11)  |             ;
+exists (0:x13=2 /\ 0:x5=1)
+
+new litmus test
+[W];po;[R];addr;[W]
+W_po_R_addr_W_PodWR_DpAddrdW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_po_R_addr_W_PodWR_DpAddrdW_Coe_Fence_rw_rwdWW_Coe
+"PodWR DpAddrdW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Co
+Orig=PodWR DpAddrdW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x8=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0             | P1          ;
+ ori x5,x0,2    | ori x5,x0,2 ;
+ sw x5,0(x6)    | sw x5,0(x6) ;
+ lw x7,0(x8)    | fence rw,rw ;
+ xor x9,x7,x7   | ori x7,x0,1 ;
+ ori x10,x0,1   | sw x7,0(x8) ;
+ add x12,x11,x9 | lw x9,0(x8) ;
+ sw x10,0(x12)  |             ;
+ lw x13,0(x11)  |             ;
+exists (0:x13=2 /\ 1:x9=2)
+
+new litmus test
+[R];data;[W];rfi;[R]
+R_data_W_rfi_R_DpDatadW_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_rfi_R_DpDatadW_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"DpDatadW Rfi DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpDatadW Rfi DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x12=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x7,x7,1     | fence rw,rw ;
+ sw x7,0(x8)     | ori x7,x0,1 ;
+ lw x9,0(x8)     | sw x7,0(x8) ;
+ xor x10,x9,x9   |             ;
+ ori x11,x0,1    |             ;
+ add x13,x12,x10 |             ;
+ sw x11,0(x13)   |             ;
+ lw x14,0(x12)   |             ;
+exists (0:x14=2 /\ 0:x5=1 /\ 0:x9=1)
+
+new litmus test
+[W];rfi;[R];addr;[W]
+W_rfi_R_addr_W_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_rfi_R_addr_W_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Coe
+"Rfi DpAddrdW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=Rfi DpAddrdW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x10=y;
+1:x6=y; 1:x8=x;
+}
+ P0             | P1          ;
+ ori x5,x0,2    | ori x5,x0,2 ;
+ sw x5,0(x6)    | sw x5,0(x6) ;
+ lw x7,0(x6)    | fence rw,rw ;
+ xor x8,x7,x7   | ori x7,x0,1 ;
+ ori x9,x0,1    | sw x7,0(x8) ;
+ add x11,x10,x8 | lw x9,0(x8) ;
+ sw x9,0(x11)   |             ;
+ lw x12,0(x10)  |             ;
+exists (0:x12=2 /\ 0:x7=2 /\ 1:x9=2)
+
+new litmus test
+[R];po;[W];po-loc;[R]
+R_po_W_po_loc_R_PodRW_PosWR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_po_W_po_loc_R_PodRW_PosWR_Fre_Fence_rw_rwdWW_Rfe
+"PodRW PosWR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Rf
+Orig=PodRW PosWR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0           | P1          ;
+ lw x5,0(x6)  | ori x5,x0,2 ;
+ ori x7,x0,1  | sw x5,0(x6) ;
+ sw x7,0(x8)  | fence rw,rw ;
+ lw x9,0(x8)  | ori x7,x0,1 ;
+ lw x10,0(x8) | sw x7,0(x8) ;
+exists (0:x10=2 /\ 0:x5=1 /\ 0:x9=1)
+
+new litmus test
+[W];po-loc;[R];po;[W]
+W_po_loc_R_po_W_PosWR_PodRW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_po_loc_R_po_W_PosWR_PodRW_Coe_Fence_rw_rwdWW_Coe
+"PosWR PodRW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=PosWR PodRW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x9=y;
+1:x6=y; 1:x8=x;
+}
+ P0           | P1          ;
+ ori x5,x0,2  | ori x5,x0,2 ;
+ sw x5,0(x6)  | sw x5,0(x6) ;
+ lw x7,0(x6)  | fence rw,rw ;
+ ori x8,x0,1  | ori x7,x0,1 ;
+ sw x8,0(x9)  | sw x7,0(x8) ;
+ lw x10,0(x9) | lw x9,0(x8) ;
+exists (0:x10=2 /\ 1:x9=2)
+
+new litmus test
+[R];data;[W];po-loc;[R]
+R_data_W_po_loc_R_DpDatadW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_po_loc_R_DpDatadW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"DpDatadW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpDatadW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x12=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x7,x7,1     | fence rw,rw ;
+ sw x7,0(x8)     | ori x7,x0,1 ;
+ lw x9,0(x8)     | sw x7,0(x8) ;
+ xor x10,x9,x9   |             ;
+ ori x11,x0,1    |             ;
+ add x13,x12,x10 |             ;
+ sw x11,0(x13)   |             ;
+ lw x14,0(x12)   |             ;
+exists (0:x14=2 /\ 0:x5=1)
+
+new litmus test
+[W];po-loc;[R];addr;[W]
+W_po_loc_R_addr_W_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_po_loc_R_addr_W_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Coe
+"PosWR DpAddrdW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=PosWR DpAddrdW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x10=y;
+1:x6=y; 1:x8=x;
+}
+ P0             | P1          ;
+ ori x5,x0,2    | ori x5,x0,2 ;
+ sw x5,0(x6)    | sw x5,0(x6) ;
+ lw x7,0(x6)    | fence rw,rw ;
+ xor x8,x7,x7   | ori x7,x0,1 ;
+ ori x9,x0,1    | sw x7,0(x8) ;
+ add x11,x10,x8 | lw x9,0(x8) ;
+ sw x9,0(x11)   |             ;
+ lw x12,0(x10)  |             ;
+exists (0:x12=2 /\ 1:x9=2)
+
+new litmus test
+[R];po;[W];po;[R];po;[W]
+R_po_W_po_R_po_W_PodRW_PodWR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_W_po_R_po_W_PodRW_PodWR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+"PodRW PodWR PodRW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:a=W,1:a=F,1:x=W
+Com=Co Rf
+Orig=PodRW PodWR PodRW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x10=z; 0:x12=a;
+1:x6=a; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,2 ;
+ ori x7,x0,1   | sw x5,0(x6) ;
+ sw x7,0(x8)   | fence rw,rw ;
+ lw x9,0(x10)  | ori x7,x0,1 ;
+ ori x11,x0,1  | sw x7,0(x8) ;
+ sw x11,0(x12) |             ;
+ lw x13,0(x12) |             ;
+exists (0:x13=2 /\ 0:x5=1)
+
+new litmus test
+[R];po;[W];rfi;[R];po;[W]
+R_po_W_rfi_R_po_W_PodRW_Rfi_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_W_rfi_R_po_W_PodRW_Rfi_PodRW_Coe_Fence_rw_rwdWW_Rfe
+"PodRW Rfi PodRW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=PodRW Rfi PodRW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,2 ;
+ ori x7,x0,1   | sw x5,0(x6) ;
+ sw x7,0(x8)   | fence rw,rw ;
+ lw x9,0(x8)   | ori x7,x0,1 ;
+ ori x10,x0,1  | sw x7,0(x8) ;
+ sw x10,0(x11) |             ;
+ lw x12,0(x11) |             ;
+exists (0:x12=2 /\ 0:x5=1 /\ 0:x9=1)
+
+new litmus test
+[R];data;[W];po;[R];po;[W]
+R_data_W_po_R_po_W_DpDatadW_PodWR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_po_R_po_W_DpDatadW_PodWR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+"DpDatadW PodWR PodRW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:a=W,1:a=F,1:x=W
+Com=Co Rf
+Orig=DpDatadW PodWR PodRW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x10=z; 0:x12=a;
+1:x6=a; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,2 ;
+ xor x7,x5,x5  | sw x5,0(x6) ;
+ ori x7,x7,1   | fence rw,rw ;
+ sw x7,0(x8)   | ori x7,x0,1 ;
+ lw x9,0(x10)  | sw x7,0(x8) ;
+ ori x11,x0,1  |             ;
+ sw x11,0(x12) |             ;
+ lw x13,0(x12) |             ;
+exists (0:x13=2 /\ 0:x5=1)
+
+new litmus test
+[R];po;[W];po;[R];addr;[W]
+R_po_W_po_R_addr_W_PodRW_PodWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_W_po_R_addr_W_PodRW_PodWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"PodRW PodWR DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:a=W,1:a=F,1:x=W
+Com=Co Rf
+Orig=PodRW PodWR DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x10=z; 0:x13=a;
+1:x6=a; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ ori x7,x0,1     | sw x5,0(x6) ;
+ sw x7,0(x8)     | fence rw,rw ;
+ lw x9,0(x10)    | ori x7,x0,1 ;
+ xor x11,x9,x9   | sw x7,0(x8) ;
+ ori x12,x0,1    |             ;
+ add x14,x13,x11 |             ;
+ sw x12,0(x14)   |             ;
+ lw x15,0(x13)   |             ;
+exists (0:x15=2 /\ 0:x5=1)
+
+new litmus test
+[R];data;[W];rfi;[R];po;[W]
+R_data_W_rfi_R_po_W_DpDatadW_Rfi_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_rfi_R_po_W_DpDatadW_Rfi_PodRW_Coe_Fence_rw_rwdWW_Rfe
+"DpDatadW Rfi PodRW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpDatadW Rfi PodRW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,2 ;
+ xor x7,x5,x5  | sw x5,0(x6) ;
+ ori x7,x7,1   | fence rw,rw ;
+ sw x7,0(x8)   | ori x7,x0,1 ;
+ lw x9,0(x8)   | sw x7,0(x8) ;
+ ori x10,x0,1  |             ;
+ sw x10,0(x11) |             ;
+ lw x12,0(x11) |             ;
+exists (0:x12=2 /\ 0:x5=1 /\ 0:x9=1)
+
+new litmus test
+[R];po;[W];rfi;[R];addr;[W]
+R_po_W_rfi_R_addr_W_PodRW_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_W_rfi_R_addr_W_PodRW_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"PodRW Rfi DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=PodRW Rfi DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x12=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ ori x7,x0,1     | sw x5,0(x6) ;
+ sw x7,0(x8)     | fence rw,rw ;
+ lw x9,0(x8)     | ori x7,x0,1 ;
+ xor x10,x9,x9   | sw x7,0(x8) ;
+ ori x11,x0,1    |             ;
+ add x13,x12,x10 |             ;
+ sw x11,0(x13)   |             ;
+ lw x14,0(x12)   |             ;
+exists (0:x14=2 /\ 0:x5=1 /\ 0:x9=1)
+
+new litmus test
+[R];data;[W];po;[R];addr;[W]
+R_data_W_po_R_addr_W_DpDatadW_PodWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_po_R_addr_W_DpDatadW_PodWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"DpDatadW PodWR DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:a=W,1:a=F,1:x=W
+Com=Co Rf
+Orig=DpDatadW PodWR DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x10=z; 0:x13=a;
+1:x6=a; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x7,x7,1     | fence rw,rw ;
+ sw x7,0(x8)     | ori x7,x0,1 ;
+ lw x9,0(x10)    | sw x7,0(x8) ;
+ xor x11,x9,x9   |             ;
+ ori x12,x0,1    |             ;
+ add x14,x13,x11 |             ;
+ sw x12,0(x14)   |             ;
+ lw x15,0(x13)   |             ;
+exists (0:x15=2 /\ 0:x5=1)
+
+new litmus test
+[R];po;[W];po-loc;[R];po;[W]
+R_po_W_po_loc_R_po_W_PodRW_PosWR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_W_po_loc_R_po_W_PodRW_PosWR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+"PodRW PosWR PodRW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=PodRW PosWR PodRW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,2 ;
+ ori x7,x0,1   | sw x5,0(x6) ;
+ sw x7,0(x8)   | fence rw,rw ;
+ lw x9,0(x8)   | ori x7,x0,1 ;
+ ori x10,x0,1  | sw x7,0(x8) ;
+ sw x10,0(x11) |             ;
+ lw x12,0(x11) |             ;
+exists (0:x12=2 /\ 0:x5=1)
+
+new litmus test
+[R];data;[W];rfi;[R];addr;[W]
+R_data_W_rfi_R_addr_W_DpDatadW_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_rfi_R_addr_W_DpDatadW_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"DpDatadW Rfi DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpDatadW Rfi DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x12=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x7,x7,1     | fence rw,rw ;
+ sw x7,0(x8)     | ori x7,x0,1 ;
+ lw x9,0(x8)     | sw x7,0(x8) ;
+ xor x10,x9,x9   |             ;
+ ori x11,x0,1    |             ;
+ add x13,x12,x10 |             ;
+ sw x11,0(x13)   |             ;
+ lw x14,0(x12)   |             ;
+exists (0:x14=2 /\ 0:x5=1 /\ 0:x9=1)
+
+new litmus test
+[R];data;[W];po-loc;[R];po;[W]
+R_data_W_po_loc_R_po_W_DpDatadW_PosWR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_po_loc_R_po_W_DpDatadW_PosWR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+"DpDatadW PosWR PodRW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpDatadW PosWR PodRW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,2 ;
+ xor x7,x5,x5  | sw x5,0(x6) ;
+ ori x7,x7,1   | fence rw,rw ;
+ sw x7,0(x8)   | ori x7,x0,1 ;
+ lw x9,0(x8)   | sw x7,0(x8) ;
+ ori x10,x0,1  |             ;
+ sw x10,0(x11) |             ;
+ lw x12,0(x11) |             ;
+exists (0:x12=2 /\ 0:x5=1)
+
+new litmus test
+[R];po;[W];po-loc;[R];addr;[W]
+R_po_W_po_loc_R_addr_W_PodRW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_W_po_loc_R_addr_W_PodRW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"PodRW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=PodRW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x12=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ ori x7,x0,1     | sw x5,0(x6) ;
+ sw x7,0(x8)     | fence rw,rw ;
+ lw x9,0(x8)     | ori x7,x0,1 ;
+ xor x10,x9,x9   | sw x7,0(x8) ;
+ ori x11,x0,1    |             ;
+ add x13,x12,x10 |             ;
+ sw x11,0(x13)   |             ;
+ lw x14,0(x12)   |             ;
+exists (0:x14=2 /\ 0:x5=1)
+
+new litmus test
+[R];data;[W];po-loc;[R];addr;[W]
+R_data_W_po_loc_R_addr_W_DpDatadW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_po_loc_R_addr_W_DpDatadW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"DpDatadW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpDatadW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x12=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x7,x7,1     | fence rw,rw ;
+ sw x7,0(x8)     | ori x7,x0,1 ;
+ lw x9,0(x8)     | sw x7,0(x8) ;
+ xor x10,x9,x9   |             ;
+ ori x11,x0,1    |             ;
+ add x13,x12,x10 |             ;
+ sw x11,0(x13)   |             ;
+ lw x14,0(x12)   |             ;
+exists (0:x14=2 /\ 0:x5=1)
+
+new litmus test
+[R];data;[W];po-loc;[W];po-loc;[R]
+R_data_W_po_loc_W_po_loc_R_DpDatadW_PosWW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_po_loc_W_po_loc_R_DpDatadW_PosWW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"DpDatadW PosWW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpDatadW PosWW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x13=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x7,x7,1     | fence rw,rw ;
+ sw x7,0(x8)     | ori x7,x0,1 ;
+ ori x9,x0,2     | sw x7,0(x8) ;
+ sw x9,0(x8)     |             ;
+ lw x10,0(x8)    |             ;
+ xor x11,x10,x10 |             ;
+ ori x12,x0,1    |             ;
+ add x14,x13,x11 |             ;
+ sw x12,0(x14)   |             ;
+ lw x15,0(x13)   |             ;
+exists (0:x15=2 /\ 0:x5=1)
+
+new litmus test
+[R];data;[W];po-loc;[W];po-loc;[R];addr;[W]
+R_data_W_po_loc_W_po_loc_R_addr_W_DpDatadW_PosWW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_po_loc_W_po_loc_R_addr_W_DpDatadW_PosWW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"DpDatadW PosWW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpDatadW PosWW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x13=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x7,x7,1     | fence rw,rw ;
+ sw x7,0(x8)     | ori x7,x0,1 ;
+ ori x9,x0,2     | sw x7,0(x8) ;
+ sw x9,0(x8)     |             ;
+ lw x10,0(x8)    |             ;
+ xor x11,x10,x10 |             ;
+ ori x12,x0,1    |             ;
+ add x14,x13,x11 |             ;
+ sw x12,0(x14)   |             ;
+ lw x15,0(x13)   |             ;
+exists (0:x15=2 /\ 0:x5=1)
+
+new litmus test
+[R];fri;[W];rfi;[R]
+R_fri_W_rfi_R_Fri_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_fri_W_rfi_R_Fri_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"Fri Rfi DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Rf
+Orig=Fri Rfi DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x11=y;
+1:x6=y; 1:x8=x;
+}
+ P0             | P1          ;
+ lw x5,0(x6)    | ori x5,x0,2 ;
+ ori x7,x0,2    | sw x5,0(x6) ;
+ sw x7,0(x6)    | fence rw,rw ;
+ lw x8,0(x6)    | ori x7,x0,1 ;
+ xor x9,x8,x8   | sw x7,0(x8) ;
+ ori x10,x0,1   |             ;
+ add x12,x11,x9 |             ;
+ sw x10,0(x12)  |             ;
+ lw x13,0(x11)  |             ;
+exists (0:x13=2 /\ 0:x5=1 /\ 0:x8=2)
+
+new litmus test
+[R];po-loc;[W];rfi;[R]
+R_po_loc_W_rfi_R_PosRW_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_loc_W_rfi_R_PosRW_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"PosRW Rfi DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Rf
+Orig=PosRW Rfi DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x11=y;
+1:x6=y; 1:x8=x;
+}
+ P0             | P1          ;
+ lw x5,0(x6)    | ori x5,x0,2 ;
+ ori x7,x0,2    | sw x5,0(x6) ;
+ sw x7,0(x6)    | fence rw,rw ;
+ lw x8,0(x6)    | ori x7,x0,1 ;
+ xor x9,x8,x8   | sw x7,0(x8) ;
+ ori x10,x0,1   |             ;
+ add x12,x11,x9 |             ;
+ sw x10,0(x12)  |             ;
+ lw x13,0(x11)  |             ;
+exists (0:x13=2 /\ 0:x5=1 /\ 0:x8=2)
+
+new litmus test
+[R];fri;[W];po-loc;[R]
+R_fri_W_po_loc_R_Fri_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_fri_W_po_loc_R_Fri_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"Fri PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Rf
+Orig=Fri PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x11=y;
+1:x6=y; 1:x8=x;
+}
+ P0             | P1          ;
+ lw x5,0(x6)    | ori x5,x0,2 ;
+ ori x7,x0,2    | sw x5,0(x6) ;
+ sw x7,0(x6)    | fence rw,rw ;
+ lw x8,0(x6)    | ori x7,x0,1 ;
+ xor x9,x8,x8   | sw x7,0(x8) ;
+ ori x10,x0,1   |             ;
+ add x12,x11,x9 |             ;
+ sw x10,0(x12)  |             ;
+ lw x13,0(x11)  |             ;
+exists (0:x13=2 /\ 0:x5=1)
+
+new litmus test
+[R];po-loc;[W];po-loc;[R]
+R_po_loc_W_po_loc_R_PosRW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_loc_W_po_loc_R_PosRW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"PosRW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Rf
+Orig=PosRW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x11=y;
+1:x6=y; 1:x8=x;
+}
+ P0             | P1          ;
+ lw x5,0(x6)    | ori x5,x0,2 ;
+ ori x7,x0,2    | sw x5,0(x6) ;
+ sw x7,0(x6)    | fence rw,rw ;
+ lw x8,0(x6)    | ori x7,x0,1 ;
+ xor x9,x8,x8   | sw x7,0(x8) ;
+ ori x10,x0,1   |             ;
+ add x12,x11,x9 |             ;
+ sw x10,0(x12)  |             ;
+ lw x13,0(x11)  |             ;
+exists (0:x13=2 /\ 0:x5=1)
+
+new litmus test
+[R];addr;[W];po;[R]
+R_addr_W_po_R_DpAddrdW_PodWR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_R_DpAddrdW_PodWR_Fre_Fence_rw_rwdWW_Rfe
+"DpAddrdW PodWR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=DpAddrdW PodWR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x12=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,1 ;
+ xor x7,x5,x5  | sw x5,0(x6) ;
+ ori x8,x0,1   | fence rw,rw ;
+ add x10,x9,x7 | ori x7,x0,1 ;
+ sw x8,0(x10)  | sw x7,0(x8) ;
+ lw x11,0(x12) |             ;
+exists (0:x5=1 /\ 0:x11=0)
+
+new litmus test
+[R];addr;[W];po;[W]
+R_addr_W_po_W_DpAddrdW_PodWW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_W_DpAddrdW_PodWW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW PodWW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW PodWW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x12=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,2 ;
+ xor x7,x5,x5  | sw x5,0(x6) ;
+ ori x8,x0,1   | fence rw,rw ;
+ add x10,x9,x7 | ori x7,x0,1 ;
+ sw x8,0(x10)  | sw x7,0(x8) ;
+ ori x11,x0,1  |             ;
+ sw x11,0(x12) |             ;
+ lw x13,0(x12) |             ;
+exists (0:x13=2 /\ 0:x5=1)
+
+new litmus test
+[R];addr;[W];rfi;[R]
+R_addr_W_rfi_R_DpAddrdW_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_rfi_R_DpAddrdW_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW Rfi DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW Rfi DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x14=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ lw x11,0(x9)    |             ;
+ xor x12,x11,x11 |             ;
+ ori x13,x0,1    |             ;
+ add x15,x14,x12 |             ;
+ sw x13,0(x15)   |             ;
+ lw x16,0(x14)   |             ;
+exists (0:x16=2 /\ 0:x5=1 /\ 0:x11=1)
+
+new litmus test
+[R];addr;[W];po-loc;[R]
+R_addr_W_po_loc_R_DpAddrdW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_loc_R_DpAddrdW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x14=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ lw x11,0(x9)    |             ;
+ xor x12,x11,x11 |             ;
+ ori x13,x0,1    |             ;
+ add x15,x14,x12 |             ;
+ sw x13,0(x15)   |             ;
+ lw x16,0(x14)   |             ;
+exists (0:x16=2 /\ 0:x5=1)
+
+new litmus test
+[R];addr;[W];po;[R];po;[W]
+R_addr_W_po_R_po_W_DpAddrdW_PodWR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_R_po_W_DpAddrdW_PodWR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW PodWR PodRW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:a=W,1:a=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW PodWR PodRW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x12=z; 0:x14=a;
+1:x6=a; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,2 ;
+ xor x7,x5,x5  | sw x5,0(x6) ;
+ ori x8,x0,1   | fence rw,rw ;
+ add x10,x9,x7 | ori x7,x0,1 ;
+ sw x8,0(x10)  | sw x7,0(x8) ;
+ lw x11,0(x12) |             ;
+ ori x13,x0,1  |             ;
+ sw x13,0(x14) |             ;
+ lw x15,0(x14) |             ;
+exists (0:x15=2 /\ 0:x5=1)
+
+new litmus test
+[R];addr;[W];rfi;[R];po;[W]
+R_addr_W_rfi_R_po_W_DpAddrdW_Rfi_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_rfi_R_po_W_DpAddrdW_Rfi_PodRW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW Rfi PodRW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW Rfi PodRW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x13=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,2 ;
+ xor x7,x5,x5  | sw x5,0(x6) ;
+ ori x8,x0,1   | fence rw,rw ;
+ add x10,x9,x7 | ori x7,x0,1 ;
+ sw x8,0(x10)  | sw x7,0(x8) ;
+ lw x11,0(x9)  |             ;
+ ori x12,x0,1  |             ;
+ sw x12,0(x13) |             ;
+ lw x14,0(x13) |             ;
+exists (0:x14=2 /\ 0:x5=1 /\ 0:x11=1)
+
+new litmus test
+[R];addr;[W];po;[R];ctrl;[W]
+R_addr_W_po_R_ctrl_W_DpAddrdW_PodWR_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_R_ctrl_W_DpAddrdW_PodWR_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW PodWR DpCtrldW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:a=W,1:a=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW PodWR DpCtrldW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x12=z; 0:x14=a;
+1:x6=a; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ lw x11,0(x12)   |             ;
+ bne x11,x0,LC00 |             ;
+ LC00:           |             ;
+ ori x13,x0,1    |             ;
+ sw x13,0(x14)   |             ;
+ lw x15,0(x14)   |             ;
+exists (0:x15=2 /\ 0:x5=1)
+
+new litmus test
+[R];addr;[W];rfi;[R];ctrl;[W]
+R_addr_W_rfi_R_ctrl_W_DpAddrdW_Rfi_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_rfi_R_ctrl_W_DpAddrdW_Rfi_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW Rfi DpCtrldW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW Rfi DpCtrldW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x13=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ lw x11,0(x9)    |             ;
+ bne x11,x0,LC00 |             ;
+ LC00:           |             ;
+ ori x12,x0,1    |             ;
+ sw x12,0(x13)   |             ;
+ lw x14,0(x13)   |             ;
+exists (0:x14=2 /\ 0:x5=1 /\ 0:x11=1)
+
+new litmus test
+[R];addr;[W];po-loc;[R];po;[W]
+R_addr_W_po_loc_R_po_W_DpAddrdW_PosWR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_loc_R_po_W_DpAddrdW_PosWR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW PosWR PodRW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW PosWR PodRW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x13=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,2 ;
+ xor x7,x5,x5  | sw x5,0(x6) ;
+ ori x8,x0,1   | fence rw,rw ;
+ add x10,x9,x7 | ori x7,x0,1 ;
+ sw x8,0(x10)  | sw x7,0(x8) ;
+ lw x11,0(x9)  |             ;
+ ori x12,x0,1  |             ;
+ sw x12,0(x13) |             ;
+ lw x14,0(x13) |             ;
+exists (0:x14=2 /\ 0:x5=1)
+
+new litmus test
+[R];addr;[W];po-loc;[R];ctrl;[W]
+R_addr_W_po_loc_R_ctrl_W_DpAddrdW_PosWR_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_loc_R_ctrl_W_DpAddrdW_PosWR_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW PosWR DpCtrldW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW PosWR DpCtrldW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x13=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ lw x11,0(x9)    |             ;
+ bne x11,x0,LC00 |             ;
+ LC00:           |             ;
+ ori x12,x0,1    |             ;
+ sw x12,0(x13)   |             ;
+ lw x14,0(x13)   |             ;
+exists (0:x14=2 /\ 0:x5=1)
+
+new litmus test
+[R];addr;[W];po-loc;[W];po-loc;[R]
+R_addr_W_po_loc_W_po_loc_R_DpAddrdW_PosWW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_loc_W_po_loc_R_DpAddrdW_PosWW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW PosWW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW PosWW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x15=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ ori x11,x0,2    |             ;
+ sw x11,0(x9)    |             ;
+ lw x12,0(x9)    |             ;
+ xor x13,x12,x12 |             ;
+ ori x14,x0,1    |             ;
+ add x16,x15,x13 |             ;
+ sw x14,0(x16)   |             ;
+ lw x17,0(x15)   |             ;
+exists (0:x17=2 /\ 0:x5=1)
+
+new litmus test
+[R];addr;[W];po-loc;[W];po-loc;[R];po;[W]
+R_addr_W_po_loc_W_po_loc_R_po_W_DpAddrdW_PosWW_PosWR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_loc_W_po_loc_R_po_W_DpAddrdW_PosWW_PosWR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW PosWW PosWR PodRW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW PosWW PosWR PodRW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x14=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,2 ;
+ xor x7,x5,x5  | sw x5,0(x6) ;
+ ori x8,x0,1   | fence rw,rw ;
+ add x10,x9,x7 | ori x7,x0,1 ;
+ sw x8,0(x10)  | sw x7,0(x8) ;
+ ori x11,x0,2  |             ;
+ sw x11,0(x9)  |             ;
+ lw x12,0(x9)  |             ;
+ ori x13,x0,1  |             ;
+ sw x13,0(x14) |             ;
+ lw x15,0(x14) |             ;
+exists (0:x15=2 /\ 0:x5=1)
+
+new litmus test
+[R];addr;[W];po-loc;[W];po-loc;[R];ctrl;[W]
+R_addr_W_po_loc_W_po_loc_R_ctrl_W_DpAddrdW_PosWW_PosWR_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_loc_W_po_loc_R_ctrl_W_DpAddrdW_PosWW_PosWR_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW PosWW PosWR DpCtrldW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW PosWW PosWR DpCtrldW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x14=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ ori x11,x0,2    |             ;
+ sw x11,0(x9)    |             ;
+ lw x12,0(x9)    |             ;
+ bne x12,x0,LC00 |             ;
+ LC00:           |             ;
+ ori x13,x0,1    |             ;
+ sw x13,0(x14)   |             ;
+ lw x15,0(x14)   |             ;
+exists (0:x15=2 /\ 0:x5=1)
+
+new litmus test
+[R];po;[R];po;[R]
+R_po_R_po_R_PodRR_PodRR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_po_R_po_R_PodRR_PodRR_Fre_Fence_rw_rwdWW_Rfe
+"PodRR PodRR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=PodRR PodRR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x10=z;
+1:x6=z; 1:x8=x;
+}
+ P0           | P1          ;
+ lw x5,0(x6)  | ori x5,x0,1 ;
+ lw x7,0(x8)  | sw x5,0(x6) ;
+ lw x9,0(x10) | fence rw,rw ;
+              | ori x7,x0,1 ;
+              | sw x7,0(x8) ;
+exists (0:x5=1 /\ 0:x9=0)
+
+new litmus test
+[W];po;[R];po;[R]
+W_po_R_po_R_PodWR_PodRR_Fre_Fence_rw_rwdWW_Coe
+RISCV W_po_R_po_R_PodWR_PodRR_Fre_Fence_rw_rwdWW_Coe
+"PodWR PodRR Fre Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Co
+Orig=PodWR PodRR Fre Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x8=y; 0:x10=z;
+1:x6=z; 1:x8=x;
+}
+ P0           | P1          ;
+ ori x5,x0,2  | ori x5,x0,1 ;
+ sw x5,0(x6)  | sw x5,0(x6) ;
+ lw x7,0(x8)  | fence rw,rw ;
+ lw x9,0(x10) | ori x7,x0,1 ;
+              | sw x7,0(x8) ;
+              | lw x9,0(x8) ;
+exists (0:x9=0 /\ 1:x9=2)
+
+new litmus test
+[W];rfi;[R];po;[R]
+W_rfi_R_po_R_Rfi_PodRR_Fre_Fence_rw_rwdWW_Coe
+RISCV W_rfi_R_po_R_Rfi_PodRR_Fre_Fence_rw_rwdWW_Coe
+"Rfi PodRR Fre Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Co
+Orig=Rfi PodRR Fre Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x9=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ ori x5,x0,2 | ori x5,x0,1 ;
+ sw x5,0(x6) | sw x5,0(x6) ;
+ lw x7,0(x6) | fence rw,rw ;
+ lw x8,0(x9) | ori x7,x0,1 ;
+             | sw x7,0(x8) ;
+             | lw x9,0(x8) ;
+exists (0:x7=2 /\ 0:x8=0 /\ 1:x9=2)
+
+new litmus test
+[R];po;[R];addr;[R]
+R_po_R_addr_R_PodRR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_po_R_addr_R_PodRR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+"PodRR DpAddrdR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=PodRR DpAddrdR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0             | P1          ;
+ lw x5,0(x6)    | ori x5,x0,1 ;
+ lw x7,0(x8)    | sw x5,0(x6) ;
+ xor x9,x7,x7   | fence rw,rw ;
+ add x12,x11,x9 | ori x7,x0,1 ;
+ lw x10,0(x12)  | sw x7,0(x8) ;
+exists (0:x5=1 /\ 0:x10=0)
+
+new litmus test
+[W];po;[R];addr;[R]
+W_po_R_addr_R_PodWR_DpAddrdR_Fre_Fence_rw_rwdWW_Coe
+RISCV W_po_R_addr_R_PodWR_DpAddrdR_Fre_Fence_rw_rwdWW_Coe
+"PodWR DpAddrdR Fre Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Co
+Orig=PodWR DpAddrdR Fre Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x8=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0             | P1          ;
+ ori x5,x0,2    | ori x5,x0,1 ;
+ sw x5,0(x6)    | sw x5,0(x6) ;
+ lw x7,0(x8)    | fence rw,rw ;
+ xor x9,x7,x7   | ori x7,x0,1 ;
+ add x12,x11,x9 | sw x7,0(x8) ;
+ lw x10,0(x12)  | lw x9,0(x8) ;
+exists (0:x10=0 /\ 1:x9=2)
+
+new litmus test
+[R];addr;[W];rfi;[R]
+R_addr_W_rfi_R_DpAddrdW_Rfi_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_rfi_R_DpAddrdW_Rfi_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+"DpAddrdW Rfi DpAddrdR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=DpAddrdW Rfi DpAddrdR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x14=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,1 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ lw x11,0(x9)    |             ;
+ xor x12,x11,x11 |             ;
+ add x15,x14,x12 |             ;
+ lw x13,0(x15)   |             ;
+exists (0:x5=1 /\ 0:x11=1 /\ 0:x13=0)
+
+new litmus test
+[W];rfi;[R];addr;[R]
+W_rfi_R_addr_R_Rfi_DpAddrdR_Fre_Fence_rw_rwdWW_Coe
+RISCV W_rfi_R_addr_R_Rfi_DpAddrdR_Fre_Fence_rw_rwdWW_Coe
+"Rfi DpAddrdR Fre Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Co
+Orig=Rfi DpAddrdR Fre Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x10=y;
+1:x6=y; 1:x8=x;
+}
+ P0             | P1          ;
+ ori x5,x0,2    | ori x5,x0,1 ;
+ sw x5,0(x6)    | sw x5,0(x6) ;
+ lw x7,0(x6)    | fence rw,rw ;
+ xor x8,x7,x7   | ori x7,x0,1 ;
+ add x11,x10,x8 | sw x7,0(x8) ;
+ lw x9,0(x11)   | lw x9,0(x8) ;
+exists (0:x7=2 /\ 0:x9=0 /\ 1:x9=2)
+
+new litmus test
+[W];po-loc;[R];po;[R]
+W_po_loc_R_po_R_PosWR_PodRR_Fre_Fence_rw_rwdWW_Coe
+RISCV W_po_loc_R_po_R_PosWR_PodRR_Fre_Fence_rw_rwdWW_Coe
+"PosWR PodRR Fre Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Co
+Orig=PosWR PodRR Fre Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x9=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ ori x5,x0,2 | ori x5,x0,1 ;
+ sw x5,0(x6) | sw x5,0(x6) ;
+ lw x7,0(x6) | fence rw,rw ;
+ lw x8,0(x9) | ori x7,x0,1 ;
+             | sw x7,0(x8) ;
+             | lw x9,0(x8) ;
+exists (0:x8=0 /\ 1:x9=2)
+
+new litmus test
+[R];addr;[W];po-loc;[R]
+R_addr_W_po_loc_R_DpAddrdW_PosWR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_loc_R_DpAddrdW_PosWR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+"DpAddrdW PosWR DpAddrdR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=DpAddrdW PosWR DpAddrdR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x14=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,1 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ lw x11,0(x9)    |             ;
+ xor x12,x11,x11 |             ;
+ add x15,x14,x12 |             ;
+ lw x13,0(x15)   |             ;
+exists (0:x5=1 /\ 0:x13=0)
+
+new litmus test
+[W];po-loc;[R];addr;[R]
+W_po_loc_R_addr_R_PosWR_DpAddrdR_Fre_Fence_rw_rwdWW_Coe
+RISCV W_po_loc_R_addr_R_PosWR_DpAddrdR_Fre_Fence_rw_rwdWW_Coe
+"PosWR DpAddrdR Fre Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Co
+Orig=PosWR DpAddrdR Fre Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x10=y;
+1:x6=y; 1:x8=x;
+}
+ P0             | P1          ;
+ ori x5,x0,2    | ori x5,x0,1 ;
+ sw x5,0(x6)    | sw x5,0(x6) ;
+ lw x7,0(x6)    | fence rw,rw ;
+ xor x8,x7,x7   | ori x7,x0,1 ;
+ add x11,x10,x8 | sw x7,0(x8) ;
+ lw x9,0(x11)   | lw x9,0(x8) ;
+exists (0:x9=0 /\ 1:x9=2)
+
+new litmus test
+[R];po;[W];po;[R];po;[R]
+R_po_W_po_R_po_R_PodRW_PodWR_PodRR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_po_W_po_R_po_R_PodRW_PodWR_PodRR_Fre_Fence_rw_rwdWW_Rfe
+"PodRW PodWR PodRR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:a=T,1:a=F,1:x=W
+Com=Fr Rf
+Orig=PodRW PodWR PodRR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x10=z; 0:x12=a;
+1:x6=a; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,1 ;
+ ori x7,x0,1   | sw x5,0(x6) ;
+ sw x7,0(x8)   | fence rw,rw ;
+ lw x9,0(x10)  | ori x7,x0,1 ;
+ lw x11,0(x12) | sw x7,0(x8) ;
+exists (0:x5=1 /\ 0:x11=0)
+
+new litmus test
+[R];po;[W];rfi;[R];po;[R]
+R_po_W_rfi_R_po_R_PodRW_Rfi_PodRR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_po_W_rfi_R_po_R_PodRW_Rfi_PodRR_Fre_Fence_rw_rwdWW_Rfe
+"PodRW Rfi PodRR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=PodRW Rfi PodRR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,1 ;
+ ori x7,x0,1   | sw x5,0(x6) ;
+ sw x7,0(x8)   | fence rw,rw ;
+ lw x9,0(x8)   | ori x7,x0,1 ;
+ lw x10,0(x11) | sw x7,0(x8) ;
+exists (0:x5=1 /\ 0:x9=1 /\ 0:x10=0)
+
+new litmus test
+[R];addr;[W];po;[R];po;[R]
+R_addr_W_po_R_po_R_DpAddrdW_PodWR_PodRR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_R_po_R_DpAddrdW_PodWR_PodRR_Fre_Fence_rw_rwdWW_Rfe
+"DpAddrdW PodWR PodRR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:a=T,1:a=F,1:x=W
+Com=Fr Rf
+Orig=DpAddrdW PodWR PodRR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x12=z; 0:x14=a;
+1:x6=a; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,1 ;
+ xor x7,x5,x5  | sw x5,0(x6) ;
+ ori x8,x0,1   | fence rw,rw ;
+ add x10,x9,x7 | ori x7,x0,1 ;
+ sw x8,0(x10)  | sw x7,0(x8) ;
+ lw x11,0(x12) |             ;
+ lw x13,0(x14) |             ;
+exists (0:x5=1 /\ 0:x13=0)
+
+new litmus test
+[R];po;[W];po;[R];addr;[R]
+R_po_W_po_R_addr_R_PodRW_PodWR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_po_W_po_R_addr_R_PodRW_PodWR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+"PodRW PodWR DpAddrdR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:a=T,1:a=F,1:x=W
+Com=Fr Rf
+Orig=PodRW PodWR DpAddrdR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x10=z; 0:x13=a;
+1:x6=a; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,1 ;
+ ori x7,x0,1     | sw x5,0(x6) ;
+ sw x7,0(x8)     | fence rw,rw ;
+ lw x9,0(x10)    | ori x7,x0,1 ;
+ xor x11,x9,x9   | sw x7,0(x8) ;
+ add x14,x13,x11 |             ;
+ lw x12,0(x14)   |             ;
+exists (0:x5=1 /\ 0:x12=0)
+
+new litmus test
+[R];addr;[W];rfi;[R];po;[R]
+R_addr_W_rfi_R_po_R_DpAddrdW_Rfi_PodRR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_rfi_R_po_R_DpAddrdW_Rfi_PodRR_Fre_Fence_rw_rwdWW_Rfe
+"DpAddrdW Rfi PodRR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=DpAddrdW Rfi PodRR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x13=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,1 ;
+ xor x7,x5,x5  | sw x5,0(x6) ;
+ ori x8,x0,1   | fence rw,rw ;
+ add x10,x9,x7 | ori x7,x0,1 ;
+ sw x8,0(x10)  | sw x7,0(x8) ;
+ lw x11,0(x9)  |             ;
+ lw x12,0(x13) |             ;
+exists (0:x5=1 /\ 0:x11=1 /\ 0:x12=0)
+
+new litmus test
+[R];po;[W];rfi;[R];addr;[R]
+R_po_W_rfi_R_addr_R_PodRW_Rfi_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_po_W_rfi_R_addr_R_PodRW_Rfi_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+"PodRW Rfi DpAddrdR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=PodRW Rfi DpAddrdR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x12=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,1 ;
+ ori x7,x0,1     | sw x5,0(x6) ;
+ sw x7,0(x8)     | fence rw,rw ;
+ lw x9,0(x8)     | ori x7,x0,1 ;
+ xor x10,x9,x9   | sw x7,0(x8) ;
+ add x13,x12,x10 |             ;
+ lw x11,0(x13)   |             ;
+exists (0:x5=1 /\ 0:x9=1 /\ 0:x11=0)
+
+new litmus test
+[R];addr;[W];po;[R];addr;[R]
+R_addr_W_po_R_addr_R_DpAddrdW_PodWR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_R_addr_R_DpAddrdW_PodWR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+"DpAddrdW PodWR DpAddrdR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:a=T,1:a=F,1:x=W
+Com=Fr Rf
+Orig=DpAddrdW PodWR DpAddrdR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x12=z; 0:x15=a;
+1:x6=a; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,1 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ lw x11,0(x12)   |             ;
+ xor x13,x11,x11 |             ;
+ add x16,x15,x13 |             ;
+ lw x14,0(x16)   |             ;
+exists (0:x5=1 /\ 0:x14=0)
+
+new litmus test
+[R];po;[W];po-loc;[R];po;[R]
+R_po_W_po_loc_R_po_R_PodRW_PosWR_PodRR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_po_W_po_loc_R_po_R_PodRW_PosWR_PodRR_Fre_Fence_rw_rwdWW_Rfe
+"PodRW PosWR PodRR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=PodRW PosWR PodRR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,1 ;
+ ori x7,x0,1   | sw x5,0(x6) ;
+ sw x7,0(x8)   | fence rw,rw ;
+ lw x9,0(x8)   | ori x7,x0,1 ;
+ lw x10,0(x11) | sw x7,0(x8) ;
+exists (0:x5=1 /\ 0:x10=0)
+
+new litmus test
+[R];addr;[W];rfi;[R];addr;[R]
+R_addr_W_rfi_R_addr_R_DpAddrdW_Rfi_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_rfi_R_addr_R_DpAddrdW_Rfi_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+"DpAddrdW Rfi DpAddrdR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=DpAddrdW Rfi DpAddrdR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x14=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,1 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ lw x11,0(x9)    |             ;
+ xor x12,x11,x11 |             ;
+ add x15,x14,x12 |             ;
+ lw x13,0(x15)   |             ;
+exists (0:x5=1 /\ 0:x11=1 /\ 0:x13=0)
+
+new litmus test
+[R];addr;[W];po-loc;[R];po;[R]
+R_addr_W_po_loc_R_po_R_DpAddrdW_PosWR_PodRR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_loc_R_po_R_DpAddrdW_PosWR_PodRR_Fre_Fence_rw_rwdWW_Rfe
+"DpAddrdW PosWR PodRR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=DpAddrdW PosWR PodRR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x13=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,1 ;
+ xor x7,x5,x5  | sw x5,0(x6) ;
+ ori x8,x0,1   | fence rw,rw ;
+ add x10,x9,x7 | ori x7,x0,1 ;
+ sw x8,0(x10)  | sw x7,0(x8) ;
+ lw x11,0(x9)  |             ;
+ lw x12,0(x13) |             ;
+exists (0:x5=1 /\ 0:x12=0)
+
+new litmus test
+[R];po;[W];po-loc;[R];addr;[R]
+R_po_W_po_loc_R_addr_R_PodRW_PosWR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_po_W_po_loc_R_addr_R_PodRW_PosWR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+"PodRW PosWR DpAddrdR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=PodRW PosWR DpAddrdR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x12=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,1 ;
+ ori x7,x0,1     | sw x5,0(x6) ;
+ sw x7,0(x8)     | fence rw,rw ;
+ lw x9,0(x8)     | ori x7,x0,1 ;
+ xor x10,x9,x9   | sw x7,0(x8) ;
+ add x13,x12,x10 |             ;
+ lw x11,0(x13)   |             ;
+exists (0:x5=1 /\ 0:x11=0)
+
+new litmus test
+[R];addr;[W];po-loc;[R];addr;[R]
+R_addr_W_po_loc_R_addr_R_DpAddrdW_PosWR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_loc_R_addr_R_DpAddrdW_PosWR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+"DpAddrdW PosWR DpAddrdR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=DpAddrdW PosWR DpAddrdR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x14=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,1 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ lw x11,0(x9)    |             ;
+ xor x12,x11,x11 |             ;
+ add x15,x14,x12 |             ;
+ lw x13,0(x15)   |             ;
+exists (0:x5=1 /\ 0:x13=0)
+
+new litmus test
+[R];addr;[W];po-loc;[W];po-loc;[R]
+R_addr_W_po_loc_W_po_loc_R_DpAddrdW_PosWW_PosWR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_loc_W_po_loc_R_DpAddrdW_PosWW_PosWR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+"DpAddrdW PosWW PosWR DpAddrdR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=DpAddrdW PosWW PosWR DpAddrdR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x15=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,1 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ ori x11,x0,2    |             ;
+ sw x11,0(x9)    |             ;
+ lw x12,0(x9)    |             ;
+ xor x13,x12,x12 |             ;
+ add x16,x15,x13 |             ;
+ lw x14,0(x16)   |             ;
+exists (0:x5=1 /\ 0:x14=0)
+
+new litmus test
+[R];addr;[W];po-loc;[W];po-loc;[R];addr;[R]
+R_addr_W_po_loc_W_po_loc_R_addr_R_DpAddrdW_PosWW_PosWR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_loc_W_po_loc_R_addr_R_DpAddrdW_PosWW_PosWR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+"DpAddrdW PosWW PosWR DpAddrdR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=DpAddrdW PosWW PosWR DpAddrdR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x15=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,1 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ ori x11,x0,2    |             ;
+ sw x11,0(x9)    |             ;
+ lw x12,0(x9)    |             ;
+ xor x13,x12,x12 |             ;
+ add x16,x15,x13 |             ;
+ lw x14,0(x16)   |             ;
+exists (0:x5=1 /\ 0:x14=0)
+
+new litmus test
+[W];po;[RL]
+W_po_RL_PodWR_Rmw_CoeRlP_Fence_rw_rwdWW_Coe
+RISCV W_po_RL_PodWR_Rmw_CoeRlP_Fence_rw_rwdWW_Coe
+"PodWR RmwPRl CoeRlP Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=PodWR RmwPRl CoeRlP Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x7=y;
+1:x6=y; 1:x8=x;
+}
+ P0                      | P1          ;
+ ori x5,x0,2             | ori x5,x0,2 ;
+ sw x5,0(x6)             | sw x5,0(x6) ;
+ ori x9,x0,1             | fence rw,rw ;
+ amoswap.w.rl x8,x9,(x7) | ori x7,x0,1 ;
+ lw x10,0(x7)            | sw x7,0(x8) ;
+                         | lw x9,0(x8) ;
+exists (0:x10=2 /\ 1:x9=2)
+
+new litmus test
+[AQRL];po;[W]
+AQRL_po_W_Rmw_PodWWRlP_Coe_Fence_rw_rwdWW_RfePAq
+RISCV AQRL_po_W_Rmw_PodWWRlP_Coe_Fence_rw_rwdWW_RfePAq
+"RmwAqRl PodWWRlP Coe Fence.rw.rwdWW RfePAq"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Rf
+Orig=RmwAqRl PodWWRlP Coe Fence.rw.rwdWW RfePAq
+{
+0:x5=x; 0:x9=y;
+1:x6=y; 1:x8=x;
+}
+ P0                         | P1          ;
+ ori x7,x0,2                | ori x5,x0,2 ;
+ amoswap.w.aq.rl x6,x7,(x5) | sw x5,0(x6) ;
+ ori x8,x0,1                | fence rw,rw ;
+ sw x8,0(x9)                | ori x7,x0,1 ;
+ lw x10,0(x9)               | sw x7,0(x8) ;
+exists (0:x10=2 /\ 0:x6=1)
+
+new litmus test
+[W];po;[AQRL];po;[W]
+W_po_AQRL_po_W_PodWRPAq_Rmw_PodWWRlP_Coe_Fence_rw_rwdWW_Coe
+RISCV W_po_AQRL_po_W_PodWRPAq_Rmw_PodWWRlP_Coe_Fence_rw_rwdWW_Coe
+"PodWRPAq RmwAqRl PodWWRlP Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Co
+Orig=PodWRPAq RmwAqRl PodWWRlP Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x7=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0                         | P1          ;
+ ori x5,x0,2                | ori x5,x0,2 ;
+ sw x5,0(x6)                | sw x5,0(x6) ;
+ ori x9,x0,1                | fence rw,rw ;
+ amoswap.w.aq.rl x8,x9,(x7) | ori x7,x0,1 ;
+ ori x10,x0,1               | sw x7,0(x8) ;
+ sw x10,0(x11)              | lw x9,0(x8) ;
+ lw x12,0(x11)              |             ;
+exists (0:x12=2 /\ 1:x9=2)
+
+new litmus test
+[R];po;[RL];po;[R]
+R_po_RL_po_R_PodRR_Rmw_PodWRRlP_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_po_RL_po_R_PodRR_Rmw_PodWRRlP_Fre_Fence_rw_rwdWW_Rfe
+"PodRR RmwPRl PodWRRlP Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=PodRR RmwPRl PodWRRlP Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x7=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0                      | P1          ;
+ lw x5,0(x6)             | ori x5,x0,1 ;
+ ori x9,x0,1             | sw x5,0(x6) ;
+ amoswap.w.rl x8,x9,(x7) | fence rw,rw ;
+ lw x10,0(x11)           | ori x7,x0,1 ;
+                         | sw x7,0(x8) ;
+exists (0:x5=1 /\ 0:x10=0)
+
+new litmus test
+[R];po;[RL];po;[W]
+R_po_RL_po_W_PodRR_Rmw_PodWWRlP_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_RL_po_W_PodRR_Rmw_PodWWRlP_Coe_Fence_rw_rwdWW_Rfe
+"PodRR RmwPRl PodWWRlP Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=PodRR RmwPRl PodWWRlP Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x7=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0                      | P1          ;
+ lw x5,0(x6)             | ori x5,x0,2 ;
+ ori x9,x0,1             | sw x5,0(x6) ;
+ amoswap.w.rl x8,x9,(x7) | fence rw,rw ;
+ ori x10,x0,1            | ori x7,x0,1 ;
+ sw x10,0(x11)           | sw x7,0(x8) ;
+ lw x12,0(x11)           |             ;
+exists (0:x12=2 /\ 0:x5=1)
+
+new litmus test
+[R];po;[RL];rfi;[R]
+R_po_RL_rfi_R_PodRR_Rmw_RfiRlP_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_po_RL_rfi_R_PodRR_Rmw_RfiRlP_Fre_Fence_rw_rwdWW_Rfe
+"PodRR RmwPRl RfiRlP Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Rf
+Orig=PodRR RmwPRl RfiRlP Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x7=y;
+1:x6=y; 1:x8=x;
+}
+ P0                      | P1          ;
+ lw x5,0(x6)             | ori x5,x0,2 ;
+ ori x9,x0,1             | sw x5,0(x6) ;
+ amoswap.w.rl x8,x9,(x7) | fence rw,rw ;
+ lw x10,0(x7)            | ori x7,x0,1 ;
+ lw x11,0(x7)            | sw x7,0(x8) ;
+exists (0:x11=2 /\ 0:x5=1 /\ 0:x10=1)
+
+new litmus test
+[R];po;[R];ctrl;[W]
+R_po_R_ctrl_W_PodRR_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_R_ctrl_W_PodRR_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+"PodRR DpCtrldW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=PodRR DpCtrldW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x10=z;
+1:x6=z; 1:x8=x;
+}
+ P0             | P1          ;
+ lw x5,0(x6)    | ori x5,x0,2 ;
+ lw x7,0(x8)    | sw x5,0(x6) ;
+ bne x7,x0,LC00 | fence rw,rw ;
+ LC00:          | ori x7,x0,1 ;
+ ori x9,x0,1    | sw x7,0(x8) ;
+ sw x9,0(x10)   |             ;
+ lw x11,0(x10)  |             ;
+exists (0:x11=2 /\ 0:x5=1)
+
+new litmus test
+[R];po;[RL];po-loc;[R]
+R_po_RL_po_loc_R_PodRR_Rmw_PosWRRlP_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_po_RL_po_loc_R_PodRR_Rmw_PosWRRlP_Fre_Fence_rw_rwdWW_Rfe
+"PodRR RmwPRl PosWRRlP Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Rf
+Orig=PodRR RmwPRl PosWRRlP Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x7=y;
+1:x6=y; 1:x8=x;
+}
+ P0                      | P1          ;
+ lw x5,0(x6)             | ori x5,x0,2 ;
+ ori x9,x0,1             | sw x5,0(x6) ;
+ amoswap.w.rl x8,x9,(x7) | fence rw,rw ;
+ lw x10,0(x7)            | ori x7,x0,1 ;
+ lw x11,0(x7)            | sw x7,0(x8) ;
+exists (0:x11=2 /\ 0:x5=1 /\ 0:x10=1)
+
+new litmus test
+[R];po;[RL];po;[R];po;[W]
+R_po_RL_po_R_po_W_PodRR_Rmw_PodWRRlP_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_RL_po_R_po_W_PodRR_Rmw_PodWRRlP_PodRW_Coe_Fence_rw_rwdWW_Rfe
+"PodRR RmwPRl PodWRRlP PodRW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:a=W,1:a=F,1:x=W
+Com=Co Rf
+Orig=PodRR RmwPRl PodWRRlP PodRW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x7=y; 0:x11=z; 0:x13=a;
+1:x6=a; 1:x8=x;
+}
+ P0                      | P1          ;
+ lw x5,0(x6)             | ori x5,x0,2 ;
+ ori x9,x0,1             | sw x5,0(x6) ;
+ amoswap.w.rl x8,x9,(x7) | fence rw,rw ;
+ lw x10,0(x11)           | ori x7,x0,1 ;
+ ori x12,x0,1            | sw x7,0(x8) ;
+ sw x12,0(x13)           |             ;
+ lw x14,0(x13)           |             ;
+exists (0:x14=2 /\ 0:x5=1)
+
+new litmus test
+[R];po;[RL];rfi;[R];po;[W]
+R_po_RL_rfi_R_po_W_PodRR_Rmw_RfiRlP_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_RL_rfi_R_po_W_PodRR_Rmw_RfiRlP_PodRW_Coe_Fence_rw_rwdWW_Rfe
+"PodRR RmwPRl RfiRlP PodRW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=PodRR RmwPRl RfiRlP PodRW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x7=y; 0:x12=z;
+1:x6=z; 1:x8=x;
+}
+ P0                      | P1          ;
+ lw x5,0(x6)             | ori x5,x0,2 ;
+ ori x9,x0,1             | sw x5,0(x6) ;
+ amoswap.w.rl x8,x9,(x7) | fence rw,rw ;
+ lw x10,0(x7)            | ori x7,x0,1 ;
+ ori x11,x0,1            | sw x7,0(x8) ;
+ sw x11,0(x12)           |             ;
+ lw x13,0(x12)           |             ;
+exists (0:x13=2 /\ 0:x5=1 /\ 0:x10=1)
+
+new litmus test
+[R];po;[RL];po;[R];ctrl;[W]
+R_po_RL_po_R_ctrl_W_PodRR_Rmw_PodWRRlP_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_RL_po_R_ctrl_W_PodRR_Rmw_PodWRRlP_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+"PodRR RmwPRl PodWRRlP DpCtrldW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:a=W,1:a=F,1:x=W
+Com=Co Rf
+Orig=PodRR RmwPRl PodWRRlP DpCtrldW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x7=y; 0:x11=z; 0:x13=a;
+1:x6=a; 1:x8=x;
+}
+ P0                      | P1          ;
+ lw x5,0(x6)             | ori x5,x0,2 ;
+ ori x9,x0,1             | sw x5,0(x6) ;
+ amoswap.w.rl x8,x9,(x7) | fence rw,rw ;
+ lw x10,0(x11)           | ori x7,x0,1 ;
+ bne x10,x0,LC00         | sw x7,0(x8) ;
+ LC00:                   |             ;
+ ori x12,x0,1            |             ;
+ sw x12,0(x13)           |             ;
+ lw x14,0(x13)           |             ;
+exists (0:x14=2 /\ 0:x5=1)
+
+new litmus test
+[R];po;[RL];rfi;[R];ctrl;[W]
+R_po_RL_rfi_R_ctrl_W_PodRR_Rmw_RfiRlP_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_RL_rfi_R_ctrl_W_PodRR_Rmw_RfiRlP_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+"PodRR RmwPRl RfiRlP DpCtrldW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=PodRR RmwPRl RfiRlP DpCtrldW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x7=y; 0:x12=z;
+1:x6=z; 1:x8=x;
+}
+ P0                      | P1          ;
+ lw x5,0(x6)             | ori x5,x0,2 ;
+ ori x9,x0,1             | sw x5,0(x6) ;
+ amoswap.w.rl x8,x9,(x7) | fence rw,rw ;
+ lw x10,0(x7)            | ori x7,x0,1 ;
+ bne x10,x0,LC00         | sw x7,0(x8) ;
+ LC00:                   |             ;
+ ori x11,x0,1            |             ;
+ sw x11,0(x12)           |             ;
+ lw x13,0(x12)           |             ;
+exists (0:x13=2 /\ 0:x5=1 /\ 0:x10=1)
+
+new litmus test
+[R];po;[RL];po-loc;[R];po;[W]
+R_po_RL_po_loc_R_po_W_PodRR_Rmw_PosWRRlP_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_RL_po_loc_R_po_W_PodRR_Rmw_PosWRRlP_PodRW_Coe_Fence_rw_rwdWW_Rfe
+"PodRR RmwPRl PosWRRlP PodRW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=PodRR RmwPRl PosWRRlP PodRW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x7=y; 0:x12=z;
+1:x6=z; 1:x8=x;
+}
+ P0                      | P1          ;
+ lw x5,0(x6)             | ori x5,x0,2 ;
+ ori x9,x0,1             | sw x5,0(x6) ;
+ amoswap.w.rl x8,x9,(x7) | fence rw,rw ;
+ lw x10,0(x7)            | ori x7,x0,1 ;
+ ori x11,x0,1            | sw x7,0(x8) ;
+ sw x11,0(x12)           |             ;
+ lw x13,0(x12)           |             ;
+exists (0:x13=2 /\ 0:x5=1)
+
+new litmus test
+[R];po;[RL];po-loc;[R];ctrl;[W]
+R_po_RL_po_loc_R_ctrl_W_PodRR_Rmw_PosWRRlP_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_RL_po_loc_R_ctrl_W_PodRR_Rmw_PosWRRlP_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+"PodRR RmwPRl PosWRRlP DpCtrldW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=PodRR RmwPRl PosWRRlP DpCtrldW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x7=y; 0:x12=z;
+1:x6=z; 1:x8=x;
+}
+ P0                      | P1          ;
+ lw x5,0(x6)             | ori x5,x0,2 ;
+ ori x9,x0,1             | sw x5,0(x6) ;
+ amoswap.w.rl x8,x9,(x7) | fence rw,rw ;
+ lw x10,0(x7)            | ori x7,x0,1 ;
+ bne x10,x0,LC00         | sw x7,0(x8) ;
+ LC00:                   |             ;
+ ori x11,x0,1            |             ;
+ sw x11,0(x12)           |             ;
+ lw x13,0(x12)           |             ;
+exists (0:x13=2 /\ 0:x5=1)
+
+new litmus test
+[R];po;[RL];po-loc;[W];po-loc;[R];ctrl;[W]
+R_po_RL_po_loc_W_po_loc_R_ctrl_W_PodRR_Rmw_PosWWRlP_PosWR_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_RL_po_loc_W_po_loc_R_ctrl_W_PodRR_Rmw_PosWWRlP_PosWR_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+"PodRR RmwPRl PosWWRlP PosWR DpCtrldW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=PodRR RmwPRl PosWWRlP PosWR DpCtrldW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x7=y; 0:x13=z;
+1:x6=z; 1:x8=x;
+}
+ P0                      | P1          ;
+ lw x5,0(x6)             | ori x5,x0,2 ;
+ ori x9,x0,1             | sw x5,0(x6) ;
+ amoswap.w.rl x8,x9,(x7) | fence rw,rw ;
+ ori x10,x0,2            | ori x7,x0,1 ;
+ sw x10,0(x7)            | sw x7,0(x8) ;
+ lw x11,0(x7)            |             ;
+ bne x11,x0,LC00         |             ;
+ LC00:                   |             ;
+ ori x12,x0,1            |             ;
+ sw x12,0(x13)           |             ;
+ lw x14,0(x13)           |             ;
+exists (0:x14=2 /\ 0:x5=1)
+
+new litmus test
+[AQRL];po;[R]
+AQRL_po_R_Rmw_PodWRRlP_Fre_Fence_rw_rwdWW_RfePAq
+RISCV AQRL_po_R_Rmw_PodWRRlP_Fre_Fence_rw_rwdWW_RfePAq
+"RmwAqRl PodWRRlP Fre Fence.rw.rwdWW RfePAq"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Rf
+Orig=RmwAqRl PodWRRlP Fre Fence.rw.rwdWW RfePAq
+{
+0:x5=x; 0:x9=y;
+1:x6=y; 1:x8=x;
+}
+ P0                         | P1          ;
+ ori x7,x0,2                | ori x5,x0,1 ;
+ amoswap.w.aq.rl x6,x7,(x5) | sw x5,0(x6) ;
+ lw x8,0(x9)                | fence rw,rw ;
+                            | ori x7,x0,1 ;
+                            | sw x7,0(x8) ;
+exists (0:x6=1 /\ 0:x8=0)
+
+new litmus test
+[R];po;[AQRL]
+R_po_AQRL_PodRRPAq_Rmw_CoeRlP_Fence_rw_rwdWW_Rfe
+RISCV R_po_AQRL_PodRRPAq_Rmw_CoeRlP_Fence_rw_rwdWW_Rfe
+"PodRRPAq RmwAqRl CoeRlP Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Rf
+Orig=PodRRPAq RmwAqRl CoeRlP Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x7=y;
+1:x6=y; 1:x8=x;
+}
+ P0                         | P1          ;
+ lw x5,0(x6)                | ori x5,x0,2 ;
+ ori x9,x0,1                | sw x5,0(x6) ;
+ amoswap.w.aq.rl x8,x9,(x7) | fence rw,rw ;
+ lw x10,0(x7)               | ori x7,x0,1 ;
+                            | sw x7,0(x8) ;
+exists (0:x10=2 /\ 0:x5=1)
+
+new litmus test
+[R];po;[RL]
+R_po_RL_PodRR_Rmw_CoeRlP_Fence_rw_rwdWW_Rfe
+RISCV R_po_RL_PodRR_Rmw_CoeRlP_Fence_rw_rwdWW_Rfe
+"PodRR RmwPRl CoeRlP Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Rf
+Orig=PodRR RmwPRl CoeRlP Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x7=y;
+1:x6=y; 1:x8=x;
+}
+ P0                      | P1          ;
+ lw x5,0(x6)             | ori x5,x0,2 ;
+ ori x9,x0,1             | sw x5,0(x6) ;
+ amoswap.w.rl x8,x9,(x7) | fence rw,rw ;
+ lw x10,0(x7)            | ori x7,x0,1 ;
+                         | sw x7,0(x8) ;
+exists (0:x10=2 /\ 0:x5=1)
+
+new litmus test
+[AQ];po;[W]
+AQ_po_W_Rmw_PodWW_Coe_Fence_rw_rwdWW_RfePAq
+RISCV AQ_po_W_Rmw_PodWW_Coe_Fence_rw_rwdWW_RfePAq
+"RmwAqP PodWW Coe Fence.rw.rwdWW RfePAq"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Rf
+Orig=RmwAqP PodWW Coe Fence.rw.rwdWW RfePAq
+{
+0:x5=x; 0:x9=y;
+1:x6=y; 1:x8=x;
+}
+ P0                      | P1          ;
+ ori x7,x0,2             | ori x5,x0,2 ;
+ amoswap.w.aq x6,x7,(x5) | sw x5,0(x6) ;
+ ori x8,x0,1             | fence rw,rw ;
+ sw x8,0(x9)             | ori x7,x0,1 ;
+ lw x10,0(x9)            | sw x7,0(x8) ;
+exists (0:x10=2 /\ 0:x6=1)
+
+new litmus test
+[AQ];po;[R]
+AQ_po_R_Rmw_PodWR_Fre_Fence_rw_rwdWW_RfePAq
+RISCV AQ_po_R_Rmw_PodWR_Fre_Fence_rw_rwdWW_RfePAq
+"RmwAqP PodWR Fre Fence.rw.rwdWW RfePAq"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Rf
+Orig=RmwAqP PodWR Fre Fence.rw.rwdWW RfePAq
+{
+0:x5=x; 0:x9=y;
+1:x6=y; 1:x8=x;
+}
+ P0                      | P1          ;
+ ori x7,x0,2             | ori x5,x0,1 ;
+ amoswap.w.aq x6,x7,(x5) | sw x5,0(x6) ;
+ lw x8,0(x9)             | fence rw,rw ;
+                         | ori x7,x0,1 ;
+                         | sw x7,0(x8) ;
+exists (0:x6=1 /\ 0:x8=0)
+
+new litmus test
+[AMO];po;[R]
+AMO_po_R_Rmw_PodWR_Fre_Fence_rw_rwdWW_Rfe
+RISCV AMO_po_R_Rmw_PodWR_Fre_Fence_rw_rwdWW_Rfe
+"Rmw PodWR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Rf
+Orig=Rmw PodWR Fre Fence.rw.rwdWW Rfe
+{
+0:x5=x; 0:x9=y;
+1:x6=y; 1:x8=x;
+}
+ P0                   | P1          ;
+ ori x7,x0,2          | ori x5,x0,1 ;
+ amoswap.w x6,x7,(x5) | sw x5,0(x6) ;
+ lw x8,0(x9)          | fence rw,rw ;
+                      | ori x7,x0,1 ;
+                      | sw x7,0(x8) ;
+exists (0:x6=1 /\ 0:x8=0)
+
+new litmus test
+[AMO];po;[AQ];po;[R]
+AMO_po_AQ_po_R_Rmw_PodWRPAq_Rmw_PodWR_Fre_Fence_rw_rwdWW_Rfe
+RISCV AMO_po_AQ_po_R_Rmw_PodWRPAq_Rmw_PodWR_Fre_Fence_rw_rwdWW_Rfe
+"Rmw PodWRPAq RmwAqP PodWR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=Rmw PodWRPAq RmwAqP PodWR Fre Fence.rw.rwdWW Rfe
+{
+0:x5=x; 0:x8=y; 0:x12=z;
+1:x6=z; 1:x8=x;
+}
+ P0                       | P1          ;
+ ori x7,x0,2              | ori x5,x0,1 ;
+ amoswap.w x6,x7,(x5)     | sw x5,0(x6) ;
+ ori x10,x0,1             | fence rw,rw ;
+ amoswap.w.aq x9,x10,(x8) | ori x7,x0,1 ;
+ lw x11,0(x12)            | sw x7,0(x8) ;
+exists (0:x6=1 /\ 0:x11=0)
+
+new litmus test
+[AMO];rfi;[AQ];po;[R]
+AMO_rfi_AQ_po_R_Rmw_RfiPAq_Rmw_PodWR_Fre_Fence_rw_rwdWW_Rfe
+RISCV AMO_rfi_AQ_po_R_Rmw_RfiPAq_Rmw_PodWR_Fre_Fence_rw_rwdWW_Rfe
+"Rmw RfiPAq RmwAqP PodWR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Rf
+Orig=Rmw RfiPAq RmwAqP PodWR Fre Fence.rw.rwdWW Rfe
+{
+0:x5=x; 0:x11=y;
+1:x6=y; 1:x8=x;
+}
+ P0                      | P1          ;
+ ori x7,x0,2             | ori x5,x0,1 ;
+ amoswap.w x6,x7,(x5)    | sw x5,0(x6) ;
+ ori x9,x0,3             | fence rw,rw ;
+ amoswap.w.aq x8,x9,(x5) | ori x7,x0,1 ;
+ lw x10,0(x11)           | sw x7,0(x8) ;
+exists (0:x6=1 /\ 0:x8=2 /\ 0:x10=0)
+
+new litmus test
+[AMO];po-loc;[AQ];po;[R]
+AMO_po_loc_AQ_po_R_Rmw_PosWRPAq_Rmw_PodWR_Fre_Fence_rw_rwdWW_Rfe
+RISCV AMO_po_loc_AQ_po_R_Rmw_PosWRPAq_Rmw_PodWR_Fre_Fence_rw_rwdWW_Rfe
+"Rmw PosWRPAq RmwAqP PodWR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Rf
+Orig=Rmw PosWRPAq RmwAqP PodWR Fre Fence.rw.rwdWW Rfe
+{
+0:x5=x; 0:x11=y;
+1:x6=y; 1:x8=x;
+}
+ P0                      | P1          ;
+ ori x7,x0,2             | ori x5,x0,1 ;
+ amoswap.w x6,x7,(x5)    | sw x5,0(x6) ;
+ ori x9,x0,3             | fence rw,rw ;
+ amoswap.w.aq x8,x9,(x5) | ori x7,x0,1 ;
+ lw x10,0(x11)           | sw x7,0(x8) ;
+exists (0:x6=1 /\ 0:x10=0)
+
+new litmus test
+[W];fencerel(Fence.r.rw);[W]
+W_fencerelFence.r.rw_W_Fence_r_rwdWW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_fencerelFence.r.rw_W_Fence_r_rwdWW_Coe_Fence_rw_rwdWW_Coe
+"Fence.r.rwdWW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=Fence.r.rwdWW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ ori x5,x0,2 | ori x5,x0,2 ;
+ sw x5,0(x6) | sw x5,0(x6) ;
+ fence r,rw  | fence rw,rw ;
+ ori x7,x0,1 | ori x7,x0,1 ;
+ sw x7,0(x8) | sw x7,0(x8) ;
+ lw x9,0(x8) | lw x9,0(x8) ;
+exists (0:x9=2 /\ 1:x9=2)
+
+new litmus test
+[R];fencerel(Fence.rw.w);[R]
+R_fencerelFence.rw.w_R_Fence_rw_wdRR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_fencerelFence.rw.w_R_Fence_rw_wdRR_Fre_Fence_rw_rwdWW_Rfe
+"Fence.rw.wdRR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Rf
+Orig=Fence.rw.wdRR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ lw x5,0(x6) | ori x5,x0,1 ;
+ fence rw,w  | sw x5,0(x6) ;
+ lw x7,0(x8) | fence rw,rw ;
+             | ori x7,x0,1 ;
+             | sw x7,0(x8) ;
+exists (0:x5=1 /\ 0:x7=0)
+
+new litmus test
+[R];fencerel(Fence.w.w);[W]
+R_fencerelFence.w.w_W_Fence_w_wdRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_fencerelFence.w.w_W_Fence_w_wdRW_Coe_Fence_rw_rwdWW_Rfe
+"Fence.w.wdRW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Rf
+Orig=Fence.w.wdRW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ lw x5,0(x6) | ori x5,x0,2 ;
+ fence w,w   | sw x5,0(x6) ;
+ ori x7,x0,1 | fence rw,rw ;
+ sw x7,0(x8) | ori x7,x0,1 ;
+ lw x9,0(x8) | sw x7,0(x8) ;
+exists (0:x9=2 /\ 0:x5=1)
+
+new litmus test
+[W];fencerel(Fence.rw.w);[R]
+W_fencerelFence.rw.w_R_Fence_rw_wdWR_Fre_Fence_rw_rwdWW_Coe
+RISCV W_fencerelFence.rw.w_R_Fence_rw_wdWR_Fre_Fence_rw_rwdWW_Coe
+"Fence.rw.wdWR Fre Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Co
+Orig=Fence.rw.wdWR Fre Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ ori x5,x0,2 | ori x5,x0,1 ;
+ sw x5,0(x6) | sw x5,0(x6) ;
+ fence rw,w  | fence rw,rw ;
+ lw x7,0(x8) | ori x7,x0,1 ;
+             | sw x7,0(x8) ;
+             | lw x9,0(x8) ;
+exists (0:x7=0 /\ 1:x9=2)
+
+new litmus test
+[W];fencerel(Fence.r.rw);[R]
+W_fencerelFence.r.rw_R_Fence_r_rwdWR_Fre_Fence_rw_rwdWW_Coe
+RISCV W_fencerelFence.r.rw_R_Fence_r_rwdWR_Fre_Fence_rw_rwdWW_Coe
+"Fence.r.rwdWR Fre Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Co
+Orig=Fence.r.rwdWR Fre Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ ori x5,x0,2 | ori x5,x0,1 ;
+ sw x5,0(x6) | sw x5,0(x6) ;
+ fence r,rw  | fence rw,rw ;
+ lw x7,0(x8) | ori x7,x0,1 ;
+             | sw x7,0(x8) ;
+             | lw x9,0(x8) ;
+exists (0:x7=0 /\ 1:x9=2)
+
+new litmus test
+[R];ctrl;[R]
+R_ctrl_R_DpCtrldR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_ctrl_R_DpCtrldR_Fre_Fence_rw_rwdWW_Rfe
+"DpCtrldR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Rf
+Orig=DpCtrldR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0             | P1          ;
+ lw x5,0(x6)    | ori x5,x0,1 ;
+ bne x5,x0,LC00 | sw x5,0(x6) ;
+ LC00:          | fence rw,rw ;
+ lw x7,0(x8)    | ori x7,x0,1 ;
+                | sw x7,0(x8) ;
+exists (0:x5=1 /\ 0:x7=0)
+
+new litmus test
+[R];fencerel(Fence.w.r);[R]
+R_fencerelFence.w.r_R_Fence_w_rdRR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_fencerelFence.w.r_R_Fence_w_rdRR_Fre_Fence_rw_rwdWW_Rfe
+"Fence.w.rdRR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Rf
+Orig=Fence.w.rdRR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ lw x5,0(x6) | ori x5,x0,1 ;
+ fence w,r   | sw x5,0(x6) ;
+ lw x7,0(x8) | fence rw,rw ;
+             | ori x7,x0,1 ;
+             | sw x7,0(x8) ;
+exists (0:x5=1 /\ 0:x7=0)
+
+new litmus test
+[W];fencerel(Fence.tso);[R]
+W_fencerelFence.tso_R_Fence_tsodWR_Fre_Fence_rw_rwdWW_Coe
+RISCV W_fencerelFence.tso_R_Fence_tsodWR_Fre_Fence_rw_rwdWW_Coe
+"Fence.tsodWR Fre Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Co
+Orig=Fence.tsodWR Fre Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ ori x5,x0,2 | ori x5,x0,1 ;
+ sw x5,0(x6) | sw x5,0(x6) ;
+ fence.tso   | fence rw,rw ;
+ lw x7,0(x8) | ori x7,x0,1 ;
+             | sw x7,0(x8) ;
+             | lw x9,0(x8) ;
+exists (0:x7=0 /\ 1:x9=2)
+
+new litmus test
+[W];fencerel(Fence.r.r);[R]
+W_fencerelFence.r.r_R_Fence_r_rdWR_Fre_Fence_rw_rwdWW_Coe
+RISCV W_fencerelFence.r.r_R_Fence_r_rdWR_Fre_Fence_rw_rwdWW_Coe
+"Fence.r.rdWR Fre Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Co
+Orig=Fence.r.rdWR Fre Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ ori x5,x0,2 | ori x5,x0,1 ;
+ sw x5,0(x6) | sw x5,0(x6) ;
+ fence r,r   | fence rw,rw ;
+ lw x7,0(x8) | ori x7,x0,1 ;
+             | sw x7,0(x8) ;
+             | lw x9,0(x8) ;
+exists (0:x7=0 /\ 1:x9=2)
+
+new litmus test
+[XSc];po;[R]
+XLr_rmw_XSc_po_R_PosRW_PodWR_Fre_Fence_rw_rwdWW_Rfe
+RISCV XLr_rmw_XSc_po_R_PosRW_PodWR_Fre_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x9=y; 1:x6=y; 1:x8=x; }
+        P0         |      P1       ;
+lr.w x5, 0(x6)     | ori x5, x0, 1 ;
+lr.w x7, 0(x6)     | sw x5, 0(x6)  ;
+ori x7, x0, 2      | fence rw, rw  ;
+sc.w x10, x7, (x6) | ori x7, x0, 1 ;
+lw x8, 0(x9)       | sw x7, 0(x8)  ;
+
+exists (0:x5=1 /\ 0:x8=0) /\ 0:x10=1
+
+new litmus test
+[XSc];fencerel(Fence.r.r);[R]
+XLr_rmw_XSc_fencerelFence.r.r_R_Rfi_PosRW_Fence_r_rdWR_Fre_Fence_rw_rwdWW_Coe
+RISCV XLr_rmw_XSc_fencerelFence.r.r_R_Rfi_PosRW_Fence_r_rdWR_Fre_Fence_rw_rwdWW_Coe
+ {0:x6=x; 0:x10=y; 1:x6=y; 1:x8=x; }
+        P0         |      P1       ;
+ori x5, x0, 2      | ori x5, x0, 1 ;
+sw x5, 0(x6)       | sw x5, 0(x6)  ;
+lr.w x7, 0(x6)     | fence rw, rw  ;
+lr.w x8, 0(x6)     | ori x7, x0, 1 ;
+ori x8, x0, 3      | sw x7, 0(x8)  ;
+sc.w x11, x8, (x6) | lw x9, 0(x8)  ;
+fence r, r         |               ;
+lw x9, 0(x10)      |               ;
+
+exists (0:x7=2 /\ 0:x9=0 /\ 1:x9=2) /\ 0:x11=1
+
+new litmus test
+[R];po;[XLr]
+R_po_XLr_PodRR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_po_XLr_PodRR_Fre_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x8=y; 1:x6=y; 1:x8=x; }
+      P0       |      P1       ;
+lw x5, 0(x6)   | ori x5, x0, 1 ;
+lr.w x7, 0(x8) | sw x5, 0(x6)  ;
+               | fence rw, rw  ;
+               | ori x7, x0, 1 ;
+               | sw x7, 0(x8)  ;
+
+exists (0:x5=1 /\ 0:x7=0)
+
+new litmus test
+[XLr];po;[W]
+XLr_po_W_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV XLr_po_W_PodRW_Coe_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x8=y; 1:x6=y; 1:x8=x; }
+      P0       |      P1       ;
+lr.w x5, 0(x6) | ori x5, x0, 2 ;
+ori x7, x0, 1  | sw x5, 0(x6)  ;
+sw x7, 0(x8)   | fence rw, rw  ;
+lw x9, 0(x8)   | ori x7, x0, 1 ;
+               | sw x7, 0(x8)  ;
+
+exists (0:x9=2 /\ 0:x5=1)
+
+new litmus test
+[XSc];po;[W]
+XLr_rmw_XSc_po_W_PosRW_PodWW_Coe_Fence_rw_rwdWW_Rfe
+RISCV XLr_rmw_XSc_po_W_PosRW_PodWW_Coe_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x9=y; 1:x6=y; 1:x8=x; }
+        P0         |      P1       ;
+lr.w x5, 0(x6)     | ori x5, x0, 2 ;
+lr.w x7, 0(x6)     | sw x5, 0(x6)  ;
+ori x7, x0, 2      | fence rw, rw  ;
+sc.w x11, x7, (x6) | ori x7, x0, 1 ;
+ori x8, x0, 1      | sw x7, 0(x8)  ;
+sw x8, 0(x9)       |               ;
+lw x10, 0(x9)      |               ;
+
+exists (0:x10=2 /\ 0:x5=1) /\ 0:x11=1
+
+new litmus test
+[W];po;[XLr]
+W_po_XLr_PodWR_Fre_Fence_rw_rwdWW_Coe
+RISCV W_po_XLr_PodWR_Fre_Fence_rw_rwdWW_Coe
+ {0:x6=x; 0:x8=y; 1:x6=y; 1:x8=x; }
+      P0       |      P1       ;
+ori x5, x0, 2  | ori x5, x0, 1 ;
+sw x5, 0(x6)   | sw x5, 0(x6)  ;
+lr.w x7, 0(x8) | fence rw, rw  ;
+               | ori x7, x0, 1 ;
+               | sw x7, 0(x8)  ;
+               | lw x9, 0(x8)  ;
+
+exists (0:x7=0 /\ 1:x9=2)
+
+new litmus test
+[W];fencerel(Fence.tso);[XLr]
+W_fencerelFence.tso_XLr_Fence_tsodWR_Fre_Fence_rw_rwdWW_Coe
+RISCV W_fencerelFence.tso_XLr_Fence_tsodWR_Fre_Fence_rw_rwdWW_Coe
+ {0:x6=x; 0:x8=y; 1:x6=y; 1:x8=x; }
+      P0       |      P1       ;
+ori x5, x0, 2  | ori x5, x0, 1 ;
+sw x5, 0(x6)   | sw x5, 0(x6)  ;
+fence.tso      | fence rw, rw  ;
+lr.w x7, 0(x8) | ori x7, x0, 1 ;
+               | sw x7, 0(x8)  ;
+               | lw x9, 0(x8)  ;
+
+exists (0:x7=0 /\ 1:x9=2)
+
+new litmus test
+[XLr];po;[AMO]
+XLr_po_AMO_PodRR_Rmw_Coe_Fence_rw_rwdWW_Rfe
+RISCV XLr_po_AMO_PodRR_Rmw_Coe_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x7=y; 1:x6=y; 1:x8=x; }
+          P0           |      P1       ;
+lr.w x5, 0(x6)         | ori x5, x0, 2 ;
+ori x9, x0, 1          | sw x5, 0(x6)  ;
+amoswap.w x8, x9, (x7) | fence rw, rw  ;
+lw x10, 0(x7)          | ori x7, x0, 1 ;
+                       | sw x7, 0(x8)  ;
+
+exists (0:x10=2 /\ 0:x5=1)
+
+new litmus test
+[R];po;[XLr];po;[W]
+R_po_XLr_po_W_PodRR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_XLr_po_W_PodRR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x8=y; 0:x10=z; 1:x6=z; 1:x8=x; }
+      P0       |      P1       ;
+lw x5, 0(x6)   | ori x5, x0, 2 ;
+lr.w x7, 0(x8) | sw x5, 0(x6)  ;
+ori x9, x0, 1  | fence rw, rw  ;
+sw x9, 0(x10)  | ori x7, x0, 1 ;
+lw x11, 0(x10) | sw x7, 0(x8)  ;
+
+exists (0:x11=2 /\ 0:x5=1)
+
+new litmus test
+[R];po;[AMO]
+R_po_AMO_PodRR_Rmw_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_AMO_PodRR_Rmw_Coe_Fence_rw_rwdWW_Rfe
+"PodRR Rmw Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Rf
+Orig=PodRR Rmw Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x7=y;
+1:x6=y; 1:x8=x;
+}
+ P0                   | P1          ;
+ lw x5,0(x6)          | ori x5,x0,2 ;
+ ori x9,x0,1          | sw x5,0(x6) ;
+ amoswap.w x8,x9,(x7) | fence rw,rw ;
+ lw x10,0(x7)         | ori x7,x0,1 ;
+                      | sw x7,0(x8) ;
+exists (0:x10=2 /\ 0:x5=1)
+
+new litmus test
+[R];po;[XLr];po;[AMO]
+R_po_XLr_po_AMO_PodRR_PodRR_Rmw_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_XLr_po_AMO_PodRR_PodRR_Rmw_Coe_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x8=y; 0:x9=z; 1:x6=z; 1:x8=x; }
+           P0            |      P1       ;
+lw x5, 0(x6)             | ori x5, x0, 2 ;
+lr.w x7, 0(x8)           | sw x5, 0(x6)  ;
+ori x11, x0, 1           | fence rw, rw  ;
+amoswap.w x10, x11, (x9) | ori x7, x0, 1 ;
+lw x12, 0(x9)            | sw x7, 0(x8)  ;
+
+exists (0:x12=2 /\ 0:x5=1)
+
+new litmus test
+[RL];po;[W]
+RL_po_W_Rmw_PodWWRlP_Coe_Fence_rw_rwdWW_Rfe
+RISCV RL_po_W_Rmw_PodWWRlP_Coe_Fence_rw_rwdWW_Rfe
+"RmwPRl PodWWRlP Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Rf
+Orig=RmwPRl PodWWRlP Coe Fence.rw.rwdWW Rfe
+{
+0:x5=x; 0:x9=y;
+1:x6=y; 1:x8=x;
+}
+ P0                      | P1          ;
+ ori x7,x0,2             | ori x5,x0,2 ;
+ amoswap.w.rl x6,x7,(x5) | sw x5,0(x6) ;
+ ori x8,x0,1             | fence rw,rw ;
+ sw x8,0(x9)             | ori x7,x0,1 ;
+ lw x10,0(x9)            | sw x7,0(x8) ;
+exists (0:x10=2 /\ 0:x6=1)
+
+new litmus test
+[W];po;[AQ]
+W_po_AQ_PodWRPAq_Rmw_Coe_Fence_rw_rwdWW_Coe
+RISCV W_po_AQ_PodWRPAq_Rmw_Coe_Fence_rw_rwdWW_Coe
+"PodWRPAq RmwAqP Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=PodWRPAq RmwAqP Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x7=y;
+1:x6=y; 1:x8=x;
+}
+ P0                      | P1          ;
+ ori x5,x0,2             | ori x5,x0,2 ;
+ sw x5,0(x6)             | sw x5,0(x6) ;
+ ori x9,x0,1             | fence rw,rw ;
+ amoswap.w.aq x8,x9,(x7) | ori x7,x0,1 ;
+ lw x10,0(x7)            | sw x7,0(x8) ;
+                         | lw x9,0(x8) ;
+exists (0:x10=2 /\ 1:x9=2)
+
+new litmus test
+[AMO];po;[AMO]
+AMO_po_AMO_Rmw_PodWR_Rmw_Coe_Fence_rw_rwdWW_Rfe
+RISCV AMO_po_AMO_Rmw_PodWR_Rmw_Coe_Fence_rw_rwdWW_Rfe
+"Rmw PodWR Rmw Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Rf
+Orig=Rmw PodWR Rmw Coe Fence.rw.rwdWW Rfe
+{
+0:x5=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0                    | P1          ;
+ ori x7,x0,2           | ori x5,x0,2 ;
+ amoswap.w x6,x7,(x5)  | sw x5,0(x6) ;
+ ori x10,x0,1          | fence rw,rw ;
+ amoswap.w x9,x10,(x8) | ori x7,x0,1 ;
+ lw x11,0(x8)          | sw x7,0(x8) ;
+exists (0:x11=2 /\ 0:x6=1)
+
+new litmus test
+[R];po;[R];data;[W]
+R_po_R_data_W_PodRR_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_R_data_W_PodRR_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+"PodRR DpDatadW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=PodRR DpDatadW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x10=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,2 ;
+ lw x7,0(x8)   | sw x5,0(x6) ;
+ xor x9,x7,x7  | fence rw,rw ;
+ ori x9,x9,1   | ori x7,x0,1 ;
+ sw x9,0(x10)  | sw x7,0(x8) ;
+ lw x11,0(x10) |             ;
+exists (0:x11=2 /\ 0:x5=1)
+
+new litmus test
+[W];po;[R];data;[W]
+W_po_R_data_W_PodWR_DpDatadW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_po_R_data_W_PodWR_DpDatadW_Coe_Fence_rw_rwdWW_Coe
+"PodWR DpDatadW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Co
+Orig=PodWR DpDatadW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x8=y; 0:x10=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ ori x5,x0,2   | ori x5,x0,2 ;
+ sw x5,0(x6)   | sw x5,0(x6) ;
+ lw x7,0(x8)   | fence rw,rw ;
+ xor x9,x7,x7  | ori x7,x0,1 ;
+ ori x9,x9,1   | sw x7,0(x8) ;
+ sw x9,0(x10)  | lw x9,0(x8) ;
+ lw x11,0(x10) |             ;
+exists (0:x11=2 /\ 1:x9=2)
+
+new litmus test
+[W];rfi;[R];data;[W]
+W_rfi_R_data_W_Rfi_DpDatadW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_rfi_R_data_W_Rfi_DpDatadW_Coe_Fence_rw_rwdWW_Coe
+"Rfi DpDatadW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=Rfi DpDatadW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x9=y;
+1:x6=y; 1:x8=x;
+}
+ P0           | P1          ;
+ ori x5,x0,2  | ori x5,x0,2 ;
+ sw x5,0(x6)  | sw x5,0(x6) ;
+ lw x7,0(x6)  | fence rw,rw ;
+ xor x8,x7,x7 | ori x7,x0,1 ;
+ ori x8,x8,1  | sw x7,0(x8) ;
+ sw x8,0(x9)  | lw x9,0(x8) ;
+ lw x10,0(x9) |             ;
+exists (0:x10=2 /\ 0:x7=2 /\ 1:x9=2)
+
+new litmus test
+[W];po-loc;[R];data;[W]
+W_po_loc_R_data_W_PosWR_DpDatadW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_po_loc_R_data_W_PosWR_DpDatadW_Coe_Fence_rw_rwdWW_Coe
+"PosWR DpDatadW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=PosWR DpDatadW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x9=y;
+1:x6=y; 1:x8=x;
+}
+ P0           | P1          ;
+ ori x5,x0,2  | ori x5,x0,2 ;
+ sw x5,0(x6)  | sw x5,0(x6) ;
+ lw x7,0(x6)  | fence rw,rw ;
+ xor x8,x7,x7 | ori x7,x0,1 ;
+ ori x8,x8,1  | sw x7,0(x8) ;
+ sw x8,0(x9)  | lw x9,0(x8) ;
+ lw x10,0(x9) |             ;
+exists (0:x10=2 /\ 1:x9=2)
+
+new litmus test
+[R];po;[W];po;[R];data;[W]
+R_po_W_po_R_data_W_PodRW_PodWR_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_W_po_R_data_W_PodRW_PodWR_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+"PodRW PodWR DpDatadW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:a=W,1:a=F,1:x=W
+Com=Co Rf
+Orig=PodRW PodWR DpDatadW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x10=z; 0:x12=a;
+1:x6=a; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,2 ;
+ ori x7,x0,1   | sw x5,0(x6) ;
+ sw x7,0(x8)   | fence rw,rw ;
+ lw x9,0(x10)  | ori x7,x0,1 ;
+ xor x11,x9,x9 | sw x7,0(x8) ;
+ ori x11,x11,1 |             ;
+ sw x11,0(x12) |             ;
+ lw x13,0(x12) |             ;
+exists (0:x13=2 /\ 0:x5=1)
+
+new litmus test
+[R];po;[W];rfi;[R];data;[W]
+R_po_W_rfi_R_data_W_PodRW_Rfi_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_W_rfi_R_data_W_PodRW_Rfi_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+"PodRW Rfi DpDatadW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=PodRW Rfi DpDatadW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,2 ;
+ ori x7,x0,1   | sw x5,0(x6) ;
+ sw x7,0(x8)   | fence rw,rw ;
+ lw x9,0(x8)   | ori x7,x0,1 ;
+ xor x10,x9,x9 | sw x7,0(x8) ;
+ ori x10,x10,1 |             ;
+ sw x10,0(x11) |             ;
+ lw x12,0(x11) |             ;
+exists (0:x12=2 /\ 0:x5=1 /\ 0:x9=1)
+
+new litmus test
+[R];addr;[W];po;[R];data;[W]
+R_addr_W_po_R_data_W_DpAddrdW_PodWR_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_R_data_W_DpAddrdW_PodWR_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW PodWR DpDatadW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:a=W,1:a=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW PodWR DpDatadW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x12=z; 0:x14=a;
+1:x6=a; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ lw x11,0(x12)   |             ;
+ xor x13,x11,x11 |             ;
+ ori x13,x13,1   |             ;
+ sw x13,0(x14)   |             ;
+ lw x15,0(x14)   |             ;
+exists (0:x15=2 /\ 0:x5=1)
+
+new litmus test
+[R];addr;[W];rfi;[R];data;[W]
+R_addr_W_rfi_R_data_W_DpAddrdW_Rfi_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_rfi_R_data_W_DpAddrdW_Rfi_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW Rfi DpDatadW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW Rfi DpDatadW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x13=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ lw x11,0(x9)    |             ;
+ xor x12,x11,x11 |             ;
+ ori x12,x12,1   |             ;
+ sw x12,0(x13)   |             ;
+ lw x14,0(x13)   |             ;
+exists (0:x14=2 /\ 0:x5=1 /\ 0:x11=1)
+
+new litmus test
+[R];po;[W];po-loc;[R];data;[W]
+R_po_W_po_loc_R_data_W_PodRW_PosWR_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_W_po_loc_R_data_W_PodRW_PosWR_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+"PodRW PosWR DpDatadW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=PodRW PosWR DpDatadW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,2 ;
+ ori x7,x0,1   | sw x5,0(x6) ;
+ sw x7,0(x8)   | fence rw,rw ;
+ lw x9,0(x8)   | ori x7,x0,1 ;
+ xor x10,x9,x9 | sw x7,0(x8) ;
+ ori x10,x10,1 |             ;
+ sw x10,0(x11) |             ;
+ lw x12,0(x11) |             ;
+exists (0:x12=2 /\ 0:x5=1)
+
+new litmus test
+[R];addr;[W];po-loc;[R];data;[W]
+R_addr_W_po_loc_R_data_W_DpAddrdW_PosWR_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_loc_R_data_W_DpAddrdW_PosWR_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW PosWR DpDatadW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW PosWR DpDatadW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x13=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ lw x11,0(x9)    |             ;
+ xor x12,x11,x11 |             ;
+ ori x12,x12,1   |             ;
+ sw x12,0(x13)   |             ;
+ lw x14,0(x13)   |             ;
+exists (0:x14=2 /\ 0:x5=1)
+
+new litmus test
+[R];addr;[W];po-loc;[W];po-loc;[R];data;[W]
+R_addr_W_po_loc_W_po_loc_R_data_W_DpAddrdW_PosWW_PosWR_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_loc_W_po_loc_R_data_W_DpAddrdW_PosWW_PosWR_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW PosWW PosWR DpDatadW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW PosWW PosWR DpDatadW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x14=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ ori x11,x0,2    |             ;
+ sw x11,0(x9)    |             ;
+ lw x12,0(x9)    |             ;
+ xor x13,x12,x12 |             ;
+ ori x13,x13,1   |             ;
+ sw x13,0(x14)   |             ;
+ lw x15,0(x14)   |             ;
+exists (0:x15=2 /\ 0:x5=1)
+
+new litmus test
+[W];po-loc;[R]
+W_po_loc_R_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_po_loc_R_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Coe
+"PosWR DpAddrdW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=PosWR DpAddrdW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x10=y;
+1:x6=y; 1:x8=x;
+}
+ P0             | P1          ;
+ ori x5,x0,2    | ori x5,x0,2 ;
+ sw x5,0(x6)    | sw x5,0(x6) ;
+ lw x7,0(x6)    | fence rw,rw ;
+ xor x8,x7,x7   | ori x7,x0,1 ;
+ ori x9,x0,1    | sw x7,0(x8) ;
+ add x11,x10,x8 | lw x9,0(x8) ;
+ sw x9,0(x11)   |             ;
+ lw x12,0(x10)  |             ;
+exists (0:x12=2 /\ 1:x9=2)
+
+
+new litmus test
+[W];rfi;[R]
+W_rfi_R_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_rfi_R_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Coe
+"Rfi DpAddrdR Fre Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Co
+Orig=Rfi DpAddrdR Fre Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x10=y;
+1:x6=y; 1:x8=x;
+}
+ P0             | P1          ;
+ ori x5,x0,2    | ori x5,x0,1 ;
+ sw x5,0(x6)    | sw x5,0(x6) ;
+ lw x7,0(x6)    | fence rw,rw ;
+ xor x8,x7,x7   | ori x7,x0,1 ;
+ add x11,x10,x8 | sw x7,0(x8) ;
+ lw x9,0(x11)   |             ;
+exists (x=2 /\ 0:x7=2 /\ 0:x9=0)
+
+new litmus test
+[RL];po;[R]
+RL_po_R_Rmw_PodWRRlP_Fre_Fence_rw_rwdWW_Rfe
+RISCV RL_po_R_Rmw_PodWRRlP_Fre_Fence_rw_rwdWW_Rfe
+"RmwPRl PodWRRlP Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Rf
+Orig=RmwPRl PodWRRlP Fre Fence.rw.rwdWW Rfe
+{
+0:x5=x; 0:x9=y;
+1:x6=y; 1:x8=x;
+}
+ P0                      | P1          ;
+ ori x7,x0,2             | ori x5,x0,1 ;
+ amoswap.w.rl x6,x7,(x5) | sw x5,0(x6) ;
+ lw x8,0(x9)             | fence rw,rw ;
+                         | ori x7,x0,1 ;
+                         | sw x7,0(x8) ;
+exists (0:x6=1 /\ 0:x8=0)
+
+new litmus test
+[RL];po;[AQ]
+RL_po_AQ_Rmw_PodWRRlAq_Rmw_Coe_Fence_rw_rwdWW_Rfe
+RISCV RL_po_AQ_Rmw_PodWRRlAq_Rmw_Coe_Fence_rw_rwdWW_Rfe
+"RmwPRl PodWRRlAq RmwAqP Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Rf
+Orig=RmwPRl PodWRRlAq RmwAqP Coe Fence.rw.rwdWW Rfe
+{
+0:x5=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0                       | P1          ;
+ ori x7,x0,2              | ori x5,x0,2 ;
+ amoswap.w.rl x6,x7,(x5)  | sw x5,0(x6) ;
+ ori x10,x0,1             | fence rw,rw ;
+ amoswap.w.aq x9,x10,(x8) | ori x7,x0,1 ;
+ lw x11,0(x8)             | sw x7,0(x8) ;
+exists (0:x11=2 /\ 0:x6=1)
+
+new litmus test
+[RL];po;[AQ];po;[R]
+RL_po_AQ_po_R_Rmw_PodWRRlAq_Rmw_PodWR_Fre_Fence_rw_rwdWW_Rfe
+RISCV RL_po_AQ_po_R_Rmw_PodWRRlAq_Rmw_PodWR_Fre_Fence_rw_rwdWW_Rfe
+"RmwPRl PodWRRlAq RmwAqP PodWR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=RmwPRl PodWRRlAq RmwAqP PodWR Fre Fence.rw.rwdWW Rfe
+{
+0:x5=x; 0:x8=y; 0:x12=z;
+1:x6=z; 1:x8=x;
+}
+ P0                       | P1          ;
+ ori x7,x0,2              | ori x5,x0,1 ;
+ amoswap.w.rl x6,x7,(x5)  | sw x5,0(x6) ;
+ ori x10,x0,1             | fence rw,rw ;
+ amoswap.w.aq x9,x10,(x8) | ori x7,x0,1 ;
+ lw x11,0(x12)            | sw x7,0(x8) ;
+exists (0:x6=1 /\ 0:x11=0)
+
+new litmus test
+[XLr];po;[R]
+XLr_po_R_PodRR_Fre_Fence_rw_rwdWW_Rfe
+RISCV XLr_po_R_PodRR_Fre_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x8=y; 1:x6=y; 1:x8=x; }
+      P0       |      P1       ;
+lr.w x5, 0(x6) | ori x5, x0, 1 ;
+lw x7, 0(x8)   | sw x5, 0(x6)  ;
+               | fence rw, rw  ;
+               | ori x7, x0, 1 ;
+               | sw x7, 0(x8)  ;
+
+exists (0:x5=1 /\ 0:x7=0)
+
+new litmus test
+[XSc];rfi;[R]
+XLr_rmw_XSc_rfi_R_PosRW_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV XLr_rmw_XSc_rfi_R_PosRW_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x11=y; 1:x6=y; 1:x8=x; }
+        P0         |      P1       ;
+lr.w x5, 0(x6)     | ori x5, x0, 2 ;
+lr.w x7, 0(x6)     | sw x5, 0(x6)  ;
+ori x7, x0, 2      | fence rw, rw  ;
+sc.w x14, x7, (x6) | ori x7, x0, 1 ;
+lw x8, 0(x6)       | sw x7, 0(x8)  ;
+xor x9, x8, x8     |               ;
+ori x10, x0, 1     |               ;
+add x12, x11, x9   |               ;
+sw x10, 0(x12)     |               ;
+lw x13, 0(x11)     |               ;
+
+exists (0:x13=2 /\ 0:x5=1 /\ 0:x8=2) /\ 0:x14=1
+
+new litmus test
+[XSc];po-loc;[R]
+XLr_rmw_XSc_po_loc_R_PosRW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV XLr_rmw_XSc_po_loc_R_PosRW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x11=y; 1:x6=y; 1:x8=x; }
+        P0         |      P1       ;
+lr.w x5, 0(x6)     | ori x5, x0, 2 ;
+lr.w x7, 0(x6)     | sw x5, 0(x6)  ;
+ori x7, x0, 2      | fence rw, rw  ;
+sc.w x14, x7, (x6) | ori x7, x0, 1 ;
+lw x8, 0(x6)       | sw x7, 0(x8)  ;
+xor x9, x8, x8     |               ;
+ori x10, x0, 1     |               ;
+add x12, x11, x9   |               ;
+sw x10, 0(x12)     |               ;
+lw x13, 0(x11)     |               ;
+
+exists (0:x13=2 /\ 0:x5=1) /\ 0:x14=1
+
+new litmus test
+[XLr];po;[R];po;[W]
+XLr_po_R_po_W_PodRR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV XLr_po_R_po_W_PodRR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x8=y; 0:x10=z; 1:x6=z; 1:x8=x; }
+      P0       |      P1       ;
+lr.w x5, 0(x6) | ori x5, x0, 2 ;
+lw x7, 0(x8)   | sw x5, 0(x6)  ;
+ori x9, x0, 1  | fence rw, rw  ;
+sw x9, 0(x10)  | ori x7, x0, 1 ;
+lw x11, 0(x10) | sw x7, 0(x8)  ;
+
+exists (0:x11=2 /\ 0:x5=1)
+
+new litmus test
+[XSc];po;[R];po;[W]
+XLr_rmw_XSc_po_R_po_W_PosRW_PodWR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV XLr_rmw_XSc_po_R_po_W_PosRW_PodWR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x9=y; 0:x11=z; 1:x6=z; 1:x8=x; }
+        P0         |      P1       ;
+lr.w x5, 0(x6)     | ori x5, x0, 2 ;
+lr.w x7, 0(x6)     | sw x5, 0(x6)  ;
+ori x7, x0, 2      | fence rw, rw  ;
+sc.w x13, x7, (x6) | ori x7, x0, 1 ;
+lw x8, 0(x9)       | sw x7, 0(x8)  ;
+ori x10, x0, 1     |               ;
+sw x10, 0(x11)     |               ;
+lw x12, 0(x11)     |               ;
+
+exists (0:x12=2 /\ 0:x5=1) /\ 0:x13=1
+
+new litmus test
+[XSc];rfi;[R];po;[W]
+XLr_rmw_XSc_rfi_R_po_W_PosRW_Rfi_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV XLr_rmw_XSc_rfi_R_po_W_PosRW_Rfi_PodRW_Coe_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x10=y; 1:x6=y; 1:x8=x; }
+        P0         |      P1       ;
+lr.w x5, 0(x6)     | ori x5, x0, 2 ;
+lr.w x7, 0(x6)     | sw x5, 0(x6)  ;
+ori x7, x0, 2      | fence rw, rw  ;
+sc.w x12, x7, (x6) | ori x7, x0, 1 ;
+lw x8, 0(x6)       | sw x7, 0(x8)  ;
+ori x9, x0, 1      |               ;
+sw x9, 0(x10)      |               ;
+lw x11, 0(x10)     |               ;
+
+exists (0:x11=2 /\ 0:x5=1 /\ 0:x8=2) /\ 0:x12=1
+
+new litmus test
+[XLr];po;[XLr];po;[R]
+XLr_po_XLr_po_R_PodRR_PodRR_Fre_Fence_rw_rwdWW_Rfe
+RISCV XLr_po_XLr_po_R_PodRR_PodRR_Fre_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x8=y; 0:x10=z; 1:x6=z; 1:x8=x; }
+      P0       |      P1       ;
+lr.w x5, 0(x6) | ori x5, x0, 1 ;
+lr.w x7, 0(x8) | sw x5, 0(x6)  ;
+lw x9, 0(x10)  | fence rw, rw  ;
+               | ori x7, x0, 1 ;
+               | sw x7, 0(x8)  ;
+
+exists (0:x5=1 /\ 0:x9=0)
+
+new litmus test
+[XLr];po;[XLr];po;[W]
+XLr_po_XLr_po_W_PodRR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV XLr_po_XLr_po_W_PodRR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x8=y; 0:x10=z; 1:x6=z; 1:x8=x; }
+      P0       |      P1       ;
+lr.w x5, 0(x6) | ori x5, x0, 2 ;
+lr.w x7, 0(x8) | sw x5, 0(x6)  ;
+ori x9, x0, 1  | fence rw, rw  ;
+sw x9, 0(x10)  | ori x7, x0, 1 ;
+lw x11, 0(x10) | sw x7, 0(x8)  ;
+
+exists (0:x11=2 /\ 0:x5=1)
+
+new litmus test
+[XLr];po;[R];addr;[W]
+XLr_po_R_addr_W_PodRR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV XLr_po_R_addr_W_PodRR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x8=y; 0:x11=z; 1:x6=z; 1:x8=x; }
+       P0        |      P1       ;
+lr.w x5, 0(x6)   | ori x5, x0, 2 ;
+lw x7, 0(x8)     | sw x5, 0(x6)  ;
+xor x9, x7, x7   | fence rw, rw  ;
+ori x10, x0, 1   | ori x7, x0, 1 ;
+add x12, x11, x9 | sw x7, 0(x8)  ;
+sw x10, 0(x12)   |               ;
+lw x13, 0(x11)   |               ;
+
+exists (0:x13=2 /\ 0:x5=1)
+
+new litmus test
+[XSc];po;[R];addr;[W]
+XLr_rmw_XSc_po_R_addr_W_PosRW_PodWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV XLr_rmw_XSc_po_R_addr_W_PosRW_PodWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x9=y; 0:x12=z; 1:x6=z; 1:x8=x; }
+        P0         |      P1       ;
+lr.w x5, 0(x6)     | ori x5, x0, 2 ;
+lr.w x7, 0(x6)     | sw x5, 0(x6)  ;
+ori x7, x0, 2      | fence rw, rw  ;
+sc.w x15, x7, (x6) | ori x7, x0, 1 ;
+lw x8, 0(x9)       | sw x7, 0(x8)  ;
+xor x10, x8, x8    |               ;
+ori x11, x0, 1     |               ;
+add x13, x12, x10  |               ;
+sw x11, 0(x13)     |               ;
+lw x14, 0(x12)     |               ;
+
+exists (0:x14=2 /\ 0:x5=1) /\ 0:x15=1
+
+new litmus test
+[W];po;[W];po;[R]
+W_po_W_po_R_PodWW_PodWR_Fre_Fence_rw_rwdWW_Coe
+RISCV W_po_W_po_R_PodWW_PodWR_Fre_Fence_rw_rwdWW_Coe
+"PodWW PodWR Fre Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Co
+Orig=PodWW PodWR Fre Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x8=y; 0:x10=z;
+1:x6=z; 1:x8=x;
+}
+ P0           | P1          ;
+ ori x5,x0,2  | ori x5,x0,1 ;
+ sw x5,0(x6)  | sw x5,0(x6) ;
+ ori x7,x0,1  | fence rw,rw ;
+ sw x7,0(x8)  | ori x7,x0,1 ;
+ lw x9,0(x10) | sw x7,0(x8) ;
+              | lw x9,0(x8) ;
+exists (0:x9=0 /\ 1:x9=2)
+
+new litmus test
+[W];po;[W];po;[W]
+W_po_W_po_W_PodWW_PodWW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_po_W_po_W_PodWW_PodWW_Coe_Fence_rw_rwdWW_Coe
+"PodWW PodWW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Co
+Orig=PodWW PodWW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x8=y; 0:x10=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ ori x5,x0,2   | ori x5,x0,2 ;
+ sw x5,0(x6)   | sw x5,0(x6) ;
+ ori x7,x0,1   | fence rw,rw ;
+ sw x7,0(x8)   | ori x7,x0,1 ;
+ ori x9,x0,1   | sw x7,0(x8) ;
+ sw x9,0(x10)  | lw x9,0(x8) ;
+ lw x11,0(x10) |             ;
+exists (0:x11=2 /\ 1:x9=2)
+
+new litmus test
+[W];po;[W];rfi;[R]
+W_po_W_rfi_R_PodWW_Rfi_Fre_Fence_rw_rwdWW_Coe
+RISCV W_po_W_rfi_R_PodWW_Rfi_Fre_Fence_rw_rwdWW_Coe
+"PodWW Rfi Fre Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Co
+Orig=PodWW Rfi Fre Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0           | P1          ;
+ ori x5,x0,2  | ori x5,x0,2 ;
+ sw x5,0(x6)  | sw x5,0(x6) ;
+ ori x7,x0,1  | fence rw,rw ;
+ sw x7,0(x8)  | ori x7,x0,1 ;
+ lw x9,0(x8)  | sw x7,0(x8) ;
+ lw x10,0(x8) | lw x9,0(x8) ;
+exists (0:x10=2 /\ 0:x9=1 /\ 1:x9=2)
+
+new litmus test
+[W];coi;[W];po;[R]
+W_coi_W_po_R_Coi_PodWR_Fre_Fence_rw_rwdWW_Coe
+RISCV W_coi_W_po_R_Coi_PodWR_Fre_Fence_rw_rwdWW_Coe
+"Coi PodWR Fre Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Co
+Orig=Coi PodWR Fre Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x9=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ ori x5,x0,2 | ori x5,x0,1 ;
+ sw x5,0(x6) | sw x5,0(x6) ;
+ ori x7,x0,3 | fence rw,rw ;
+ sw x7,0(x6) | ori x7,x0,1 ;
+ lw x8,0(x9) | sw x7,0(x8) ;
+             | lw x9,0(x8) ;
+exists (0:x8=0 /\ 1:x9=2)
+
+new litmus test
+[W];coi;[W];po;[W]
+W_coi_W_po_W_Coi_PodWW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_coi_W_po_W_Coi_PodWW_Coe_Fence_rw_rwdWW_Coe
+"Coi PodWW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=Coi PodWW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x9=y;
+1:x6=y; 1:x8=x;
+}
+ P0           | P1          ;
+ ori x5,x0,2  | ori x5,x0,2 ;
+ sw x5,0(x6)  | sw x5,0(x6) ;
+ ori x7,x0,3  | fence rw,rw ;
+ sw x7,0(x6)  | ori x7,x0,1 ;
+ ori x8,x0,1  | sw x7,0(x8) ;
+ sw x8,0(x9)  | lw x9,0(x8) ;
+ lw x10,0(x9) |             ;
+exists (0:x10=2 /\ 1:x9=2)
+
+new litmus test
+[W];coi;[W];rfi;[R]
+W_coi_W_rfi_R_Coi_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_coi_W_rfi_R_Coi_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Coe
+"Coi Rfi DpAddrdW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=Coi Rfi DpAddrdW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x11=y;
+1:x6=y; 1:x8=x;
+}
+ P0             | P1          ;
+ ori x5,x0,2    | ori x5,x0,2 ;
+ sw x5,0(x6)    | sw x5,0(x6) ;
+ ori x7,x0,3    | fence rw,rw ;
+ sw x7,0(x6)    | ori x7,x0,1 ;
+ lw x8,0(x6)    | sw x7,0(x8) ;
+ xor x9,x8,x8   | lw x9,0(x8) ;
+ ori x10,x0,1   |             ;
+ add x12,x11,x9 |             ;
+ sw x10,0(x12)  |             ;
+ lw x13,0(x11)  |             ;
+exists (0:x13=2 /\ 0:x8=3 /\ 1:x9=2)
+
+new litmus test
+[W];po;[R];ctrl;[W]
+W_po_R_ctrl_W_PodWR_DpCtrldW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_po_R_ctrl_W_PodWR_DpCtrldW_Coe_Fence_rw_rwdWW_Coe
+"PodWR DpCtrldW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Co
+Orig=PodWR DpCtrldW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x8=y; 0:x10=z;
+1:x6=z; 1:x8=x;
+}
+ P0             | P1          ;
+ ori x5,x0,2    | ori x5,x0,2 ;
+ sw x5,0(x6)    | sw x5,0(x6) ;
+ lw x7,0(x8)    | fence rw,rw ;
+ bne x7,x0,LC00 | ori x7,x0,1 ;
+ LC00:          | sw x7,0(x8) ;
+ ori x9,x0,1    | lw x9,0(x8) ;
+ sw x9,0(x10)   |             ;
+ lw x11,0(x10)  |             ;
+exists (0:x11=2 /\ 1:x9=2)
+
+new litmus test
+[W];rfi;[R];ctrl;[W]
+W_rfi_R_ctrl_W_Rfi_DpCtrldW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_rfi_R_ctrl_W_Rfi_DpCtrldW_Coe_Fence_rw_rwdWW_Coe
+"Rfi DpCtrldW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=Rfi DpCtrldW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x9=y;
+1:x6=y; 1:x8=x;
+}
+ P0             | P1          ;
+ ori x5,x0,2    | ori x5,x0,2 ;
+ sw x5,0(x6)    | sw x5,0(x6) ;
+ lw x7,0(x6)    | fence rw,rw ;
+ bne x7,x0,LC00 | ori x7,x0,1 ;
+ LC00:          | sw x7,0(x8) ;
+ ori x8,x0,1    | lw x9,0(x8) ;
+ sw x8,0(x9)    |             ;
+ lw x10,0(x9)   |             ;
+exists (0:x10=2 /\ 0:x7=2 /\ 1:x9=2)
+
+new litmus test
+[W];po;[W];po-loc;[R]
+W_po_W_po_loc_R_PodWW_PosWR_Fre_Fence_rw_rwdWW_Coe
+RISCV W_po_W_po_loc_R_PodWW_PosWR_Fre_Fence_rw_rwdWW_Coe
+"PodWW PosWR Fre Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Co
+Orig=PodWW PosWR Fre Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0           | P1          ;
+ ori x5,x0,2  | ori x5,x0,2 ;
+ sw x5,0(x6)  | sw x5,0(x6) ;
+ ori x7,x0,1  | fence rw,rw ;
+ sw x7,0(x8)  | ori x7,x0,1 ;
+ lw x9,0(x8)  | sw x7,0(x8) ;
+ lw x10,0(x8) | lw x9,0(x8) ;
+exists (0:x10=2 /\ 0:x9=1 /\ 1:x9=2)
+
+new litmus test
+[W];po-loc;[W];po;[R]
+W_po_loc_W_po_R_PosWW_PodWR_Fre_Fence_rw_rwdWW_Coe
+RISCV W_po_loc_W_po_R_PosWW_PodWR_Fre_Fence_rw_rwdWW_Coe
+"PosWW PodWR Fre Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Co
+Orig=PosWW PodWR Fre Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x9=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ ori x5,x0,2 | ori x5,x0,1 ;
+ sw x5,0(x6) | sw x5,0(x6) ;
+ ori x7,x0,3 | fence rw,rw ;
+ sw x7,0(x6) | ori x7,x0,1 ;
+ lw x8,0(x9) | sw x7,0(x8) ;
+             | lw x9,0(x8) ;
+exists (0:x8=0 /\ 1:x9=2)
+
+new litmus test
+[W];po-loc;[W];po;[W]
+W_po_loc_W_po_W_PosWW_PodWW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_po_loc_W_po_W_PosWW_PodWW_Coe_Fence_rw_rwdWW_Coe
+"PosWW PodWW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=PosWW PodWW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x9=y;
+1:x6=y; 1:x8=x;
+}
+ P0           | P1          ;
+ ori x5,x0,2  | ori x5,x0,2 ;
+ sw x5,0(x6)  | sw x5,0(x6) ;
+ ori x7,x0,3  | fence rw,rw ;
+ sw x7,0(x6)  | ori x7,x0,1 ;
+ ori x8,x0,1  | sw x7,0(x8) ;
+ sw x8,0(x9)  | lw x9,0(x8) ;
+ lw x10,0(x9) |             ;
+exists (0:x10=2 /\ 1:x9=2)
+
+new litmus test
+[W];po-loc;[W];rfi;[R]
+W_po_loc_W_rfi_R_PosWW_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_po_loc_W_rfi_R_PosWW_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Coe
+"PosWW Rfi DpAddrdW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=PosWW Rfi DpAddrdW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x11=y;
+1:x6=y; 1:x8=x;
+}
+ P0             | P1          ;
+ ori x5,x0,2    | ori x5,x0,2 ;
+ sw x5,0(x6)    | sw x5,0(x6) ;
+ ori x7,x0,3    | fence rw,rw ;
+ sw x7,0(x6)    | ori x7,x0,1 ;
+ lw x8,0(x6)    | sw x7,0(x8) ;
+ xor x9,x8,x8   | lw x9,0(x8) ;
+ ori x10,x0,1   |             ;
+ add x12,x11,x9 |             ;
+ sw x10,0(x12)  |             ;
+ lw x13,0(x11)  |             ;
+exists (0:x13=2 /\ 0:x8=3 /\ 1:x9=2)
+
+new litmus test
+[W];coi;[W];po-loc;[R]
+W_coi_W_po_loc_R_Coi_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_coi_W_po_loc_R_Coi_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Coe
+"Coi PosWR DpAddrdW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=Coi PosWR DpAddrdW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x11=y;
+1:x6=y; 1:x8=x;
+}
+ P0             | P1          ;
+ ori x5,x0,2    | ori x5,x0,2 ;
+ sw x5,0(x6)    | sw x5,0(x6) ;
+ ori x7,x0,3    | fence rw,rw ;
+ sw x7,0(x6)    | ori x7,x0,1 ;
+ lw x8,0(x6)    | sw x7,0(x8) ;
+ xor x9,x8,x8   | lw x9,0(x8) ;
+ ori x10,x0,1   |             ;
+ add x12,x11,x9 |             ;
+ sw x10,0(x12)  |             ;
+ lw x13,0(x11)  |             ;
+exists (0:x13=2 /\ 1:x9=2)
+new litmus test
+[XSc];rfi;[R];addr;[W]
+XLr_rmw_XSc_rfi_R_addr_W_PosRW_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV XLr_rmw_XSc_rfi_R_addr_W_PosRW_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x11=y; 1:x6=y; 1:x8=x; }
+        P0         |      P1       ;
+lr.w x5, 0(x6)     | ori x5, x0, 2 ;
+ori x7, x0, 2      | sw x5, 0(x6)  ;
+sc.w x14, x7, (x6) | fence rw, rw  ;
+lw x8, 0(x6)       | ori x7, x0, 1 ;
+xor x9, x8, x8     | sw x7, 0(x8)  ;
+ori x10, x0, 1     |               ;
+add x12, x11, x9   |               ;
+sw x10, 0(x12)     |               ;
+lw x13, 0(x11)     |               ;
+
+exists (0:x13=2 /\ 0:x5=1 /\ 0:x8=2) /\ 0:x14=1
+
+new litmus test
+[XLr];po-loc;[R];po;[W]
+XLr_po_loc_R_po_W_PosRR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV XLr_po_loc_R_po_W_PosRR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x9=y; 1:x6=y; 1:x8=x; }
+      P0       |      P1       ;
+lr.w x5, 0(x6) | ori x5, x0, 2 ;
+lw x7, 0(x6)   | sw x5, 0(x6)  ;
+ori x8, x0, 1  | fence rw, rw  ;
+sw x8, 0(x9)   | ori x7, x0, 1 ;
+lw x10, 0(x9)  | sw x7, 0(x8)  ;
+
+exists (0:x10=2 /\ 0:x5=1)
+
+new litmus test
+[XSc];po-loc;[R];po;[W]
+XLr_rmw_XSc_po_loc_R_po_W_PosRW_PosWR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV XLr_rmw_XSc_po_loc_R_po_W_PosRW_PosWR_PodRW_Coe_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x10=y; 1:x6=y; 1:x8=x; }
+        P0         |      P1       ;
+lr.w x5, 0(x6)     | ori x5, x0, 2 ;
+ori x7, x0, 2      | sw x5, 0(x6)  ;
+sc.w x12, x7, (x6) | fence rw, rw  ;
+lw x8, 0(x6)       | ori x7, x0, 1 ;
+ori x9, x0, 1      | sw x7, 0(x8)  ;
+sw x9, 0(x10)      |               ;
+lw x11, 0(x10)     |               ;
+
+exists (0:x11=2 /\ 0:x5=1) /\ 0:x12=1
+
+new litmus test
+[XSc];po-loc;[R];addr;[W]
+XLr_rmw_XSc_po_loc_R_addr_W_PosRW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV XLr_rmw_XSc_po_loc_R_addr_W_PosRW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x11=y; 1:x6=y; 1:x8=x; }
+        P0         |      P1       ;
+lr.w x5, 0(x6)     | ori x5, x0, 2 ;
+ori x7, x0, 2      | sw x5, 0(x6)  ;
+sc.w x14, x7, (x6) | fence rw, rw  ;
+lw x8, 0(x6)       | ori x7, x0, 1 ;
+xor x9, x8, x8     | sw x7, 0(x8)  ;
+ori x10, x0, 1     |               ;
+add x12, x11, x9   |               ;
+sw x10, 0(x12)     |               ;
+lw x13, 0(x11)     |               ;
+
+exists (0:x13=2 /\ 0:x5=1) /\ 0:x14=1
+
+new litmus test
+[XSc];po-loc;[W];po-loc;[R]
+XLr_rmw_XSc_po_loc_W_po_loc_R_PosRW_PosWW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV XLr_rmw_XSc_po_loc_W_po_loc_R_PosRW_PosWW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x12=y; 1:x6=y; 1:x8=x; }
+        P0         |      P1       ;
+lr.w x5, 0(x6)     | ori x5, x0, 2 ;
+ori x7, x0, 2      | sw x5, 0(x6)  ;
+sc.w x15, x7, (x6) | fence rw, rw  ;
+ori x8, x0, 3      | ori x7, x0, 1 ;
+sw x8, 0(x6)       | sw x7, 0(x8)  ;
+lw x9, 0(x6)       |               ;
+xor x10, x9, x9    |               ;
+ori x11, x0, 1     |               ;
+add x13, x12, x10  |               ;
+sw x11, 0(x13)     |               ;
+lw x14, 0(x12)     |               ;
+
+exists (0:x14=2 /\ 0:x5=1) /\ 0:x15=1
+
+new litmus test
+[XSc];po-loc;[W];po-loc;[R];addr;[W]
+XLr_rmw_XSc_po_loc_W_po_loc_R_addr_W_PosRW_PosWW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV XLr_rmw_XSc_po_loc_W_po_loc_R_addr_W_PosRW_PosWW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x12=y; 1:x6=y; 1:x8=x; }
+        P0         |      P1       ;
+lr.w x5, 0(x6)     | ori x5, x0, 2 ;
+ori x7, x0, 2      | sw x5, 0(x6)  ;
+sc.w x15, x7, (x6) | fence rw, rw  ;
+ori x8, x0, 3      | ori x7, x0, 1 ;
+sw x8, 0(x6)       | sw x7, 0(x8)  ;
+lw x9, 0(x6)       |               ;
+xor x10, x9, x9    |               ;
+ori x11, x0, 1     |               ;
+add x13, x12, x10  |               ;
+sw x11, 0(x13)     |               ;
+lw x14, 0(x12)     |               ;
+
+exists (0:x14=2 /\ 0:x5=1) /\ 0:x15=1
+
+new litmus test
+[R];rsw;[R]
+R_rsw_R_DpAddrdR_PosRR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_rsw_R_DpAddrdR_PosRR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+"DpAddrdR PosRR DpAddrdR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=DpAddrdR PosRR DpAddrdR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x14=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,1 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ add x10,x9,x7   | fence rw,rw ;
+ lw x8,0(x10)    | ori x7,x0,1 ;
+ lw x11,0(x9)    | sw x7,0(x8) ;
+ xor x12,x11,x11 |             ;
+ add x15,x14,x12 |             ;
+ lw x13,0(x15)   |             ;
+exists (0:x5=1 /\ 0:x13=0)
+
+new litmus test
+[W];po-loc;[R];ctrl;[W]
+W_po_loc_R_ctrl_W_PosWR_DpCtrldW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_po_loc_R_ctrl_W_PosWR_DpCtrldW_Coe_Fence_rw_rwdWW_Coe
+"PosWR DpCtrldW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=PosWR DpCtrldW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x9=y;
+1:x6=y; 1:x8=x;
+}
+ P0             | P1          ;
+ ori x5,x0,2    | ori x5,x0,2 ;
+ sw x5,0(x6)    | sw x5,0(x6) ;
+ lw x7,0(x6)    | fence rw,rw ;
+ bne x7,x0,LC00 | ori x7,x0,1 ;
+ LC00:          | sw x7,0(x8) ;
+ ori x8,x0,1    | lw x9,0(x8) ;
+ sw x8,0(x9)    |             ;
+ lw x10,0(x9)   |             ;
+exists (0:x10=2 /\ 1:x9=2)
+
+new litmus test
+[R];po;[W];po;[R];ctrl;[W]
+R_po_W_po_R_ctrl_W_PodRW_PodWR_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_W_po_R_ctrl_W_PodRW_PodWR_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+"PodRW PodWR DpCtrldW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:a=W,1:a=F,1:x=W
+Com=Co Rf
+Orig=PodRW PodWR DpCtrldW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x10=z; 0:x12=a;
+1:x6=a; 1:x8=x;
+}
+ P0             | P1          ;
+ lw x5,0(x6)    | ori x5,x0,2 ;
+ ori x7,x0,1    | sw x5,0(x6) ;
+ sw x7,0(x8)    | fence rw,rw ;
+ lw x9,0(x10)   | ori x7,x0,1 ;
+ bne x9,x0,LC00 | sw x7,0(x8) ;
+ LC00:          |             ;
+ ori x11,x0,1   |             ;
+ sw x11,0(x12)  |             ;
+ lw x13,0(x12)  |             ;
+exists (0:x13=2 /\ 0:x5=1)
+
+new litmus test
+[R];po;[W];rfi;[R];ctrl;[W]
+R_po_W_rfi_R_ctrl_W_PodRW_Rfi_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_W_rfi_R_ctrl_W_PodRW_Rfi_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+"PodRW Rfi DpCtrldW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=PodRW Rfi DpCtrldW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0             | P1          ;
+ lw x5,0(x6)    | ori x5,x0,2 ;
+ ori x7,x0,1    | sw x5,0(x6) ;
+ sw x7,0(x8)    | fence rw,rw ;
+ lw x9,0(x8)    | ori x7,x0,1 ;
+ bne x9,x0,LC00 | sw x7,0(x8) ;
+ LC00:          |             ;
+ ori x10,x0,1   |             ;
+ sw x10,0(x11)  |             ;
+ lw x12,0(x11)  |             ;
+exists (0:x12=2 /\ 0:x5=1 /\ 0:x9=1)
+
+new litmus test
+[R];po;[W];po-loc;[R];ctrl;[W]
+R_po_W_po_loc_R_ctrl_W_PodRW_PosWR_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_W_po_loc_R_ctrl_W_PodRW_PosWR_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+"PodRW PosWR DpCtrldW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=PodRW PosWR DpCtrldW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0             | P1          ;
+ lw x5,0(x6)    | ori x5,x0,2 ;
+ ori x7,x0,1    | sw x5,0(x6) ;
+ sw x7,0(x8)    | fence rw,rw ;
+ lw x9,0(x8)    | ori x7,x0,1 ;
+ bne x9,x0,LC00 | sw x7,0(x8) ;
+ LC00:          |             ;
+ ori x10,x0,1   |             ;
+ sw x10,0(x11)  |             ;
+ lw x12,0(x11)  |             ;
+exists (0:x12=2 /\ 0:x5=1)
+
+new litmus test
+[R];data;[W];po;[R];ctrl;[W]
+R_data_W_po_R_ctrl_W_DpDatadW_PodWR_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_po_R_ctrl_W_DpDatadW_PodWR_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+"DpDatadW PodWR DpCtrldW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:a=W,1:a=F,1:x=W
+Com=Co Rf
+Orig=DpDatadW PodWR DpCtrldW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x10=z; 0:x12=a;
+1:x6=a; 1:x8=x;
+}
+ P0             | P1          ;
+ lw x5,0(x6)    | ori x5,x0,2 ;
+ xor x7,x5,x5   | sw x5,0(x6) ;
+ ori x7,x7,1    | fence rw,rw ;
+ sw x7,0(x8)    | ori x7,x0,1 ;
+ lw x9,0(x10)   | sw x7,0(x8) ;
+ bne x9,x0,LC00 |             ;
+ LC00:          |             ;
+ ori x11,x0,1   |             ;
+ sw x11,0(x12)  |             ;
+ lw x13,0(x12)  |             ;
+exists (0:x13=2 /\ 0:x5=1)
+
+new litmus test
+[R];data;[W];rfi;[R];ctrl;[W]
+R_data_W_rfi_R_ctrl_W_DpDatadW_Rfi_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_rfi_R_ctrl_W_DpDatadW_Rfi_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+"DpDatadW Rfi DpCtrldW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpDatadW Rfi DpCtrldW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0             | P1          ;
+ lw x5,0(x6)    | ori x5,x0,2 ;
+ xor x7,x5,x5   | sw x5,0(x6) ;
+ ori x7,x7,1    | fence rw,rw ;
+ sw x7,0(x8)    | ori x7,x0,1 ;
+ lw x9,0(x8)    | sw x7,0(x8) ;
+ bne x9,x0,LC00 |             ;
+ LC00:          |             ;
+ ori x10,x0,1   |             ;
+ sw x10,0(x11)  |             ;
+ lw x12,0(x11)  |             ;
+exists (0:x12=2 /\ 0:x5=1 /\ 0:x9=1)
+
+new litmus test
+[R];data;[W];po-loc;[R];ctrl;[W]
+R_data_W_po_loc_R_ctrl_W_DpDatadW_PosWR_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_po_loc_R_ctrl_W_DpDatadW_PosWR_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+"DpDatadW PosWR DpCtrldW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpDatadW PosWR DpCtrldW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0             | P1          ;
+ lw x5,0(x6)    | ori x5,x0,2 ;
+ xor x7,x5,x5   | sw x5,0(x6) ;
+ ori x7,x7,1    | fence rw,rw ;
+ sw x7,0(x8)    | ori x7,x0,1 ;
+ lw x9,0(x8)    | sw x7,0(x8) ;
+ bne x9,x0,LC00 |             ;
+ LC00:          |             ;
+ ori x10,x0,1   |             ;
+ sw x10,0(x11)  |             ;
+ lw x12,0(x11)  |             ;
+exists (0:x12=2 /\ 0:x5=1)
+
+new litmus test
+[R];data;[W];po-loc;[W];po-loc;[R];ctrl;[W]
+R_data_W_po_loc_W_po_loc_R_ctrl_W_DpDatadW_PosWW_PosWR_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_po_loc_W_po_loc_R_ctrl_W_DpDatadW_PosWW_PosWR_DpCtrldW_Coe_Fence_rw_rwdWW_Rfe
+"DpDatadW PosWW PosWR DpCtrldW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpDatadW PosWW PosWR DpCtrldW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x12=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x7,x7,1     | fence rw,rw ;
+ sw x7,0(x8)     | ori x7,x0,1 ;
+ ori x9,x0,2     | sw x7,0(x8) ;
+ sw x9,0(x8)     |             ;
+ lw x10,0(x8)    |             ;
+ bne x10,x0,LC00 |             ;
+ LC00:           |             ;
+ ori x11,x0,1    |             ;
+ sw x11,0(x12)   |             ;
+ lw x13,0(x12)   |             ;
+exists (0:x13=2 /\ 0:x5=1)
+
+new litmus test
+[R];addr;[W];po;[R];addr;[W]
+R_addr_W_po_R_addr_W_DpAddrdW_PodWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_R_addr_W_DpAddrdW_PodWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW PodWR DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:a=W,1:a=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW PodWR DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x12=z; 0:x15=a;
+1:x6=a; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ lw x11,0(x12)   |             ;
+ xor x13,x11,x11 |             ;
+ ori x14,x0,1    |             ;
+ add x16,x15,x13 |             ;
+ sw x14,0(x16)   |             ;
+ lw x17,0(x15)   |             ;
+exists (0:x17=2 /\ 0:x5=1)
+
+new litmus test
+[R];addr;[W];rfi;[R];addr;[W]
+R_addr_W_rfi_R_addr_W_DpAddrdW_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_rfi_R_addr_W_DpAddrdW_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW Rfi DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW Rfi DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x14=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ lw x11,0(x9)    |             ;
+ xor x12,x11,x11 |             ;
+ ori x13,x0,1    |             ;
+ add x15,x14,x12 |             ;
+ sw x13,0(x15)   |             ;
+ lw x16,0(x14)   |             ;
+exists (0:x16=2 /\ 0:x5=1 /\ 0:x11=1)
+
+new litmus test
+[R];addr;[W];po-loc;[R];addr;[W]
+R_addr_W_po_loc_R_addr_W_DpAddrdW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_loc_R_addr_W_DpAddrdW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x14=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ lw x11,0(x9)    |             ;
+ xor x12,x11,x11 |             ;
+ ori x13,x0,1    |             ;
+ add x15,x14,x12 |             ;
+ sw x13,0(x15)   |             ;
+ lw x16,0(x14)   |             ;
+exists (0:x16=2 /\ 0:x5=1)
+
+new litmus test
+[R];addr;[W];po-loc;[W];po-loc;[R];addr;[W]
+R_addr_W_po_loc_W_po_loc_R_addr_W_DpAddrdW_PosWW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_loc_W_po_loc_R_addr_W_DpAddrdW_PosWW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW PosWW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW PosWW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x15=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ ori x11,x0,2    |             ;
+ sw x11,0(x9)    |             ;
+ lw x12,0(x9)    |             ;
+ xor x13,x12,x12 |             ;
+ ori x14,x0,1    |             ;
+ add x16,x15,x13 |             ;
+ sw x14,0(x16)   |             ;
+ lw x17,0(x15)   |             ;
+exists (0:x17=2 /\ 0:x5=1)
+
+new litmus test
+[R];addr;[W];po;[R];addr;[W]
+R_addr_W_po_R_addr_W_DpAddrdW_PodWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_R_addr_W_DpAddrdW_PodWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW PodWR DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:a=W,1:a=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW PodWR DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x12=z; 0:x15=a;
+1:x6=a; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ lw x11,0(x12)   |             ;
+ xor x13,x11,x11 |             ;
+ ori x14,x0,1    |             ;
+ add x16,x15,x13 |             ;
+ sw x14,0(x16)   |             ;
+ lw x17,0(x15)   |             ;
+exists (0:x17=2 /\ 0:x5=1)
+
+new litmus test
+[R];addr;[W];rfi;[R];addr;[W]
+R_addr_W_rfi_R_addr_W_DpAddrdW_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_rfi_R_addr_W_DpAddrdW_Rfi_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW Rfi DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW Rfi DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x14=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ lw x11,0(x9)    |             ;
+ xor x12,x11,x11 |             ;
+ ori x13,x0,1    |             ;
+ add x15,x14,x12 |             ;
+ sw x13,0(x15)   |             ;
+ lw x16,0(x14)   |             ;
+exists (0:x16=2 /\ 0:x5=1 /\ 0:x11=1)
+
+new litmus test
+[R];addr;[W];po-loc;[R];addr;[W]
+R_addr_W_po_loc_R_addr_W_DpAddrdW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_loc_R_addr_W_DpAddrdW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x14=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ lw x11,0(x9)    |             ;
+ xor x12,x11,x11 |             ;
+ ori x13,x0,1    |             ;
+ add x15,x14,x12 |             ;
+ sw x13,0(x15)   |             ;
+ lw x16,0(x14)   |             ;
+exists (0:x16=2 /\ 0:x5=1)
+
+new litmus test
+[R];addr;[W];po-loc;[W];po-loc;[R];addr;[W]
+R_addr_W_po_loc_W_po_loc_R_addr_W_DpAddrdW_PosWW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_addr_W_po_loc_W_po_loc_R_addr_W_DpAddrdW_PosWW_PosWR_DpAddrdW_Coe_Fence_rw_rwdWW_Rfe
+"DpAddrdW PosWW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpAddrdW PosWW PosWR DpAddrdW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x15=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x8,x0,1     | fence rw,rw ;
+ add x10,x9,x7   | ori x7,x0,1 ;
+ sw x8,0(x10)    | sw x7,0(x8) ;
+ ori x11,x0,2    |             ;
+ sw x11,0(x9)    |             ;
+ lw x12,0(x9)    |             ;
+ xor x13,x12,x12 |             ;
+ ori x14,x0,1    |             ;
+ add x16,x15,x13 |             ;
+ sw x14,0(x16)   |             ;
+ lw x17,0(x15)   |             ;
+exists (0:x17=2 /\ 0:x5=1)
+
+new litmus test
+[R];data;[W];po;[R];data;[W]
+R_data_W_po_R_data_W_DpDatadW_PodWR_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_po_R_data_W_DpDatadW_PodWR_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+"DpDatadW PodWR DpDatadW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:a=W,1:a=F,1:x=W
+Com=Co Rf
+Orig=DpDatadW PodWR DpDatadW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x10=z; 0:x12=a;
+1:x6=a; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,2 ;
+ xor x7,x5,x5  | sw x5,0(x6) ;
+ ori x7,x7,1   | fence rw,rw ;
+ sw x7,0(x8)   | ori x7,x0,1 ;
+ lw x9,0(x10)  | sw x7,0(x8) ;
+ xor x11,x9,x9 |             ;
+ ori x11,x11,1 |             ;
+ sw x11,0(x12) |             ;
+ lw x13,0(x12) |             ;
+exists (0:x13=2 /\ 0:x5=1)
+
+new litmus test
+[R];data;[W];rfi;[R];data;[W]
+R_data_W_rfi_R_data_W_DpDatadW_Rfi_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_rfi_R_data_W_DpDatadW_Rfi_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+"DpDatadW Rfi DpDatadW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpDatadW Rfi DpDatadW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,2 ;
+ xor x7,x5,x5  | sw x5,0(x6) ;
+ ori x7,x7,1   | fence rw,rw ;
+ sw x7,0(x8)   | ori x7,x0,1 ;
+ lw x9,0(x8)   | sw x7,0(x8) ;
+ xor x10,x9,x9 |             ;
+ ori x10,x10,1 |             ;
+ sw x10,0(x11) |             ;
+ lw x12,0(x11) |             ;
+exists (0:x12=2 /\ 0:x5=1 /\ 0:x9=1)
+
+new litmus test
+[R];data;[W];po-loc;[R];data;[W]
+R_data_W_po_loc_R_data_W_DpDatadW_PosWR_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_po_loc_R_data_W_DpDatadW_PosWR_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+"DpDatadW PosWR DpDatadW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpDatadW PosWR DpDatadW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,2 ;
+ xor x7,x5,x5  | sw x5,0(x6) ;
+ ori x7,x7,1   | fence rw,rw ;
+ sw x7,0(x8)   | ori x7,x0,1 ;
+ lw x9,0(x8)   | sw x7,0(x8) ;
+ xor x10,x9,x9 |             ;
+ ori x10,x10,1 |             ;
+ sw x10,0(x11) |             ;
+ lw x12,0(x11) |             ;
+exists (0:x12=2 /\ 0:x5=1)
+
+new litmus test
+[R];data;[W];po-loc;[W];po-loc;[R];data;[W]
+R_data_W_po_loc_W_po_loc_R_data_W_DpDatadW_PosWW_PosWR_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_po_loc_W_po_loc_R_data_W_DpDatadW_PosWW_PosWR_DpDatadW_Coe_Fence_rw_rwdWW_Rfe
+"DpDatadW PosWW PosWR DpDatadW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=W,1:z=F,1:x=W
+Com=Co Rf
+Orig=DpDatadW PosWW PosWR DpDatadW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x12=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,2 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x7,x7,1     | fence rw,rw ;
+ sw x7,0(x8)     | ori x7,x0,1 ;
+ ori x9,x0,2     | sw x7,0(x8) ;
+ sw x9,0(x8)     |             ;
+ lw x10,0(x8)    |             ;
+ xor x11,x10,x10 |             ;
+ ori x11,x11,1   |             ;
+ sw x11,0(x12)   |             ;
+ lw x13,0(x12)   |             ;
+exists (0:x13=2 /\ 0:x5=1)
+
+new litmus test
+[R];data;[W];po;[R];po;[R]
+R_data_W_po_R_po_R_DpDatadW_PodWR_PodRR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_po_R_po_R_DpDatadW_PodWR_PodRR_Fre_Fence_rw_rwdWW_Rfe
+"DpDatadW PodWR PodRR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:a=T,1:a=F,1:x=W
+Com=Fr Rf
+Orig=DpDatadW PodWR PodRR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x10=z; 0:x12=a;
+1:x6=a; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,1 ;
+ xor x7,x5,x5  | sw x5,0(x6) ;
+ ori x7,x7,1   | fence rw,rw ;
+ sw x7,0(x8)   | ori x7,x0,1 ;
+ lw x9,0(x10)  | sw x7,0(x8) ;
+ lw x11,0(x12) |             ;
+exists (0:x5=1 /\ 0:x11=0)
+
+new litmus test
+[R];data;[W];rfi;[R];po;[R]
+R_data_W_rfi_R_po_R_DpDatadW_Rfi_PodRR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_rfi_R_po_R_DpDatadW_Rfi_PodRR_Fre_Fence_rw_rwdWW_Rfe
+"DpDatadW Rfi PodRR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=DpDatadW Rfi PodRR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,1 ;
+ xor x7,x5,x5  | sw x5,0(x6) ;
+ ori x7,x7,1   | fence rw,rw ;
+ sw x7,0(x8)   | ori x7,x0,1 ;
+ lw x9,0(x8)   | sw x7,0(x8) ;
+ lw x10,0(x11) |             ;
+exists (0:x5=1 /\ 0:x9=1 /\ 0:x10=0)
+
+new litmus test
+[R];data;[W];po;[R];addr;[R]
+R_data_W_po_R_addr_R_DpDatadW_PodWR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_po_R_addr_R_DpDatadW_PodWR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+"DpDatadW PodWR DpAddrdR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:a=T,1:a=F,1:x=W
+Com=Fr Rf
+Orig=DpDatadW PodWR DpAddrdR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x10=z; 0:x13=a;
+1:x6=a; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,1 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x7,x7,1     | fence rw,rw ;
+ sw x7,0(x8)     | ori x7,x0,1 ;
+ lw x9,0(x10)    | sw x7,0(x8) ;
+ xor x11,x9,x9   |             ;
+ add x14,x13,x11 |             ;
+ lw x12,0(x14)   |             ;
+exists (0:x5=1 /\ 0:x12=0)
+
+new litmus test
+[R];data;[W];rfi;[R];addr;[R]
+R_data_W_rfi_R_addr_R_DpDatadW_Rfi_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_rfi_R_addr_R_DpDatadW_Rfi_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+"DpDatadW Rfi DpAddrdR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=DpDatadW Rfi DpAddrdR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x12=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,1 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x7,x7,1     | fence rw,rw ;
+ sw x7,0(x8)     | ori x7,x0,1 ;
+ lw x9,0(x8)     | sw x7,0(x8) ;
+ xor x10,x9,x9   |             ;
+ add x13,x12,x10 |             ;
+ lw x11,0(x13)   |             ;
+exists (0:x5=1 /\ 0:x9=1 /\ 0:x11=0)
+
+new litmus test
+[R];data;[W];po-loc;[R];po;[R]
+R_data_W_po_loc_R_po_R_DpDatadW_PosWR_PodRR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_po_loc_R_po_R_DpDatadW_PosWR_PodRR_Fre_Fence_rw_rwdWW_Rfe
+"DpDatadW PosWR PodRR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=DpDatadW PosWR PodRR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,1 ;
+ xor x7,x5,x5  | sw x5,0(x6) ;
+ ori x7,x7,1   | fence rw,rw ;
+ sw x7,0(x8)   | ori x7,x0,1 ;
+ lw x9,0(x8)   | sw x7,0(x8) ;
+ lw x10,0(x11) |             ;
+exists (0:x5=1 /\ 0:x10=0)
+
+new litmus test
+[R];data;[W];po-loc;[R];addr;[R]
+R_data_W_po_loc_R_addr_R_DpDatadW_PosWR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_po_loc_R_addr_R_DpDatadW_PosWR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+"DpDatadW PosWR DpAddrdR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=DpDatadW PosWR DpAddrdR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x12=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,1 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x7,x7,1     | fence rw,rw ;
+ sw x7,0(x8)     | ori x7,x0,1 ;
+ lw x9,0(x8)     | sw x7,0(x8) ;
+ xor x10,x9,x9   |             ;
+ add x13,x12,x10 |             ;
+ lw x11,0(x13)   |             ;
+exists (0:x5=1 /\ 0:x11=0)
+
+new litmus test
+[R];data;[W];po-loc;[W];po-loc;[R];addr;[R]
+R_data_W_po_loc_W_po_loc_R_addr_R_DpDatadW_PosWW_PosWR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_data_W_po_loc_W_po_loc_R_addr_R_DpDatadW_PosWW_PosWR_DpAddrdR_Fre_Fence_rw_rwdWW_Rfe
+"DpDatadW PosWW PosWR DpAddrdR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=DpDatadW PosWW PosWR DpAddrdR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x13=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,1 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ ori x7,x7,1     | fence rw,rw ;
+ sw x7,0(x8)     | ori x7,x0,1 ;
+ ori x9,x0,2     | sw x7,0(x8) ;
+ sw x9,0(x8)     |             ;
+ lw x10,0(x8)    |             ;
+ xor x11,x10,x10 |             ;
+ add x14,x13,x11 |             ;
+ lw x12,0(x14)   |             ;
+exists (0:x5=1 /\ 0:x12=0)
+
+new litmus test
+[R];fencerel(Fence.w.rw);[R]
+R_fencerelFence.w.rw_R_Fence_w_rwdRR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_fencerelFence.w.rw_R_Fence_w_rwdRR_Fre_Fence_rw_rwdWW_Rfe
+"Fence.w.rwdRR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Rf
+Orig=Fence.w.rwdRR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ lw x5,0(x6) | ori x5,x0,1 ;
+ fence w,rw  | sw x5,0(x6) ;
+ lw x7,0(x8) | fence rw,rw ;
+             | ori x7,x0,1 ;
+             | sw x7,0(x8) ;
+exists (0:x5=1 /\ 0:x7=0)
+
+new litmus test
+[R];fencerel(Fence.rw.r);[W]
+R_fencerelFence.rw.r_W_Fence_rw_rdRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_fencerelFence.rw.r_W_Fence_rw_rdRW_Coe_Fence_rw_rwdWW_Rfe
+"Fence.rw.rdRW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Rf
+Orig=Fence.rw.rdRW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ lw x5,0(x6) | ori x5,x0,2 ;
+ fence rw,r  | sw x5,0(x6) ;
+ ori x7,x0,1 | fence rw,rw ;
+ sw x7,0(x8) | ori x7,x0,1 ;
+ lw x9,0(x8) | sw x7,0(x8) ;
+exists (0:x9=2 /\ 0:x5=1)
+
+new litmus test
+[R];fencerel(Fence.w.r);[W]
+R_fencerelFence.w.r_W_Fence_w_rdRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_fencerelFence.w.r_W_Fence_w_rdRW_Coe_Fence_rw_rwdWW_Rfe
+"Fence.w.rdRW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Rf
+Orig=Fence.w.rdRW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ lw x5,0(x6) | ori x5,x0,2 ;
+ fence w,r   | sw x5,0(x6) ;
+ ori x7,x0,1 | fence rw,rw ;
+ sw x7,0(x8) | ori x7,x0,1 ;
+ lw x9,0(x8) | sw x7,0(x8) ;
+exists (0:x9=2 /\ 0:x5=1)
+
+new litmus test
+[R];fencerel(Fence.w.rw);[W]
+R_fencerelFence.w.rw_W_Fence_w_rwdRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_fencerelFence.w.rw_W_Fence_w_rwdRW_Coe_Fence_rw_rwdWW_Rfe
+"Fence.w.rwdRW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Rf
+Orig=Fence.w.rwdRW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ lw x5,0(x6) | ori x5,x0,2 ;
+ fence w,rw  | sw x5,0(x6) ;
+ ori x7,x0,1 | fence rw,rw ;
+ sw x7,0(x8) | ori x7,x0,1 ;
+ lw x9,0(x8) | sw x7,0(x8) ;
+exists (0:x9=2 /\ 0:x5=1)
+
+new litmus test
+[W];fencerel(Fence.rw.r);[W]
+W_fencerelFence.rw.r_W_Fence_rw_rdWW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_fencerelFence.rw.r_W_Fence_rw_rdWW_Coe_Fence_rw_rwdWW_Coe
+"Fence.rw.rdWW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=Fence.rw.rdWW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ ori x5,x0,2 | ori x5,x0,2 ;
+ sw x5,0(x6) | sw x5,0(x6) ;
+ fence rw,r  | fence rw,rw ;
+ ori x7,x0,1 | ori x7,x0,1 ;
+ sw x7,0(x8) | sw x7,0(x8) ;
+ lw x9,0(x8) | lw x9,0(x8) ;
+exists (0:x9=2 /\ 1:x9=2)
+
+new litmus test
+[W];fencerel(Fence.r.r);[W]
+W_fencerelFence.r.r_W_Fence_r_rdWW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_fencerelFence.r.r_W_Fence_r_rdWW_Coe_Fence_rw_rwdWW_Coe
+"Fence.r.rdWW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=Fence.r.rdWW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ ori x5,x0,2 | ori x5,x0,2 ;
+ sw x5,0(x6) | sw x5,0(x6) ;
+ fence r,r   | fence rw,rw ;
+ ori x7,x0,1 | ori x7,x0,1 ;
+ sw x7,0(x8) | sw x7,0(x8) ;
+ lw x9,0(x8) | lw x9,0(x8) ;
+exists (0:x9=2 /\ 1:x9=2)
+
+new litmus test
+[W];fencerel(Fence.w.r);[W]
+W_fencerelFence.w.r_W_Fence_w_rdWW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_fencerelFence.w.r_W_Fence_w_rdWW_Coe_Fence_rw_rwdWW_Coe
+"Fence.w.rdWW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=Fence.w.rdWW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ ori x5,x0,2 | ori x5,x0,2 ;
+ sw x5,0(x6) | sw x5,0(x6) ;
+ fence w,r   | fence rw,rw ;
+ ori x7,x0,1 | ori x7,x0,1 ;
+ sw x7,0(x8) | sw x7,0(x8) ;
+ lw x9,0(x8) | lw x9,0(x8) ;
+exists (0:x9=2 /\ 1:x9=2)
+
+new litmus test
+[XLr];ctrl;[R]
+XLr_ctrl_R_DpCtrldR_Fre_Fence_rw_rwdWW_Rfe
+RISCV XLr_ctrl_R_DpCtrldR_Fre_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x8=y; 1:x6=y; 1:x8=x; }
+       P0        |      P1       ;
+lr.w x5, 0(x6)   | ori x5, x0, 1 ;
+bne x5, x0, LC00 | sw x5, 0(x6)  ;
+LC00:            | fence rw, rw  ;
+lw x7, 0(x8)     | ori x7, x0, 1 ;
+                 | sw x7, 0(x8)  ;
+
+exists (0:x5=1 /\ 0:x7=0)
+
+new litmus test
+[AMO];po;[W]
+AMO_po_W_Rmw_PodWW_Coe_Fence_rw_rwdWW_Rfe
+RISCV AMO_po_W_Rmw_PodWW_Coe_Fence_rw_rwdWW_Rfe
+"Rmw PodWW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Rf
+Orig=Rmw PodWW Coe Fence.rw.rwdWW Rfe
+{
+0:x5=x; 0:x9=y;
+1:x6=y; 1:x8=x;
+}
+ P0                   | P1          ;
+ ori x7,x0,2          | ori x5,x0,2 ;
+ amoswap.w x6,x7,(x5) | sw x5,0(x6) ;
+ ori x8,x0,1          | fence rw,rw ;
+ sw x8,0(x9)          | ori x7,x0,1 ;
+ lw x10,0(x9)         | sw x7,0(x8) ;
+exists (0:x10=2 /\ 0:x6=1)
+
+new litmus test
+[W];po;[AMO]
+W_po_AMO_PodWR_Rmw_Coe_Fence_rw_rwdWW_Coe
+RISCV W_po_AMO_PodWR_Rmw_Coe_Fence_rw_rwdWW_Coe
+"PodWR Rmw Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=PodWR Rmw Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x7=y;
+1:x6=y; 1:x8=x;
+}
+ P0                   | P1          ;
+ ori x5,x0,2          | ori x5,x0,2 ;
+ sw x5,0(x6)          | sw x5,0(x6) ;
+ ori x9,x0,1          | fence rw,rw ;
+ amoswap.w x8,x9,(x7) | ori x7,x0,1 ;
+ lw x10,0(x7)         | sw x7,0(x8) ;
+                      | lw x9,0(x8) ;
+exists (0:x10=2 /\ 1:x9=2)
+
+new litmus test
+[R];fencerel(Fence.r.w);[R]
+R_fencerelFence.r.w_R_Fence_r_wdRR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_fencerelFence.r.w_R_Fence_r_wdRR_Fre_Fence_rw_rwdWW_Rfe
+"Fence.r.wdRR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Rf
+Orig=Fence.r.wdRR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ lw x5,0(x6) | ori x5,x0,1 ;
+ fence r,w   | sw x5,0(x6) ;
+ lw x7,0(x8) | fence rw,rw ;
+             | ori x7,x0,1 ;
+             | sw x7,0(x8) ;
+exists (0:x5=1 /\ 0:x7=0)
+
+new litmus test
+[R];fencerel(Fence.r.r);[W]
+R_fencerelFence.r.r_W_Fence_r_rdRW_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_fencerelFence.r.r_W_Fence_r_rdRW_Coe_Fence_rw_rwdWW_Rfe
+"Fence.r.rdRW Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Rf
+Orig=Fence.r.rdRW Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ lw x5,0(x6) | ori x5,x0,2 ;
+ fence r,r   | sw x5,0(x6) ;
+ ori x7,x0,1 | fence rw,rw ;
+ sw x7,0(x8) | ori x7,x0,1 ;
+ lw x9,0(x8) | sw x7,0(x8) ;
+exists (0:x9=2 /\ 0:x5=1)
+
+new litmus test
+[W];fencerel(Fence.r.w);[R]
+W_fencerelFence.r.w_R_Fence_r_wdWR_Fre_Fence_rw_rwdWW_Coe
+RISCV W_fencerelFence.r.w_R_Fence_r_wdWR_Fre_Fence_rw_rwdWW_Coe
+"Fence.r.wdWR Fre Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Co
+Orig=Fence.r.wdWR Fre Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ ori x5,x0,2 | ori x5,x0,1 ;
+ sw x5,0(x6) | sw x5,0(x6) ;
+ fence r,w   | fence rw,rw ;
+ lw x7,0(x8) | ori x7,x0,1 ;
+             | sw x7,0(x8) ;
+             | lw x9,0(x8) ;
+exists (0:x7=0 /\ 1:x9=2)
+
+new litmus test
+[W];fencerel(Fence.r.w);[W]
+W_fencerelFence.r.w_W_Fence_r_wdWW_Coe_Fence_rw_rwdWW_Coe
+RISCV W_fencerelFence.r.w_W_Fence_r_wdWW_Coe_Fence_rw_rwdWW_Coe
+"Fence.r.wdWW Coe Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Co
+Orig=Fence.r.wdWW Coe Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ ori x5,x0,2 | ori x5,x0,2 ;
+ sw x5,0(x6) | sw x5,0(x6) ;
+ fence r,w   | fence rw,rw ;
+ ori x7,x0,1 | ori x7,x0,1 ;
+ sw x7,0(x8) | sw x7,0(x8) ;
+ lw x9,0(x8) | lw x9,0(x8) ;
+exists (0:x9=2 /\ 1:x9=2)
+
+new litmus test
+[R];fencerel(Fence.w.w);[R]
+R_fencerelFence.w.w_R_Fence_w_wdRR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_fencerelFence.w.w_R_Fence_w_wdRR_Fre_Fence_rw_rwdWW_Rfe
+"Fence.w.wdRR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Rf
+Orig=Fence.w.wdRR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ lw x5,0(x6) | ori x5,x0,1 ;
+ fence w,w   | sw x5,0(x6) ;
+ lw x7,0(x8) | fence rw,rw ;
+             | ori x7,x0,1 ;
+             | sw x7,0(x8) ;
+exists (0:x5=1 /\ 0:x7=0)
+
+new litmus test
+[W];fencerel(Fence.w.w);[R]
+W_fencerelFence.w.w_R_Fence_w_wdWR_Fre_Fence_rw_rwdWW_Coe
+RISCV W_fencerelFence.w.w_R_Fence_w_wdWR_Fre_Fence_rw_rwdWW_Coe
+"Fence.w.wdWR Fre Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=W
+Com=Fr Co
+Orig=Fence.w.wdWR Fre Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x8=y;
+1:x6=y; 1:x8=x;
+}
+ P0          | P1          ;
+ ori x5,x0,2 | ori x5,x0,1 ;
+ sw x5,0(x6) | sw x5,0(x6) ;
+ fence w,w   | fence rw,rw ;
+ lw x7,0(x8) | ori x7,x0,1 ;
+             | sw x7,0(x8) ;
+             | lw x9,0(x8) ;
+exists (0:x7=0 /\ 1:x9=2)
+
+new litmus test
+[XLr];po;[XLr]
+XLr_po_XLr_PodRR_Fre_Fence_rw_rwdWW_Rfe
+RISCV XLr_po_XLr_PodRR_Fre_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x8=y; 1:x6=y; 1:x8=x; }
+      P0       |      P1       ;
+lr.w x5, 0(x6) | ori x5, x0, 1 ;
+lr.w x7, 0(x8) | sw x5, 0(x6)  ;
+               | fence rw, rw  ;
+               | ori x7, x0, 1 ;
+               | sw x7, 0(x8)  ;
+
+exists (0:x5=1/\0:x7=0)
+
+new litmus test
+[XSc];po;[XLr]
+XLr_rmw_XSc_po_XLr_PosRW_PodWR_Fre_Fence_rw_rwdWW_Rfe
+RISCV XLr_rmw_XSc_po_XLr_PosRW_PodWR_Fre_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x9=y; 1:x6=y; 1:x8=x; }
+        P0         |      P1       ;
+lr.w x5, 0(x6)     | ori x5, x0, 1 ;
+ori x7, x0, 2      | sw x5, 0(x6)  ;
+sc.w x10, x7, (x6) | fence rw, rw  ;
+lr.w x8, 0(x9)     | ori x7, x0, 1 ;
+                   | sw x7, 0(x8)  ;
+
+exists (0:x5=1/\0:x8=0) /\ 0:x10=1
+
+new litmus test
+[R];ctrl;[XLr]
+R_ctrl_XLr_DpCtrldR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_ctrl_XLr_DpCtrldR_Fre_Fence_rw_rwdWW_Rfe
+ {0:x6=x; 0:x8=y; 1:x6=y; 1:x8=x; }
+       P0        |      P1       ;
+lw x5, 0(x6)     | ori x5, x0, 1 ;
+bne x5, x0, LC00 | sw x5, 0(x6)  ;
+LC00:            | fence rw, rw  ;
+lr.w x7, 0(x8)   | ori x7, x0, 1 ;
+                 | sw x7, 0(x8)  ;
+
+exists (0:x5=1/\0:x7=0)
+
+new litmus test
+[R];po;[AQ]
+R_po_AQ_PodRRPAq_Rmw_Coe_Fence_rw_rwdWW_Rfe
+RISCV R_po_AQ_PodRRPAq_Rmw_Coe_Fence_rw_rwdWW_Rfe
+"PodRRPAq LxSxAqP Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Rf
+Orig=PodRRPAq LxSxAqP Coe Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x7=y;
+1:x6=y; 1:x8=x;
+}
+ P0                      | P1          ;
+ lw x5,0(x6)             | ori x5,x0,2 ;
+ ori x9,x0,1             | sw x5,0(x6) ;
+ amoswap.w.aq x8,x9,(x7) | fence rw,rw ;
+ lw x10,0(x7)            | ori x7,x0,1 ;
+                         | sw x7,0(x8) ;
+exists (0:x10=2 /\ 0:x5=1)
+
+new litmus test
+[R];po;[AQ];po;[R]
+R_po_AQ_po_R_PodRRPAq_Rmw_PodWR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_po_AQ_po_R_PodRRPAq_Rmw_PodWR_Fre_Fence_rw_rwdWW_Rfe
+"PodRRPAq LxSxAqP PodWR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=PodRRPAq LxSxAqP PodWR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x7=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0                      | P1          ;
+ lw x5,0(x6)             | ori x5,x0,1 ;
+ ori x9,x0,1             | sw x5,0(x6) ;
+ amoswap.w.aq x8,x9,(x7) | fence rw,rw ;
+ lw x10,0(x11)           | ori x7,x0,1 ;
+                         | sw x7,0(x8) ;
+exists (0:x5=1 /\ 0:x10=0)
+
+new litmus test
+[XSc];po;[R]
+XLr_rmw_XSc_po_R_Rfi_PosRW_PodWR_Fre_Fence_rw_rwdWR_Fre
+RISCV XLr_rmw_XSc_po_R_Rfi_PosRW_PodWR_Fre_Fence_rw_rwdWR_Fre
+ {0:x6=x; 0:x10=y; 1:x6=y; 1:x8=x; }
+        P0         |      P1       ;
+ori x5, x0, 1      | ori x5, x0, 1 ;
+sw x5, 0(x6)       | sw x5, 0(x6)  ;
+lr.w x7, 0(x6)     | fence rw, rw  ;
+ori x8, x0, 2      | lw x7, 0(x8)  ;
+sc.w x11, x8, (x6) |               ;
+lw x9, 0(x10)      |               ;
+
+exists (0:x7=1/\0:x9=0/\1:x7=0) /\ 0:x11=1
+
+new litmus test
+[XSc];fencerel(Fence.r.r);[R]
+XLr_rmw_XSc_fencerelFence.r.r_R_Rfi_PosRW_Fence_r_rdWR_Fre_Fence_rw_rwdWR_Fre
+RISCV XLr_rmw_XSc_fencerelFence.r.r_R_Rfi_PosRW_Fence_r_rdWR_Fre_Fence_rw_rwdWR_Fre
+ {0:x6=x; 0:x10=y; 1:x6=y; 1:x8=x; }
+        P0         |      P1       ;
+ori x5, x0, 1      | ori x5, x0, 1 ;
+sw x5, 0(x6)       | sw x5, 0(x6)  ;
+lr.w x7, 0(x6)     | fence rw, rw  ;
+ori x8, x0, 2      | lw x7, 0(x8)  ;
+sc.w x11, x8, (x6) |               ;
+fence r, r         |               ;
+lw x9, 0(x10)      |               ;
+
+exists (0:x7=1/\0:x9=0/\1:x7=0) /\ 0:x11=1
+
+new litmus test
+[W];po;[AMO];po;[R]
+W_po_AMO_po_R_PodWR_Rmw_PodWR_Fre_Fence_rw_rwdWW_Coe
+RISCV W_po_AMO_po_R_PodWR_Rmw_PodWR_Fre_Fence_rw_rwdWW_Coe
+"PodWR LxSx PodWR Fre Fence.rw.rwdWW Coe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Co
+Orig=PodWR LxSx PodWR Fre Fence.rw.rwdWW Coe
+{
+0:x6=x; 0:x7=y; 0:x11=z;
+1:x6=z; 1:x8=x;
+}
+ P0                   | P1          ;
+ ori x5,x0,2          | ori x5,x0,1 ;
+ sw x5,0(x6)          | sw x5,0(x6) ;
+ ori x9,x0,1          | fence rw,rw ;
+ amoswap.w x8,x9,(x7) | ori x7,x0,1 ;
+ lw x10,0(x11)        | sw x7,0(x8) ;
+                      | lw x9,0(x8) ;
+exists (0:x10=0 /\ 1:x9=2)
+
+new litmus test
+[R];addr;[R];po;[R]
+R_addr_R_po_R_DpAddrdR_PodRR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_addr_R_po_R_DpAddrdR_PodRR_Fre_Fence_rw_rwdWW_Rfe
+"DpAddrdR PodRR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=DpAddrdR PodRR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x12=z;
+1:x6=z; 1:x8=x;
+}
+ P0            | P1          ;
+ lw x5,0(x6)   | ori x5,x0,1 ;
+ xor x7,x5,x5  | sw x5,0(x6) ;
+ add x10,x9,x7 | fence rw,rw ;
+ lw x8,0(x10)  | ori x7,x0,1 ;
+ lw x11,0(x12) | sw x7,0(x8) ;
+exists (0:x5=1 /\ 0:x11=0)
+
+new litmus test
+[R];po;[R];ctrl;[R]
+R_po_R_ctrl_R_PodRR_DpCtrldR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_po_R_ctrl_R_PodRR_DpCtrldR_Fre_Fence_rw_rwdWW_Rfe
+"PodRR DpCtrldR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=PodRR DpCtrldR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x8=y; 0:x10=z;
+1:x6=z; 1:x8=x;
+}
+ P0             | P1          ;
+ lw x5,0(x6)    | ori x5,x0,1 ;
+ lw x7,0(x8)    | sw x5,0(x6) ;
+ bne x7,x0,LC00 | fence rw,rw ;
+ LC00:          | ori x7,x0,1 ;
+ lw x9,0(x10)   | sw x7,0(x8) ;
+exists (0:x5=1 /\ 0:x9=0)
+
+new litmus test
+[R];addr;[R];ctrl;[R]
+R_addr_R_ctrl_R_DpAddrdR_DpCtrldR_Fre_Fence_rw_rwdWW_Rfe
+RISCV R_addr_R_ctrl_R_DpAddrdR_DpCtrldR_Fre_Fence_rw_rwdWW_Rfe
+"DpAddrdR DpCtrldR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=DpAddrdR DpCtrldR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x12=z;
+1:x6=z; 1:x8=x;
+}
+ P0             | P1          ;
+ lw x5,0(x6)    | ori x5,x0,1 ;
+ xor x7,x5,x5   | sw x5,0(x6) ;
+ add x10,x9,x7  | fence rw,rw ;
+ lw x8,0(x10)   | ori x7,x0,1 ;
+ bne x8,x0,LC00 | sw x7,0(x8) ;
+ LC00:          |             ;
+ lw x11,0(x12)  |             ;
+exists (0:x5=1 /\ 0:x11=0)
+
+
+

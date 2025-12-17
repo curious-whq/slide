@@ -1,0 +1,20 @@
+RISCV A
+"DpAddrdR PosRR DpAddrdR Fre Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:z=T,1:z=F,1:x=W
+Com=Fr Rf
+Orig=DpAddrdR PosRR DpAddrdR Fre Fence.rw.rwdWW Rfe
+{
+0:x6=x; 0:x9=y; 0:x14=z;
+1:x6=z; 1:x8=x;
+}
+ P0              | P1          ;
+ lw x5,0(x6)     | ori x5,x0,1 ;
+ xor x7,x5,x5    | sw x5,0(x6) ;
+ add x10,x9,x7   | fence rw,rw ;
+ lw x8,0(x10)    | ori x7,x0,1 ;
+ lw x11,0(x9)    | sw x7,0(x8) ;
+ xor x12,x11,x11 |             ;
+ add x15,x14,x12 |             ;
+ lw x13,0(x15)   |             ;
+exists (0:x5=1 /\ 0:x13=0)

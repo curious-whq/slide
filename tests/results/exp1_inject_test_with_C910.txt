@@ -1,0 +1,13 @@
+{"litmus_name": "2+2W", "state": "[x]=2; [y]=2; ", "before_num": 1097, "before_sum": 2000000, "after_num": 18556, "after_sum": 2200000, "ratio": 15.377475760338111}
+{"litmus_name": "LB", "state": "0:x5=1; 1:x5=1; ", "before_num": 5629, "before_sum": 2200000, "after_num": 425, "after_sum": 2002000, "ratio": 0.08296908279143134}
+{"litmus_name": "SB", "state": "0:x7=1; 1:x7=1; ", "before_num": 7110, "before_sum": 2200000, "after_num": 159154, "after_sum": 8000000, "ratio": 6.155745428973278}
+{"litmus_name": "2+2W", "state": "[x]=2; [y]=2; ", "before_num": 1063, "before_sum": 2000000, "after_num": 18844, "after_sum": 2000000, "ratio": 17.727187206020695}
+{"litmus_name": "LB", "state": "0:x5=1; 1:x5=1; ", "before_num": 5124, "before_sum": 2000000, "after_num": 409, "after_sum": 2000000, "ratio": 0.07982045277127245}
+{"litmus_name": "SB", "state": "0:x7=1; 1:x7=1; ", "before_num": 5449, "before_sum": 2000000, "after_num": 85637, "after_sum": 4000000, "ratio": 7.858047348137273}
+{"litmus_name": "MP", "state": "1:x5=1; 1:x7=0; ", "before_num": 22134, "before_sum": 2000000, "after_num": 38309, "after_sum": 2000000, "ratio": 1.730776181440318}
+{"litmus_name": "R", "state": "1:x7=1; [y]=1; ", "before_num": 19820, "before_sum": 2000000, "after_num": 120736, "after_sum": 4000000, "ratio": 3.0458123107971744}
+{"litmus_name": "S", "state": "1:x5=1; [x]=2; ", "before_num": 2240, "before_sum": 2000000, "after_num": 14740, "after_sum": 2000000, "ratio": 6.580357142857143}
+{"litmus_name": "ISA2", "state": "1:x5=1; 2:x5=1; 2:x7=0; ", "before_num": 287, "before_sum": 1000000, "after_num": 592, "after_sum": 1000000, "ratio": 2.062717770034843}
+{"litmus_name": "WRC", "state": "1:x5=1; 2:x5=1; 2:x7=0; ", "before_num": 93, "before_sum": 1000000, "after_num": 282, "after_sum": 1000000, "ratio": 3.032258064516129}
+{"litmus_name": "PPO12-2", "state": "1:x10=1; 1:x13=0; ", "before_num": 356, "before_sum": 2000000, "after_num": 298, "after_sum": 2000000, "ratio": 0.8370786516853933}
+{"litmus_name": "PPOCA", "state": "1:x5=1; 1:x9=1; 1:x11=0; ", "before_num": 14, "before_sum": 2000000, "after_num": 83, "after_sum": 2000000, "ratio": 5.928571428571429}

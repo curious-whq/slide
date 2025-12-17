@@ -1,0 +1,13 @@
+RISCV RL_po_XLr_ctrl_AQ_Rmw_PodWRRlP_DpCtrldRPAq_Rmw_Coe_Fence_rw_rwdWW_Rfe
+ {0:x5=x; 0:x9=y; 0:x10=z; 1:x6=z; 1:x8=x; }
+             P0              |      P1       ;
+ori x7, x0, 2                | ori x5, x0, 2 ;
+amoswap.w.rl x6, x7, (x5)    | sw x5, 0(x6)  ;
+lr.w x8, 0(x9)               | fence rw, rw  ;
+bne x8, x0, LC00             | ori x7, x0, 1 ;
+LC00:                        | sw x7, 0(x8)  ;
+ori x12, x0, 1               |               ;
+amoswap.w.aq x11, x12, (x10) |               ;
+lw x13, 0(x10)               |               ;
+
+exists (0:x13=2/\0:x6=1)

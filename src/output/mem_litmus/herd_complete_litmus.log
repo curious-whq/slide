@@ -1,0 +1,1129 @@
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+addrs.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.6689300537109375e-06
+
+Test LB+addrs Allowed
+States 3
+0:x5=0; 1:x5=0;
+0:x5=0; 1:x5=1;
+0:x5=1; 1:x5=0;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (0:x5=0 /\ 1:x5=0)
+Observation LB+addrs Sometimes 1 2
+Time LB+addrs 0.00
+Hash=479e53d8526e29d942a4442c2e836b41
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+datas.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 2.1457672119140625e-06
+
+Test LB+datas Allowed
+States 3
+0:x5=0; 1:x5=0;
+0:x5=0; 1:x5=1;
+0:x5=1; 1:x5=0;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (0:x5=0 /\ 1:x5=0)
+Observation LB+datas Sometimes 1 2
+Time LB+datas 0.00
+Hash=4b6dbad1e20829e00bf8e46c27feadfe
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+addr+data.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 2.1457672119140625e-06
+
+Test LB+addr+data Allowed
+States 3
+0:x5=0; 1:x5=0;
+0:x5=0; 1:x5=1;
+0:x5=1; 1:x5=0;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (0:x5=0 /\ 1:x5=0)
+Observation LB+addr+data Sometimes 1 2
+Time LB+addr+data 0.00
+Hash=f4a4d6a55b57fc7521468920404a06e4
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+datas.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.430511474609375e-06
+
+Test LB+datas Allowed
+States 3
+0:x5=0; 1:x5=0;
+0:x5=0; 1:x5=1;
+0:x5=1; 1:x5=0;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (0:x5=0 /\ 1:x5=0)
+Observation LB+datas Sometimes 1 2
+Time LB+datas 0.00
+Hash=4b6dbad1e20829e00bf8e46c27feadfe
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/RSW+W.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 2.1457672119140625e-06
+
+Test RSW+W Allowed
+States 5
+1:x5=0; 1:x8=0; 1:x11=0; 1:x13=0;
+1:x5=0; 1:x8=0; 1:x11=0; 1:x13=1;
+1:x5=0; 1:x8=0; 1:x11=1; 1:x13=1;
+1:x5=0; 1:x8=1; 1:x11=1; 1:x13=1;
+1:x5=1; 1:x8=1; 1:x11=1; 1:x13=1;
+No
+Witnesses
+Positive: 0 Negative: 5
+Condition exists (1:x5=0 /\ 1:x13=0 /\ 1:x8=1 /\ 1:x11=1)
+Observation RSW+W Never 0 5
+Time RSW+W 0.02
+Hash=e682a1b2a267bc967018848180b3f060
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+fri-rfi-datas.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.430511474609375e-06
+
+Test LB+fri-rfi-datas Allowed
+States 15
+0:x5=0; 0:x8=1; 1:x5=0; 1:x8=2; x=1; y=1;
+0:x5=0; 0:x8=1; 1:x5=0; 1:x8=2; x=1; y=2;
+0:x5=0; 0:x8=1; 1:x5=1; 1:x8=2; x=1; y=2;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=1; x=1; y=1;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=1; x=2; y=1;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=2; x=1; y=1;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=2; x=1; y=2;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=2; x=2; y=1;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=2; x=2; y=2;
+0:x5=0; 0:x8=2; 1:x5=1; 1:x8=2; x=1; y=2;
+0:x5=0; 0:x8=2; 1:x5=1; 1:x8=2; x=2; y=2;
+0:x5=1; 0:x8=2; 1:x5=0; 1:x8=1; x=2; y=1;
+0:x5=1; 0:x8=2; 1:x5=0; 1:x8=2; x=2; y=1;
+0:x5=1; 0:x8=2; 1:x5=0; 1:x8=2; x=2; y=2;
+0:x5=1; 0:x8=2; 1:x5=1; 1:x8=2; x=2; y=2;
+Ok
+Witnesses
+Positive: 1 Negative: 14
+Condition exists (0:x5=0 /\ 0:x8=1 /\ 1:x5=0 /\ 1:x8=2 /\ x=1 /\ y=1)
+Observation LB+fri-rfi-datas Sometimes 1 14
+Time LB+fri-rfi-datas 0.07
+Hash=c58f8ec776e782f4c0f08076e6d6dcb9
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+data+data-rfi-addr.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 2.1457672119140625e-06
+
+Test LB+data+data-rfi-addr Allowed
+States 3
+0:x5=0; 1:x5=0; 1:x9=1;
+0:x5=0; 1:x5=1; 1:x9=1;
+0:x5=1; 1:x5=0; 1:x9=1;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (0:x5=0 /\ 1:x5=0 /\ 1:x9=1)
+Observation LB+data+data-rfi-addr Sometimes 1 2
+Time LB+data+data-rfi-addr 0.01
+Hash=6fee53156615163b36fbdab5ead69d38
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/S+rfi-data+addr-rfi-data.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.430511474609375e-06
+
+Test S+rfi-data+addr-rfi-data Allowed
+States 5
+0:x7=1; 1:x5=0; 1:x11=1; x=1;
+0:x7=2; 1:x5=0; 1:x11=1; x=1;
+0:x7=2; 1:x5=0; 1:x11=1; x=2;
+0:x7=2; 1:x5=1; 1:x11=1; x=1;
+0:x7=2; 1:x5=1; 1:x11=1; x=2;
+Ok
+Witnesses
+Positive: 1 Negative: 4
+Condition exists (0:x7=1 /\ 1:x5=0 /\ 1:x11=1 /\ x=1)
+Observation S+rfi-data+addr-rfi-data Sometimes 1 4
+Time S+rfi-data+addr-rfi-data 0.02
+Hash=b952393ec4c642616eb22e839fc7cdd6
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/S+rfi-data+data.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.9073486328125e-06
+
+Test S+rfi-data+data Allowed
+States 5
+0:x7=1; 1:x5=0; x=1;
+0:x7=2; 1:x5=0; x=1;
+0:x7=2; 1:x5=0; x=2;
+0:x7=2; 1:x5=1; x=1;
+0:x7=2; 1:x5=1; x=2;
+Ok
+Witnesses
+Positive: 1 Negative: 4
+Condition exists (0:x7=1 /\ 1:x5=0 /\ x=1)
+Observation S+rfi-data+data Sometimes 1 4
+Time S+rfi-data+data 0.01
+Hash=36989b17f0eae5771114e2ae62d553ee
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/S+rfi-addr+addr-rfi-data.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 2.1457672119140625e-06
+
+Test S+rfi-addr+addr-rfi-data Allowed
+States 5
+0:x7=1; 1:x5=0; 1:x11=1; x=1;
+0:x7=2; 1:x5=0; 1:x11=1; x=1;
+0:x7=2; 1:x5=0; 1:x11=1; x=2;
+0:x7=2; 1:x5=1; 1:x11=1; x=1;
+0:x7=2; 1:x5=1; 1:x11=1; x=2;
+Ok
+Witnesses
+Positive: 1 Negative: 4
+Condition exists (0:x7=1 /\ 1:x5=0 /\ 1:x11=1 /\ x=1)
+Observation S+rfi-addr+addr-rfi-data Sometimes 1 4
+Time S+rfi-addr+addr-rfi-data 0.01
+Hash=bfb7f8c8a5c0712c6cdda8571bdff757
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/SB+rfi-addr-rfi+rfi-data-rfi.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 9.5367431640625e-07
+
+Test SB+rfi-addr-rfi+rfi-data-rfi Allowed
+States 15
+0:x7=1; 0:x12=1; 1:x7=2; 1:x10=1; x=1; y=1;
+0:x7=1; 0:x12=1; 1:x7=2; 1:x10=1; x=1; y=2;
+0:x7=1; 0:x12=2; 1:x7=2; 1:x10=1; x=1; y=2;
+0:x7=2; 0:x12=1; 1:x7=1; 1:x10=1; x=1; y=1;
+0:x7=2; 0:x12=1; 1:x7=1; 1:x10=1; x=2; y=1;
+0:x7=2; 0:x12=1; 1:x7=1; 1:x10=2; x=2; y=1;
+0:x7=2; 0:x12=1; 1:x7=2; 1:x10=1; x=1; y=1;
+0:x7=2; 0:x12=1; 1:x7=2; 1:x10=1; x=1; y=2;
+0:x7=2; 0:x12=1; 1:x7=2; 1:x10=1; x=2; y=1;
+0:x7=2; 0:x12=1; 1:x7=2; 1:x10=1; x=2; y=2;
+0:x7=2; 0:x12=1; 1:x7=2; 1:x10=2; x=2; y=1;
+0:x7=2; 0:x12=1; 1:x7=2; 1:x10=2; x=2; y=2;
+0:x7=2; 0:x12=2; 1:x7=2; 1:x10=1; x=1; y=2;
+0:x7=2; 0:x12=2; 1:x7=2; 1:x10=1; x=2; y=2;
+0:x7=2; 0:x12=2; 1:x7=2; 1:x10=2; x=2; y=2;
+Ok
+Witnesses
+Positive: 1 Negative: 14
+Condition exists (0:x7=1 /\ 0:x12=1 /\ 1:x7=2 /\ 1:x10=1 /\ x=1 /\ y=1)
+Observation SB+rfi-addr-rfi+rfi-data-rfi Sometimes 1 14
+Time SB+rfi-addr-rfi+rfi-data-rfi 0.07
+Hash=f08c27f8a97f1d424f43dada1673a659
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+addr+data-rfi-addr.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.430511474609375e-06
+
+Test LB+addr+data-rfi-addr Allowed
+States 3
+0:x5=0; 1:x5=0; 1:x9=1;
+0:x5=0; 1:x5=1; 1:x9=1;
+0:x5=1; 1:x5=0; 1:x9=1;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (0:x5=0 /\ 1:x5=0 /\ 1:x9=1)
+Observation LB+addr+data-rfi-addr Sometimes 1 2
+Time LB+addr+data-rfi-addr 0.01
+Hash=ac405bb39f2d1161555ceaed7e07d5c4
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+data+data-rfi-data.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.6689300537109375e-06
+
+Test LB+data+data-rfi-data Allowed
+States 3
+0:x5=0; 1:x5=0; 1:x9=1;
+0:x5=0; 1:x5=1; 1:x9=1;
+0:x5=1; 1:x5=0; 1:x9=1;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (0:x5=0 /\ 1:x5=0 /\ 1:x9=1)
+Observation LB+data+data-rfi-data Sometimes 1 2
+Time LB+data+data-rfi-data 0.01
+Hash=6b5252bbd63eda478c96b0b6a4717605
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/R+rfi-addr+rfi-addr-rfi.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 7.152557373046875e-07
+
+Test R+rfi-addr+rfi-addr-rfi Allowed
+States 11
+0:x7=1; 1:x7=2; 1:x12=1; x=1; y=1;
+0:x7=1; 1:x7=2; 1:x12=1; x=1; y=2;
+0:x7=2; 1:x7=1; 1:x12=1; x=1; y=1;
+0:x7=2; 1:x7=1; 1:x12=1; x=2; y=1;
+0:x7=2; 1:x7=1; 1:x12=2; x=2; y=1;
+0:x7=2; 1:x7=2; 1:x12=1; x=1; y=1;
+0:x7=2; 1:x7=2; 1:x12=1; x=1; y=2;
+0:x7=2; 1:x7=2; 1:x12=1; x=2; y=1;
+0:x7=2; 1:x7=2; 1:x12=1; x=2; y=2;
+0:x7=2; 1:x7=2; 1:x12=2; x=2; y=1;
+0:x7=2; 1:x7=2; 1:x12=2; x=2; y=2;
+Ok
+Witnesses
+Positive: 1 Negative: 10
+Condition exists (0:x7=1 /\ 1:x7=2 /\ 1:x12=1 /\ x=1 /\ y=1)
+Observation R+rfi-addr+rfi-addr-rfi Sometimes 1 10
+Time R+rfi-addr+rfi-addr-rfi 0.03
+Hash=19d11a34d1c00c7426dc818979b34178
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/S+rfi-addr+data.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.6689300537109375e-06
+
+Test S+rfi-addr+data Allowed
+States 5
+0:x7=1; 1:x5=0; x=1;
+0:x7=2; 1:x5=0; x=1;
+0:x7=2; 1:x5=0; x=2;
+0:x7=2; 1:x5=1; x=1;
+0:x7=2; 1:x5=1; x=2;
+Ok
+Witnesses
+Positive: 1 Negative: 4
+Condition exists (0:x7=1 /\ 1:x5=0 /\ x=1)
+Observation S+rfi-addr+data Sometimes 1 4
+Time S+rfi-addr+data 0.00
+Hash=13480a90e01315995cce94432b3aa011
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+addr-rfi-data+data-rfi-addr.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.1920928955078125e-06
+
+Test LB+addr-rfi-data+data-rfi-addr Allowed
+States 3
+0:x5=0; 0:x11=1; 1:x5=0; 1:x9=1;
+0:x5=0; 0:x11=1; 1:x5=1; 1:x9=1;
+0:x5=1; 0:x11=1; 1:x5=0; 1:x9=1;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (0:x5=0 /\ 0:x11=1 /\ 1:x5=0 /\ 1:x9=1)
+Observation LB+addr-rfi-data+data-rfi-addr Sometimes 1 2
+Time LB+addr-rfi-data+data-rfi-addr 0.02
+Hash=9928e2a35827df8af53e17f4915dc1a9
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+data+addr-rfi-addr.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 9.5367431640625e-07
+
+Test LB+data+addr-rfi-addr Allowed
+States 3
+0:x5=0; 1:x5=0; 1:x11=1;
+0:x5=0; 1:x5=1; 1:x11=1;
+0:x5=1; 1:x5=0; 1:x11=1;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (0:x5=0 /\ 1:x5=0 /\ 1:x11=1)
+Observation LB+data+addr-rfi-addr Sometimes 1 2
+Time LB+data+addr-rfi-addr 0.01
+Hash=a865e0e2495488e8dbe0aef74cf3383a
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/MP+rfi-addr+addr-rfi-addrs.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 9.5367431640625e-07
+
+Test MP+rfi-addr+addr-rfi-addrs Allowed
+States 9
+0:x7=1; 1:x5=0; 1:x11=1; 1:x13=1; x=1;
+0:x7=2; 1:x5=0; 1:x11=1; 1:x13=1; x=1;
+0:x7=2; 1:x5=0; 1:x11=1; 1:x13=1; x=2;
+0:x7=2; 1:x5=0; 1:x11=1; 1:x13=2; x=2;
+0:x7=2; 1:x5=0; 1:x11=2; 1:x13=2; x=2;
+0:x7=2; 1:x5=1; 1:x11=1; 1:x13=1; x=1;
+0:x7=2; 1:x5=1; 1:x11=1; 1:x13=1; x=2;
+0:x7=2; 1:x5=1; 1:x11=1; 1:x13=2; x=2;
+0:x7=2; 1:x5=1; 1:x11=2; 1:x13=2; x=2;
+Ok
+Witnesses
+Positive: 1 Negative: 8
+Condition exists (0:x7=1 /\ 1:x5=0 /\ 1:x11=1 /\ 1:x13=1 /\ x=1)
+Observation MP+rfi-addr+addr-rfi-addrs Sometimes 1 8
+Time MP+rfi-addr+addr-rfi-addrs 0.04
+Hash=84be00c2cbda605efbdb78031a56d944
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+addr-rfi-addrs.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.1920928955078125e-06
+
+Test LB+addr-rfi-addrs Allowed
+States 3
+0:x5=0; 0:x11=1; 1:x5=0; 1:x11=1;
+0:x5=0; 0:x11=1; 1:x5=1; 1:x11=1;
+0:x5=1; 0:x11=1; 1:x5=0; 1:x11=1;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (0:x5=0 /\ 0:x11=1 /\ 1:x5=0 /\ 1:x11=1)
+Observation LB+addr-rfi-addrs Sometimes 1 2
+Time LB+addr-rfi-addrs 0.02
+Hash=1b6e4898f1c3910b7c04e67db1b1279f
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+addr-rfi-addr+data-rfi-data.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.9073486328125e-06
+
+Test LB+addr-rfi-addr+data-rfi-data Allowed
+States 3
+0:x5=0; 0:x11=1; 1:x5=0; 1:x9=1;
+0:x5=0; 0:x11=1; 1:x5=1; 1:x9=1;
+0:x5=1; 0:x11=1; 1:x5=0; 1:x9=1;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (0:x5=0 /\ 0:x11=1 /\ 1:x5=0 /\ 1:x9=1)
+Observation LB+addr-rfi-addr+data-rfi-data Sometimes 1 2
+Time LB+addr-rfi-addr+data-rfi-data 0.02
+Hash=fcf58381aa2972c23210b69ae112c1a9
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+data+addr-rfi-data.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 2.1457672119140625e-06
+
+Test LB+data+addr-rfi-data Allowed
+States 3
+0:x5=0; 1:x5=0; 1:x11=1;
+0:x5=0; 1:x5=1; 1:x11=1;
+0:x5=1; 1:x5=0; 1:x11=1;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (0:x5=0 /\ 1:x5=0 /\ 1:x11=1)
+Observation LB+data+addr-rfi-data Sometimes 1 2
+Time LB+data+addr-rfi-data 0.01
+Hash=d5c07c2280ba028d8659ac13f0dac42e
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/S+rfi-data+data-rfi-addr.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 9.5367431640625e-07
+
+Test S+rfi-data+data-rfi-addr Allowed
+States 5
+0:x7=1; 1:x5=0; 1:x9=1; x=1;
+0:x7=2; 1:x5=0; 1:x9=1; x=1;
+0:x7=2; 1:x5=0; 1:x9=1; x=2;
+0:x7=2; 1:x5=1; 1:x9=1; x=1;
+0:x7=2; 1:x5=1; 1:x9=1; x=2;
+Ok
+Witnesses
+Positive: 1 Negative: 4
+Condition exists (0:x7=1 /\ 1:x5=0 /\ 1:x9=1 /\ x=1)
+Observation S+rfi-data+data-rfi-addr Sometimes 1 4
+Time S+rfi-data+data-rfi-addr 0.01
+Hash=a592ddae8b4b097791527c770c5b1fb0
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/S+rfi-addr+data-rfi-data.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.1920928955078125e-06
+
+Test S+rfi-addr+data-rfi-data Allowed
+States 5
+0:x7=1; 1:x5=0; 1:x9=1; x=1;
+0:x7=2; 1:x5=0; 1:x9=1; x=1;
+0:x7=2; 1:x5=0; 1:x9=1; x=2;
+0:x7=2; 1:x5=1; 1:x9=1; x=1;
+0:x7=2; 1:x5=1; 1:x9=1; x=2;
+Ok
+Witnesses
+Positive: 1 Negative: 4
+Condition exists (0:x7=1 /\ 1:x5=0 /\ 1:x9=1 /\ x=1)
+Observation S+rfi-addr+data-rfi-data Sometimes 1 4
+Time S+rfi-addr+data-rfi-data 0.02
+Hash=a3b250808e5e3ca8a3548292b2f9e3f8
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+addr+addr-rfi-addr.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.430511474609375e-06
+
+Test LB+addr+addr-rfi-addr Allowed
+States 3
+0:x5=0; 1:x5=0; 1:x11=1;
+0:x5=0; 1:x5=1; 1:x11=1;
+0:x5=1; 1:x5=0; 1:x11=1;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (0:x5=0 /\ 1:x5=0 /\ 1:x11=1)
+Observation LB+addr+addr-rfi-addr Sometimes 1 2
+Time LB+addr+addr-rfi-addr 0.01
+Hash=a999e9e17d8fd6ad15369f77b386a65e
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/MP+rfi-addr+data-rfi.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.430511474609375e-06
+
+Test MP+rfi-addr+data-rfi Allowed
+States 7
+0:x7=1; 1:x5=0; 1:x9=1; x=1;
+0:x7=2; 1:x5=0; 1:x9=1; x=1;
+0:x7=2; 1:x5=0; 1:x9=1; x=2;
+0:x7=2; 1:x5=0; 1:x9=2; x=2;
+0:x7=2; 1:x5=1; 1:x9=1; x=1;
+0:x7=2; 1:x5=1; 1:x9=1; x=2;
+0:x7=2; 1:x5=1; 1:x9=2; x=2;
+Ok
+Witnesses
+Positive: 1 Negative: 6
+Condition exists (0:x7=1 /\ 1:x5=0 /\ 1:x9=1 /\ x=1)
+Observation MP+rfi-addr+data-rfi Sometimes 1 6
+Time MP+rfi-addr+data-rfi 0.01
+Hash=5afcc9364960bd531f3a9a174d94376a
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+addr+data-rfi-data.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.9073486328125e-06
+
+Test LB+addr+data-rfi-data Allowed
+States 3
+0:x5=0; 1:x5=0; 1:x9=1;
+0:x5=0; 1:x5=1; 1:x9=1;
+0:x5=1; 1:x5=0; 1:x9=1;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (0:x5=0 /\ 1:x5=0 /\ 1:x9=1)
+Observation LB+addr+data-rfi-data Sometimes 1 2
+Time LB+addr+data-rfi-data 0.01
+Hash=1099179f6131606cf56720a70bc591bb
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/S+rfi-data+data-rfi-data.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 9.5367431640625e-07
+
+Test S+rfi-data+data-rfi-data Allowed
+States 5
+0:x7=1; 1:x5=0; 1:x9=1; x=1;
+0:x7=2; 1:x5=0; 1:x9=1; x=1;
+0:x7=2; 1:x5=0; 1:x9=1; x=2;
+0:x7=2; 1:x5=1; 1:x9=1; x=1;
+0:x7=2; 1:x5=1; 1:x9=1; x=2;
+Ok
+Witnesses
+Positive: 1 Negative: 4
+Condition exists (0:x7=1 /\ 1:x5=0 /\ 1:x9=1 /\ x=1)
+Observation S+rfi-data+data-rfi-data Sometimes 1 4
+Time S+rfi-data+data-rfi-data 0.01
+Hash=53fc693bce6b647aaec87d629b08d4ab
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/2+2W+rfi-addr+rfi-data.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.6689300537109375e-06
+
+Test 2+2W+rfi-addr+rfi-data Allowed
+States 8
+0:x7=1; 1:x7=2; x=1; y=1;
+0:x7=1; 1:x7=2; x=1; y=2;
+0:x7=2; 1:x7=1; x=1; y=1;
+0:x7=2; 1:x7=1; x=2; y=1;
+0:x7=2; 1:x7=2; x=1; y=1;
+0:x7=2; 1:x7=2; x=1; y=2;
+0:x7=2; 1:x7=2; x=2; y=1;
+0:x7=2; 1:x7=2; x=2; y=2;
+Ok
+Witnesses
+Positive: 1 Negative: 7
+Condition exists (0:x7=1 /\ 1:x7=2 /\ x=1 /\ y=1)
+Observation 2+2W+rfi-addr+rfi-data Sometimes 1 7
+Time 2+2W+rfi-addr+rfi-data 0.02
+Hash=600c604326534f4b5c997f5161e2bb3e
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/S+rfi-addr+addr.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.9073486328125e-06
+
+Test S+rfi-addr+addr Allowed
+States 5
+0:x7=1; 1:x5=0; x=1;
+0:x7=2; 1:x5=0; x=1;
+0:x7=2; 1:x5=0; x=2;
+0:x7=2; 1:x5=1; x=1;
+0:x7=2; 1:x5=1; x=2;
+Ok
+Witnesses
+Positive: 1 Negative: 4
+Condition exists (0:x7=1 /\ 1:x5=0 /\ x=1)
+Observation S+rfi-addr+addr Sometimes 1 4
+Time S+rfi-addr+addr 0.01
+Hash=5c8bc5767cdcf5c98e484866450a205e
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/S+rfi-data+addr-rfi-addr.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 7.152557373046875e-07
+
+Test S+rfi-data+addr-rfi-addr Allowed
+States 5
+0:x7=1; 1:x5=0; 1:x11=1; x=1;
+0:x7=2; 1:x5=0; 1:x11=1; x=1;
+0:x7=2; 1:x5=0; 1:x11=1; x=2;
+0:x7=2; 1:x5=1; 1:x11=1; x=1;
+0:x7=2; 1:x5=1; 1:x11=1; x=2;
+Ok
+Witnesses
+Positive: 1 Negative: 4
+Condition exists (0:x7=1 /\ 1:x5=0 /\ 1:x11=1 /\ x=1)
+Observation S+rfi-data+addr-rfi-addr Sometimes 1 4
+Time S+rfi-data+addr-rfi-addr 0.02
+Hash=4a5efdb4a097499c474ed5521661bc3f
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/MP+rfi-addr+addr-rfi.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 9.5367431640625e-07
+
+Test MP+rfi-addr+addr-rfi Allowed
+States 7
+0:x7=1; 1:x5=0; 1:x11=1; x=1;
+0:x7=2; 1:x5=0; 1:x11=1; x=1;
+0:x7=2; 1:x5=0; 1:x11=1; x=2;
+0:x7=2; 1:x5=0; 1:x11=2; x=2;
+0:x7=2; 1:x5=1; 1:x11=1; x=1;
+0:x7=2; 1:x5=1; 1:x11=1; x=2;
+0:x7=2; 1:x5=1; 1:x11=2; x=2;
+Ok
+Witnesses
+Positive: 1 Negative: 6
+Condition exists (0:x7=1 /\ 1:x5=0 /\ 1:x11=1 /\ x=1)
+Observation MP+rfi-addr+addr-rfi Sometimes 1 6
+Time MP+rfi-addr+addr-rfi 0.02
+Hash=03ffd156d512e037ab706aa34e033cb5
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/S+rfi-addr+addr-rfi-addr.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 7.152557373046875e-07
+
+Test S+rfi-addr+addr-rfi-addr Allowed
+States 5
+0:x7=1; 1:x5=0; 1:x11=1; x=1;
+0:x7=2; 1:x5=0; 1:x11=1; x=1;
+0:x7=2; 1:x5=0; 1:x11=1; x=2;
+0:x7=2; 1:x5=1; 1:x11=1; x=1;
+0:x7=2; 1:x5=1; 1:x11=1; x=2;
+Ok
+Witnesses
+Positive: 1 Negative: 4
+Condition exists (0:x7=1 /\ 1:x5=0 /\ 1:x11=1 /\ x=1)
+Observation S+rfi-addr+addr-rfi-addr Sometimes 1 4
+Time S+rfi-addr+addr-rfi-addr 0.01
+Hash=3c207a957bbfb501419ae5fa4daa3b43
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+data-rfi-datas.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 9.5367431640625e-07
+
+Test LB+data-rfi-datas Allowed
+States 3
+0:x5=0; 0:x9=1; 1:x5=0; 1:x9=1;
+0:x5=0; 0:x9=1; 1:x5=1; 1:x9=1;
+0:x5=1; 0:x9=1; 1:x5=0; 1:x9=1;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (0:x5=0 /\ 0:x9=1 /\ 1:x5=0 /\ 1:x9=1)
+Observation LB+data-rfi-datas Sometimes 1 2
+Time LB+data-rfi-datas 0.01
+Hash=a10c264b43cb274f7614b6461c8e3b6a
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+addr+addr-rfi-data.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.1920928955078125e-06
+
+Test LB+addr+addr-rfi-data Allowed
+States 3
+0:x5=0; 1:x5=0; 1:x11=1;
+0:x5=0; 1:x5=1; 1:x11=1;
+0:x5=1; 1:x5=0; 1:x11=1;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (0:x5=0 /\ 1:x5=0 /\ 1:x11=1)
+Observation LB+addr+addr-rfi-data Sometimes 1 2
+Time LB+addr+addr-rfi-data 0.01
+Hash=45ac37c0af71ea472fb7a234e307bedf
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+addr-rfi-addr+addr-rfi-data.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.1920928955078125e-06
+
+Test LB+addr-rfi-addr+addr-rfi-data Allowed
+States 3
+0:x5=0; 0:x11=1; 1:x5=0; 1:x11=1;
+0:x5=0; 0:x11=1; 1:x5=1; 1:x11=1;
+0:x5=1; 0:x11=1; 1:x5=0; 1:x11=1;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (0:x5=0 /\ 0:x11=1 /\ 1:x5=0 /\ 1:x11=1)
+Observation LB+addr-rfi-addr+addr-rfi-data Sometimes 1 2
+Time LB+addr-rfi-addr+addr-rfi-data 0.02
+Hash=8cac9bd3da692aa669322567525c732e
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/2+2W+rfi-addrs.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 9.5367431640625e-07
+
+Test 2+2W+rfi-addrs Allowed
+States 8
+0:x7=1; 1:x7=2; x=1; y=1;
+0:x7=1; 1:x7=2; x=1; y=2;
+0:x7=2; 1:x7=1; x=1; y=1;
+0:x7=2; 1:x7=1; x=2; y=1;
+0:x7=2; 1:x7=2; x=1; y=1;
+0:x7=2; 1:x7=2; x=1; y=2;
+0:x7=2; 1:x7=2; x=2; y=1;
+0:x7=2; 1:x7=2; x=2; y=2;
+Ok
+Witnesses
+Positive: 1 Negative: 7
+Condition exists (0:x7=1 /\ 1:x7=2 /\ x=1 /\ y=1)
+Observation 2+2W+rfi-addrs Sometimes 1 7
+Time 2+2W+rfi-addrs 0.02
+Hash=3165bbcbbfc4fba801b31a9c691f663b
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/S+rfi-data+addr.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.1920928955078125e-06
+
+Test S+rfi-data+addr Allowed
+States 5
+0:x7=1; 1:x5=0; x=1;
+0:x7=2; 1:x5=0; x=1;
+0:x7=2; 1:x5=0; x=2;
+0:x7=2; 1:x5=1; x=1;
+0:x7=2; 1:x5=1; x=2;
+Ok
+Witnesses
+Positive: 1 Negative: 4
+Condition exists (0:x7=1 /\ 1:x5=0 /\ x=1)
+Observation S+rfi-data+addr Sometimes 1 4
+Time S+rfi-data+addr 0.01
+Hash=2959d64e2099dd7bd5c6f06f9c5518d9
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/MP+rfi-data+data-rfi.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.430511474609375e-06
+
+Test MP+rfi-data+data-rfi Allowed
+States 7
+0:x7=1; 1:x5=0; 1:x9=1; x=1;
+0:x7=2; 1:x5=0; 1:x9=1; x=1;
+0:x7=2; 1:x5=0; 1:x9=1; x=2;
+0:x7=2; 1:x5=0; 1:x9=2; x=2;
+0:x7=2; 1:x5=1; 1:x9=1; x=1;
+0:x7=2; 1:x5=1; 1:x9=1; x=2;
+0:x7=2; 1:x5=1; 1:x9=2; x=2;
+Ok
+Witnesses
+Positive: 1 Negative: 6
+Condition exists (0:x7=1 /\ 1:x5=0 /\ 1:x9=1 /\ x=1)
+Observation MP+rfi-data+data-rfi Sometimes 1 6
+Time MP+rfi-data+data-rfi 0.01
+Hash=ec9893a3f06ca0fb7ffc5845386ba3bd
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/MP+rfi-data+data-rfi-addrs.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.1920928955078125e-06
+
+Test MP+rfi-data+data-rfi-addrs Allowed
+States 9
+0:x7=1; 1:x5=0; 1:x9=1; 1:x11=1; x=1;
+0:x7=2; 1:x5=0; 1:x9=1; 1:x11=1; x=1;
+0:x7=2; 1:x5=0; 1:x9=1; 1:x11=1; x=2;
+0:x7=2; 1:x5=0; 1:x9=1; 1:x11=2; x=2;
+0:x7=2; 1:x5=0; 1:x9=2; 1:x11=2; x=2;
+0:x7=2; 1:x5=1; 1:x9=1; 1:x11=1; x=1;
+0:x7=2; 1:x5=1; 1:x9=1; 1:x11=1; x=2;
+0:x7=2; 1:x5=1; 1:x9=1; 1:x11=2; x=2;
+0:x7=2; 1:x5=1; 1:x9=2; 1:x11=2; x=2;
+Ok
+Witnesses
+Positive: 1 Negative: 8
+Condition exists (0:x7=1 /\ 1:x5=0 /\ 1:x9=1 /\ 1:x11=1 /\ x=1)
+Observation MP+rfi-data+data-rfi-addrs Sometimes 1 8
+Time MP+rfi-data+data-rfi-addrs 0.04
+Hash=8abcd8c49d34971f72ec5a8bfb9f4078
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+addr-rfi-addr+data-rfi-addr.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 2.1457672119140625e-06
+
+Test LB+addr-rfi-addr+data-rfi-addr Allowed
+States 3
+0:x5=0; 0:x11=1; 1:x5=0; 1:x9=1;
+0:x5=0; 0:x11=1; 1:x5=1; 1:x9=1;
+0:x5=1; 0:x11=1; 1:x5=0; 1:x9=1;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (0:x5=0 /\ 0:x11=1 /\ 1:x5=0 /\ 1:x9=1)
+Observation LB+addr-rfi-addr+data-rfi-addr Sometimes 1 2
+Time LB+addr-rfi-addr+data-rfi-addr 0.01
+Hash=7dbd7f784a0f1ef0adf51c8972e96f76
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/R+rfi-data+rfi-data-rfi.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.6689300537109375e-06
+
+Test R+rfi-data+rfi-data-rfi Allowed
+States 11
+0:x7=1; 1:x7=2; 1:x10=1; x=1; y=1;
+0:x7=1; 1:x7=2; 1:x10=1; x=1; y=2;
+0:x7=2; 1:x7=1; 1:x10=1; x=1; y=1;
+0:x7=2; 1:x7=1; 1:x10=1; x=2; y=1;
+0:x7=2; 1:x7=1; 1:x10=2; x=2; y=1;
+0:x7=2; 1:x7=2; 1:x10=1; x=1; y=1;
+0:x7=2; 1:x7=2; 1:x10=1; x=1; y=2;
+0:x7=2; 1:x7=2; 1:x10=1; x=2; y=1;
+0:x7=2; 1:x7=2; 1:x10=1; x=2; y=2;
+0:x7=2; 1:x7=2; 1:x10=2; x=2; y=1;
+0:x7=2; 1:x7=2; 1:x10=2; x=2; y=2;
+Ok
+Witnesses
+Positive: 1 Negative: 10
+Condition exists (0:x7=1 /\ 1:x7=2 /\ 1:x10=1 /\ x=1 /\ y=1)
+Observation R+rfi-data+rfi-data-rfi Sometimes 1 10
+Time R+rfi-data+rfi-data-rfi 0.03
+Hash=1440ed0f1fcf5613c2142a3f65a52ba5
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+data-rfi-addrs.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 2.1457672119140625e-06
+
+Test LB+data-rfi-addrs Allowed
+States 3
+0:x5=0; 0:x9=1; 1:x5=0; 1:x9=1;
+0:x5=0; 0:x9=1; 1:x5=1; 1:x9=1;
+0:x5=1; 0:x9=1; 1:x5=0; 1:x9=1;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (0:x5=0 /\ 0:x9=1 /\ 1:x5=0 /\ 1:x9=1)
+Observation LB+data-rfi-addrs Sometimes 1 2
+Time LB+data-rfi-addrs 0.02
+Hash=bbcc8370f3073b96b81bd6cb9a128e15
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/S+rfi-addr+data-rfi-addr.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.1920928955078125e-06
+
+Test S+rfi-addr+data-rfi-addr Allowed
+States 5
+0:x7=1; 1:x5=0; 1:x9=1; x=1;
+0:x7=2; 1:x5=0; 1:x9=1; x=1;
+0:x7=2; 1:x5=0; 1:x9=1; x=2;
+0:x7=2; 1:x5=1; 1:x9=1; x=1;
+0:x7=2; 1:x5=1; 1:x9=1; x=2;
+Ok
+Witnesses
+Positive: 1 Negative: 4
+Condition exists (0:x7=1 /\ 1:x5=0 /\ 1:x9=1 /\ x=1)
+Observation S+rfi-addr+data-rfi-addr Sometimes 1 4
+Time S+rfi-addr+data-rfi-addr 0.01
+Hash=a66149eca6c123b3ef77076f090c34e0
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/SB+rfi-data-rfis.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.430511474609375e-06
+
+Test SB+rfi-data-rfis Allowed
+States 15
+0:x7=1; 0:x10=1; 1:x7=2; 1:x10=1; x=1; y=1;
+0:x7=1; 0:x10=1; 1:x7=2; 1:x10=1; x=1; y=2;
+0:x7=1; 0:x10=2; 1:x7=2; 1:x10=1; x=1; y=2;
+0:x7=2; 0:x10=1; 1:x7=1; 1:x10=1; x=1; y=1;
+0:x7=2; 0:x10=1; 1:x7=1; 1:x10=1; x=2; y=1;
+0:x7=2; 0:x10=1; 1:x7=1; 1:x10=2; x=2; y=1;
+0:x7=2; 0:x10=1; 1:x7=2; 1:x10=1; x=1; y=1;
+0:x7=2; 0:x10=1; 1:x7=2; 1:x10=1; x=1; y=2;
+0:x7=2; 0:x10=1; 1:x7=2; 1:x10=1; x=2; y=1;
+0:x7=2; 0:x10=1; 1:x7=2; 1:x10=1; x=2; y=2;
+0:x7=2; 0:x10=1; 1:x7=2; 1:x10=2; x=2; y=1;
+0:x7=2; 0:x10=1; 1:x7=2; 1:x10=2; x=2; y=2;
+0:x7=2; 0:x10=2; 1:x7=2; 1:x10=1; x=1; y=2;
+0:x7=2; 0:x10=2; 1:x7=2; 1:x10=1; x=2; y=2;
+0:x7=2; 0:x10=2; 1:x7=2; 1:x10=2; x=2; y=2;
+Ok
+Witnesses
+Positive: 1 Negative: 14
+Condition exists (0:x7=1 /\ 0:x10=1 /\ 1:x7=2 /\ 1:x10=1 /\ x=1 /\ y=1)
+Observation SB+rfi-data-rfis Sometimes 1 14
+Time SB+rfi-data-rfis 0.07
+Hash=751795f80e775bf08f085a8a203ec751
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/R+rfi-data+rfi-addr-rfi.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 9.5367431640625e-07
+
+Test R+rfi-data+rfi-addr-rfi Allowed
+States 11
+0:x7=1; 1:x7=2; 1:x12=1; x=1; y=1;
+0:x7=1; 1:x7=2; 1:x12=1; x=1; y=2;
+0:x7=2; 1:x7=1; 1:x12=1; x=1; y=1;
+0:x7=2; 1:x7=1; 1:x12=1; x=2; y=1;
+0:x7=2; 1:x7=1; 1:x12=2; x=2; y=1;
+0:x7=2; 1:x7=2; 1:x12=1; x=1; y=1;
+0:x7=2; 1:x7=2; 1:x12=1; x=1; y=2;
+0:x7=2; 1:x7=2; 1:x12=1; x=2; y=1;
+0:x7=2; 1:x7=2; 1:x12=1; x=2; y=2;
+0:x7=2; 1:x7=2; 1:x12=2; x=2; y=1;
+0:x7=2; 1:x7=2; 1:x12=2; x=2; y=2;
+Ok
+Witnesses
+Positive: 1 Negative: 10
+Condition exists (0:x7=1 /\ 1:x7=2 /\ 1:x12=1 /\ x=1 /\ y=1)
+Observation R+rfi-data+rfi-addr-rfi Sometimes 1 10
+Time R+rfi-data+rfi-addr-rfi 0.02
+Hash=30e453616a558dc17283b4a57b327e38
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/MP+rfi-data+addr-rfi-addrs.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 9.5367431640625e-07
+
+Test MP+rfi-data+addr-rfi-addrs Allowed
+States 9
+0:x7=1; 1:x5=0; 1:x11=1; 1:x13=1; x=1;
+0:x7=2; 1:x5=0; 1:x11=1; 1:x13=1; x=1;
+0:x7=2; 1:x5=0; 1:x11=1; 1:x13=1; x=2;
+0:x7=2; 1:x5=0; 1:x11=1; 1:x13=2; x=2;
+0:x7=2; 1:x5=0; 1:x11=2; 1:x13=2; x=2;
+0:x7=2; 1:x5=1; 1:x11=1; 1:x13=1; x=1;
+0:x7=2; 1:x5=1; 1:x11=1; 1:x13=1; x=2;
+0:x7=2; 1:x5=1; 1:x11=1; 1:x13=2; x=2;
+0:x7=2; 1:x5=1; 1:x11=2; 1:x13=2; x=2;
+Ok
+Witnesses
+Positive: 1 Negative: 8
+Condition exists (0:x7=1 /\ 1:x5=0 /\ 1:x11=1 /\ 1:x13=1 /\ x=1)
+Observation MP+rfi-data+addr-rfi-addrs Sometimes 1 8
+Time MP+rfi-data+addr-rfi-addrs 0.04
+Hash=a639a0b8d25f13c0c29afd02c4f97991
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/SB+rfi-addr-rfis.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.430511474609375e-06
+
+Test SB+rfi-addr-rfis Allowed
+States 15
+0:x7=1; 0:x12=1; 1:x7=2; 1:x12=1; x=1; y=1;
+0:x7=1; 0:x12=1; 1:x7=2; 1:x12=1; x=1; y=2;
+0:x7=1; 0:x12=2; 1:x7=2; 1:x12=1; x=1; y=2;
+0:x7=2; 0:x12=1; 1:x7=1; 1:x12=1; x=1; y=1;
+0:x7=2; 0:x12=1; 1:x7=1; 1:x12=1; x=2; y=1;
+0:x7=2; 0:x12=1; 1:x7=1; 1:x12=2; x=2; y=1;
+0:x7=2; 0:x12=1; 1:x7=2; 1:x12=1; x=1; y=1;
+0:x7=2; 0:x12=1; 1:x7=2; 1:x12=1; x=1; y=2;
+0:x7=2; 0:x12=1; 1:x7=2; 1:x12=1; x=2; y=1;
+0:x7=2; 0:x12=1; 1:x7=2; 1:x12=1; x=2; y=2;
+0:x7=2; 0:x12=1; 1:x7=2; 1:x12=2; x=2; y=1;
+0:x7=2; 0:x12=1; 1:x7=2; 1:x12=2; x=2; y=2;
+0:x7=2; 0:x12=2; 1:x7=2; 1:x12=1; x=1; y=2;
+0:x7=2; 0:x12=2; 1:x7=2; 1:x12=1; x=2; y=2;
+0:x7=2; 0:x12=2; 1:x7=2; 1:x12=2; x=2; y=2;
+Ok
+Witnesses
+Positive: 1 Negative: 14
+Condition exists (0:x7=1 /\ 0:x12=1 /\ 1:x7=2 /\ 1:x12=1 /\ x=1 /\ y=1)
+Observation SB+rfi-addr-rfis Sometimes 1 14
+Time SB+rfi-addr-rfis 0.08
+Hash=af3cff66fadc56023779493a7aca770a
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+data-rfi-addr+data-rfi-data.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 9.5367431640625e-07
+
+Test LB+data-rfi-addr+data-rfi-data Allowed
+States 3
+0:x5=0; 0:x9=1; 1:x5=0; 1:x9=1;
+0:x5=0; 0:x9=1; 1:x5=1; 1:x9=1;
+0:x5=1; 0:x9=1; 1:x5=0; 1:x9=1;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (0:x5=0 /\ 0:x9=1 /\ 1:x5=0 /\ 1:x9=1)
+Observation LB+data-rfi-addr+data-rfi-data Sometimes 1 2
+Time LB+data-rfi-addr+data-rfi-data 0.01
+Hash=58cea6d8eb9c5536159a68ecac9ec6bd
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/2+2W+rfi-datas.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.9073486328125e-06
+
+Test 2+2W+rfi-datas Allowed
+States 8
+0:x7=1; 1:x7=2; x=1; y=1;
+0:x7=1; 1:x7=2; x=1; y=2;
+0:x7=2; 1:x7=1; x=1; y=1;
+0:x7=2; 1:x7=1; x=2; y=1;
+0:x7=2; 1:x7=2; x=1; y=1;
+0:x7=2; 1:x7=2; x=1; y=2;
+0:x7=2; 1:x7=2; x=2; y=1;
+0:x7=2; 1:x7=2; x=2; y=2;
+Ok
+Witnesses
+Positive: 1 Negative: 7
+Condition exists (0:x7=1 /\ 1:x7=2 /\ x=1 /\ y=1)
+Observation 2+2W+rfi-datas Sometimes 1 7
+Time 2+2W+rfi-datas 0.02
+Hash=392b5b9c14305be1b0cf4dbac5c05df5
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/MP+rfi-data+addr-rfi.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.430511474609375e-06
+
+Test MP+rfi-data+addr-rfi Allowed
+States 7
+0:x7=1; 1:x5=0; 1:x11=1; x=1;
+0:x7=2; 1:x5=0; 1:x11=1; x=1;
+0:x7=2; 1:x5=0; 1:x11=1; x=2;
+0:x7=2; 1:x5=0; 1:x11=2; x=2;
+0:x7=2; 1:x5=1; 1:x11=1; x=1;
+0:x7=2; 1:x5=1; 1:x11=1; x=2;
+0:x7=2; 1:x5=1; 1:x11=2; x=2;
+Ok
+Witnesses
+Positive: 1 Negative: 6
+Condition exists (0:x7=1 /\ 1:x5=0 /\ 1:x11=1 /\ x=1)
+Observation MP+rfi-data+addr-rfi Sometimes 1 6
+Time MP+rfi-data+addr-rfi 0.02
+Hash=c0bbc289d6bcde003928353e5cc2b0f1
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+addr-rfi-datas.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.6689300537109375e-06
+
+Test LB+addr-rfi-datas Allowed
+States 3
+0:x5=0; 0:x11=1; 1:x5=0; 1:x11=1;
+0:x5=0; 0:x11=1; 1:x5=1; 1:x11=1;
+0:x5=1; 0:x11=1; 1:x5=0; 1:x11=1;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (0:x5=0 /\ 0:x11=1 /\ 1:x5=0 /\ 1:x11=1)
+Observation LB+addr-rfi-datas Sometimes 1 2
+Time LB+addr-rfi-datas 0.02
+Hash=da043f0876ff00079e9bc1109057fc14
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/MP+rfi-addr+data-rfi-addrs.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 9.5367431640625e-07
+
+Test MP+rfi-addr+data-rfi-addrs Allowed
+States 9
+0:x7=1; 1:x5=0; 1:x9=1; 1:x11=1; x=1;
+0:x7=2; 1:x5=0; 1:x9=1; 1:x11=1; x=1;
+0:x7=2; 1:x5=0; 1:x9=1; 1:x11=1; x=2;
+0:x7=2; 1:x5=0; 1:x9=1; 1:x11=2; x=2;
+0:x7=2; 1:x5=0; 1:x9=2; 1:x11=2; x=2;
+0:x7=2; 1:x5=1; 1:x9=1; 1:x11=1; x=1;
+0:x7=2; 1:x5=1; 1:x9=1; 1:x11=1; x=2;
+0:x7=2; 1:x5=1; 1:x9=1; 1:x11=2; x=2;
+0:x7=2; 1:x5=1; 1:x9=2; 1:x11=2; x=2;
+Ok
+Witnesses
+Positive: 1 Negative: 8
+Condition exists (0:x7=1 /\ 1:x5=0 /\ 1:x9=1 /\ 1:x11=1 /\ x=1)
+Observation MP+rfi-addr+data-rfi-addrs Sometimes 1 8
+Time MP+rfi-addr+data-rfi-addrs 0.04
+Hash=86a9b009d93f10087ee67bac3b7c2cca
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+addr-rfi-data+data-rfi-data.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 7.152557373046875e-07
+
+Test LB+addr-rfi-data+data-rfi-data Allowed
+States 3
+0:x5=0; 0:x11=1; 1:x5=0; 1:x9=1;
+0:x5=0; 0:x11=1; 1:x5=1; 1:x9=1;
+0:x5=1; 0:x11=1; 1:x5=0; 1:x9=1;
+Ok
+Witnesses
+Positive: 1 Negative: 2
+Condition exists (0:x5=0 /\ 0:x11=1 /\ 1:x5=0 /\ 1:x9=1)
+Observation LB+addr-rfi-data+data-rfi-data Sometimes 1 2
+Time LB+addr-rfi-data+data-rfi-data 0.02
+Hash=8ceaaa75d3f9308d2c71546ddcb8ee97
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/R+rfi-addr+rfi-data-rfi.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.1920928955078125e-06
+
+Test R+rfi-addr+rfi-data-rfi Allowed
+States 11
+0:x7=1; 1:x7=2; 1:x10=1; x=1; y=1;
+0:x7=1; 1:x7=2; 1:x10=1; x=1; y=2;
+0:x7=2; 1:x7=1; 1:x10=1; x=1; y=1;
+0:x7=2; 1:x7=1; 1:x10=1; x=2; y=1;
+0:x7=2; 1:x7=1; 1:x10=2; x=2; y=1;
+0:x7=2; 1:x7=2; 1:x10=1; x=1; y=1;
+0:x7=2; 1:x7=2; 1:x10=1; x=1; y=2;
+0:x7=2; 1:x7=2; 1:x10=1; x=2; y=1;
+0:x7=2; 1:x7=2; 1:x10=1; x=2; y=2;
+0:x7=2; 1:x7=2; 1:x10=2; x=2; y=1;
+0:x7=2; 1:x7=2; 1:x10=2; x=2; y=2;
+Ok
+Witnesses
+Positive: 1 Negative: 10
+Condition exists (0:x7=1 /\ 1:x7=2 /\ 1:x10=1 /\ x=1 /\ y=1)
+Observation R+rfi-addr+rfi-data-rfi Sometimes 1 10
+Time R+rfi-addr+rfi-data-rfi 0.03
+Hash=74dce3c7b98b1e3cd978072e4da3c4ff
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+addr+fri-rfi-addr.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 7.152557373046875e-07
+
+Test LB+addr+fri-rfi-addr Allowed
+States 7
+0:x5=0; 1:x5=0; 1:x8=1; y=1;
+0:x5=0; 1:x5=0; 1:x8=2; y=1;
+0:x5=0; 1:x5=0; 1:x8=2; y=2;
+0:x5=0; 1:x5=1; 1:x8=2; y=2;
+0:x5=1; 1:x5=0; 1:x8=2; y=1;
+0:x5=1; 1:x5=0; 1:x8=2; y=2;
+0:x5=1; 1:x5=1; 1:x8=2; y=2;
+Ok
+Witnesses
+Positive: 1 Negative: 6
+Condition exists (0:x5=0 /\ 1:x5=0 /\ 1:x8=1 /\ y=1)
+Observation LB+addr+fri-rfi-addr Sometimes 1 6
+Time LB+addr+fri-rfi-addr 0.01
+Hash=081dec840877712af274cdf17ac35e81
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+data+fri-rfi-addr.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 9.5367431640625e-07
+
+Test LB+data+fri-rfi-addr Allowed
+States 7
+0:x5=0; 1:x5=0; 1:x8=1; y=1;
+0:x5=0; 1:x5=0; 1:x8=2; y=1;
+0:x5=0; 1:x5=0; 1:x8=2; y=2;
+0:x5=0; 1:x5=1; 1:x8=2; y=2;
+0:x5=1; 1:x5=0; 1:x8=2; y=1;
+0:x5=1; 1:x5=0; 1:x8=2; y=2;
+0:x5=1; 1:x5=1; 1:x8=2; y=2;
+Ok
+Witnesses
+Positive: 1 Negative: 6
+Condition exists (0:x5=0 /\ 1:x5=0 /\ 1:x8=1 /\ y=1)
+Observation LB+data+fri-rfi-addr Sometimes 1 6
+Time LB+data+fri-rfi-addr 0.01
+Hash=e8b71f635c2f777f42afdc4595d1e5d6
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+addr+fri-rfi-data.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.1920928955078125e-06
+
+Test LB+addr+fri-rfi-data Allowed
+States 7
+0:x5=0; 1:x5=0; 1:x8=1; y=1;
+0:x5=0; 1:x5=0; 1:x8=2; y=1;
+0:x5=0; 1:x5=0; 1:x8=2; y=2;
+0:x5=0; 1:x5=1; 1:x8=2; y=2;
+0:x5=1; 1:x5=0; 1:x8=2; y=1;
+0:x5=1; 1:x5=0; 1:x8=2; y=2;
+0:x5=1; 1:x5=1; 1:x8=2; y=2;
+Ok
+Witnesses
+Positive: 1 Negative: 6
+Condition exists (0:x5=0 /\ 1:x5=0 /\ 1:x8=1 /\ y=1)
+Observation LB+addr+fri-rfi-data Sometimes 1 6
+Time LB+addr+fri-rfi-data 0.01
+Hash=9072e12ebf55ed031e9f23a2194d47ea
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+fri-rfi-addr+fri-rfi-data.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.1920928955078125e-06
+
+Test LB+fri-rfi-addr+fri-rfi-data Allowed
+States 15
+0:x5=0; 0:x8=1; 1:x5=0; 1:x8=2; x=1; y=1;
+0:x5=0; 0:x8=1; 1:x5=0; 1:x8=2; x=1; y=2;
+0:x5=0; 0:x8=1; 1:x5=1; 1:x8=2; x=1; y=2;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=1; x=1; y=1;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=1; x=2; y=1;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=2; x=1; y=1;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=2; x=1; y=2;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=2; x=2; y=1;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=2; x=2; y=2;
+0:x5=0; 0:x8=2; 1:x5=1; 1:x8=2; x=1; y=2;
+0:x5=0; 0:x8=2; 1:x5=1; 1:x8=2; x=2; y=2;
+0:x5=1; 0:x8=2; 1:x5=0; 1:x8=1; x=2; y=1;
+0:x5=1; 0:x8=2; 1:x5=0; 1:x8=2; x=2; y=1;
+0:x5=1; 0:x8=2; 1:x5=0; 1:x8=2; x=2; y=2;
+0:x5=1; 0:x8=2; 1:x5=1; 1:x8=2; x=2; y=2;
+Ok
+Witnesses
+Positive: 1 Negative: 14
+Condition exists (0:x5=0 /\ 0:x8=1 /\ 1:x5=0 /\ 1:x8=2 /\ x=1 /\ y=1)
+Observation LB+fri-rfi-addr+fri-rfi-data Sometimes 1 14
+Time LB+fri-rfi-addr+fri-rfi-data 0.07
+Hash=03e2e832aeedba6598733d6f51e382a1
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+data+fri-rfi-data.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 9.5367431640625e-07
+
+Test LB+data+fri-rfi-data Allowed
+States 7
+0:x5=0; 1:x5=0; 1:x8=1; y=1;
+0:x5=0; 1:x5=0; 1:x8=2; y=1;
+0:x5=0; 1:x5=0; 1:x8=2; y=2;
+0:x5=0; 1:x5=1; 1:x8=2; y=2;
+0:x5=1; 1:x5=0; 1:x8=2; y=1;
+0:x5=1; 1:x5=0; 1:x8=2; y=2;
+0:x5=1; 1:x5=1; 1:x8=2; y=2;
+Ok
+Witnesses
+Positive: 1 Negative: 6
+Condition exists (0:x5=0 /\ 1:x5=0 /\ 1:x8=1 /\ y=1)
+Observation LB+data+fri-rfi-data Sometimes 1 6
+Time LB+data+fri-rfi-data 0.01
+Hash=f8bf35475d14fc4fe5ecae424ab24e6a
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+fri-rfi-datas.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.9073486328125e-06
+
+Test LB+fri-rfi-datas Allowed
+States 15
+0:x5=0; 0:x8=1; 1:x5=0; 1:x8=2; x=1; y=1;
+0:x5=0; 0:x8=1; 1:x5=0; 1:x8=2; x=1; y=2;
+0:x5=0; 0:x8=1; 1:x5=1; 1:x8=2; x=1; y=2;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=1; x=1; y=1;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=1; x=2; y=1;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=2; x=1; y=1;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=2; x=1; y=2;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=2; x=2; y=1;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=2; x=2; y=2;
+0:x5=0; 0:x8=2; 1:x5=1; 1:x8=2; x=1; y=2;
+0:x5=0; 0:x8=2; 1:x5=1; 1:x8=2; x=2; y=2;
+0:x5=1; 0:x8=2; 1:x5=0; 1:x8=1; x=2; y=1;
+0:x5=1; 0:x8=2; 1:x5=0; 1:x8=2; x=2; y=1;
+0:x5=1; 0:x8=2; 1:x5=0; 1:x8=2; x=2; y=2;
+0:x5=1; 0:x8=2; 1:x5=1; 1:x8=2; x=2; y=2;
+Ok
+Witnesses
+Positive: 1 Negative: 14
+Condition exists (0:x5=0 /\ 0:x8=1 /\ 1:x5=0 /\ 1:x8=2 /\ x=1 /\ y=1)
+Observation LB+fri-rfi-datas Sometimes 1 14
+Time LB+fri-rfi-datas 0.08
+Hash=c58f8ec776e782f4c0f08076e6d6dcb9
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../output/litmus_align_memsynth_init/LB+fri-rfi-addrs.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 1.1920928955078125e-06
+
+Test LB+fri-rfi-addrs Allowed
+States 15
+0:x5=0; 0:x8=1; 1:x5=0; 1:x8=2; x=1; y=1;
+0:x5=0; 0:x8=1; 1:x5=0; 1:x8=2; x=1; y=2;
+0:x5=0; 0:x8=1; 1:x5=1; 1:x8=2; x=1; y=2;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=1; x=1; y=1;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=1; x=2; y=1;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=2; x=1; y=1;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=2; x=1; y=2;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=2; x=2; y=1;
+0:x5=0; 0:x8=2; 1:x5=0; 1:x8=2; x=2; y=2;
+0:x5=0; 0:x8=2; 1:x5=1; 1:x8=2; x=1; y=2;
+0:x5=0; 0:x8=2; 1:x5=1; 1:x8=2; x=2; y=2;
+0:x5=1; 0:x8=2; 1:x5=0; 1:x8=1; x=2; y=1;
+0:x5=1; 0:x8=2; 1:x5=0; 1:x8=2; x=2; y=1;
+0:x5=1; 0:x8=2; 1:x5=0; 1:x8=2; x=2; y=2;
+0:x5=1; 0:x8=2; 1:x5=1; 1:x8=2; x=2; y=2;
+Ok
+Witnesses
+Positive: 1 Negative: 14
+Condition exists (0:x5=0 /\ 0:x8=1 /\ 1:x5=0 /\ 1:x8=2 /\ x=1 /\ y=1)
+Observation LB+fri-rfi-addrs Sometimes 1 14
+Time LB+fri-rfi-addrs 0.07
+Hash=21cf31e97aeccb57a8e956eb38dda03e
+
+[INFO] total time cost: 2.664678

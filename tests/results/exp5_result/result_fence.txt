@@ -1,0 +1,22 @@
+W;fence_r_rw;R
+R;fence_rw_w;R
+W;fence_rw_w;R
+W;fence_r_rw;W
+R;fence_w_w;W
+R;fence_r_w;R
+R;fence_w_w;R
+R;fence_w_rw;R
+W;fence_w_w;R
+R;fence_w_r;R
+W;fence_tso;R
+R;fence_w_r;W
+W;fence_r_r;R
+R;fence_w_rw;W
+R;fence_r_r;W
+W;fence_r_w;R
+R;fence_rw_r;W
+W;fence_w_r;W
+W;fence_r_r;W
+W;fence_r_w;W
+W;fence_rw_r;W
+time:  35.483237504959106

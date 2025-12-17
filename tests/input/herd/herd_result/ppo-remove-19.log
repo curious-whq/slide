@@ -1,0 +1,18 @@
+[INFO] cmd: herd7 /home/whq/Desktop/slide/src/slide/../output/test_ppo/19/new_test_0_19.litmus -model /home/whq/Desktop/slide/src/slide/../../tests/input/CAT/riscv-remove-ppo-3.cat, time cost: 5.9604644775390625e-06
+
+Test /home/whq/Desktop/slide/src/slide/../output/test_ppo/19/new_test_0_19 Allowed
+States 5
+0:x6=0; 0:x8=1; 0:x13=1;
+0:x6=0; 0:x8=2; 0:x13=1;
+0:x6=0; 0:x8=2; 0:x13=2;
+0:x6=1; 0:x8=2; 0:x13=1;
+0:x6=1; 0:x8=2; 0:x13=2;
+Ok
+Witnesses
+Positive: 1 Negative: 6
+Condition exists (0:x13=2 /\ 0:x6=1 /\ 0:x8=2)
+Observation /home/whq/Desktop/slide/src/slide/../output/test_ppo/19/new_test_0_19 Sometimes 1 6
+Time /home/whq/Desktop/slide/src/slide/../output/test_ppo/19/new_test_0_19 0.03
+Hash=d3d8fb2e5c49b4ce2820219df57d84f4
+
+[INFO] total time cost: 0.038177

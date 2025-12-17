@@ -1,0 +1,21 @@
+W;fence_r_rw;W
+R;fence_rw_w;R
+R;po;W
+W;fence_rw_w;R
+R;fence_w_w;R
+W;fence_w_w;R
+W;fence_r_rw;R
+R;fence_r_w;R
+R;fence_w_r;R
+R;fence_w_rw;R
+W;fence_tso;R
+W;fence_r_r;R
+W;fence_r_w;R
+R;addr;W;po;R
+R;addr;R;po;R
+R;data;W;po;R
+W;fence_w_r;W
+W;fence_r_w;W
+W;fence_r_r;W
+W;fence_rw_r;W
+time:  124.72579312324524

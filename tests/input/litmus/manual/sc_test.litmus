@@ -1,0 +1,22 @@
+RISCV A
+"PodWWXX RfeXX PodRRXX FreXX"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=T
+Com=Rf Fr
+Orig=PodWWXX RfeXX PodRRXX FreXX
+{
+0:x5=x; 0:x9=y;
+1:x5=y; 1:x8=x;
+}
+ P0                | P1               ;
+ ori x6,x0,1       | Loop02:          ;
+ Loop00:           | lr.w x6,0(x5)    ;
+ lr.w x7,0(x5)     | sc.w x7,x6,0(x5) ;
+ sc.w x8,x6,0(x5)  | bne x7,x0,Loop02 ;
+ bne x8,x0,Loop00  | Loop03:          ;
+ ori x10,x0,1      | lr.w x9,0(x8)    ;
+ Loop01:           | sc.w x7,x9,0(x8) ;
+ lr.w x11,0(x9)    | bne x7,x0,Loop03 ;
+ sc.w x8,x10,0(x9) |                  ;
+ bne x8,x0,Loop01  |                  ;
+exists (x=1 /\ y=1 /\ 0:x7=0 /\ 0:x11=0 /\ 1:x6=1 /\ 1:x9=0)

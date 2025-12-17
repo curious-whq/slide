@@ -1,0 +1,228 @@
+(*****************************************)
+(* The RISCV Instruction set manual v2.3 *)
+(*****************************************)
+(*"Generate co's"*)(*deheng commented this line (to merge into one file)*)
+
+(* generates possible co's, optimized version *)
+
+(* co observations in test *)
+let invrf = rf^-1
+
+let obsco =
+  let ww = po-loc & (W * W)
+  and rw = rf ; (po-loc & (R * W))
+  and wr = ((po-loc & (W * R)) ; invrf) \ id
+  and rr = (rf ; (po-loc & (R * R)) ; invrf) \ id in
+  (ww|rw|wr|rr)
+
+(* The following applies to C only, where RMW is both R and W *)
+let rmwco =
+  let _RMW = R & W in
+  rf & (W * _RMW) (* co observation by atomicity *)
+
+let cobase = obsco|rmwco|co0
+
+(* Catch uniproc violations early *)
+acyclic cobase as ConsCo
+
+include "cross.cat"
+
+with co from generate_cos(cobase)
+(* From now, co is a coherence order *)
+let coi = co & int
+let coe = co \ coi
+
+(* Compute fr *)
+let fr = (invrf ; co) \ id
+let fri = fr & int
+let fre = fr \ fri
+
+show co,fr
+
+
+(*************)
+(* Utilities *)
+(*************)
+
+let fence.r.r = [R];fencerel(Fence.r.r);[R]
+let fence.r.w = [R];fencerel(Fence.r.w);[W]
+let fence.r.rw = [R];fencerel(Fence.r.rw);[M]
+let fence.w.r = [W];fencerel(Fence.w.r);[R]
+let fence.w.w = [W];fencerel(Fence.w.w);[W]
+let fence.w.rw = [W];fencerel(Fence.w.rw);[M]
+let fence.rw.r = [M];fencerel(Fence.rw.r);[R]
+let fence.rw.w = [M];fencerel(Fence.rw.w);[W]
+let fence.rw.rw = [M];fencerel(Fence.rw.rw);[M]
+let fence.tso =
+  let f = fencerel(Fence.tso) in
+  ([W];f;[W]) | ([R];f;[M])
+
+let fence =
+  fence.r.r | fence.r.w | fence.r.rw |
+  fence.w.r | fence.w.w | fence.w.rw |
+  fence.rw.r | fence.rw.w | fence.rw.rw |
+  fence.tso
+
+
+let po-loc-no-w = po-loc \ (po-loc?;[W];po-loc)
+let rsw = rf^-1;rf
+let AcqRel = AcqRel|Sc (* Compat *)
+let AQ = (Acq|AcqRel)
+and RL = (Rel|AcqRel)
+let AMO = try AMO with (R & W) (* Compat *)
+let RCsc = (Acq|Rel|AcqRel) & (AMO|X)
+let AQRL = AcqRel
+
+let XLr = (X & R) \ AMO
+let XSc = (X & W) \ AMO
+(*************)
+(* ppo rules *)
+(*************)
+
+
+let r1 = [R];po-loc;[W] 
+and r2 = [W];po-loc;[W] 
+and r3 = ([R];po-loc\(po-loc;[W];po-loc)\(rsw);[R])\([AMO];po-loc;[R]) 
+and r4 = [XSc];rfi;[R] 
+and r5 = [AMO];rfi;[R] 
+and r6 = [R];fencerel(Fence.r.r);[R] 
+and r7 = [R];fencerel(Fence.r.w);[W] 
+and r8 = [R];fencerel(Fence.r.rw);[R] 
+and r9 = [R];fencerel(Fence.r.rw);[W] 
+and r10 = [W];fencerel(Fence.w.r);[R] 
+and r11 = [W];fencerel(Fence.w.w);[W] 
+and r12 = [W];fencerel(Fence.w.rw);[W] 
+and r13 = [W];fencerel(Fence.w.rw);[R] 
+and r14 = [R];fencerel(Fence.rw.r);[R] 
+and r15 = [W];fencerel(Fence.rw.r);[R] 
+and r16 = [R];fencerel(Fence.rw.w);[W] 
+and r17 = [W];fencerel(Fence.rw.w);[W] 
+and r18 = [R];fencerel(Fence.rw.rw);[W] 
+and r19 = [W];fencerel(Fence.rw.rw);[R] 
+and r20 = [W];fencerel(Fence.rw.rw);[W] 
+and r21 = [R];fencerel(Fence.rw.rw);[R] 
+and r22 = [W];fencerel(Fence.tso);[W] 
+and r23 = [R];fencerel(Fence.tso);[W] 
+and r24 = [R];fencerel(Fence.tso);[R] 
+and r25 = [AQ];po;[W] 
+and r26 = [AQ];po;[R] 
+and r27 = [W];po;[RL] 
+and r28 = [R];po;[RL] 
+and r29 = [RL];po;[AQ] 
+and r30 = [XLr];rmw;[XSc] 
+and r31 = [R];addr;[W] 
+and r32 = [R];addr;[R] 
+and r33 = [R];data;[W] 
+and r34 = [R];ctrl;[W] 
+and r35 = [R];addr;[W];rfi;[R] 
+and r36 = [R];data;[W];rfi;[R] 
+and r37 = [R];addr;[W];po;[W] 
+and r38 = [R];addr;[R];po;[W] 
+and r39 = [W];fencerel(Fence.r.rw);[W] 
+and r40 = [R];fencerel(Fence.rw.w);[R] 
+and r41 = [R];po;[W] 
+and r42 = [W];fencerel(Fence.rw.w);[R] 
+and r43 = [R];fencerel(Fence.w.w);[R] 
+and r44 = [W];fencerel(Fence.w.w);[R] 
+and r45 = [W];fencerel(Fence.r.rw);[R] 
+and r46 = [R];fencerel(Fence.r.w);[R] 
+and r47 = [R];fencerel(Fence.w.r);[R] 
+and r48 = [R];fencerel(Fence.w.rw);[R] 
+and r49 = [W];fencerel(Fence.tso);[R] 
+and r50 = [W];fencerel(Fence.r.r);[R] 
+and r51 = [W];fencerel(Fence.r.w);[R] 
+and r52 = [R];addr;[W];po;[R] 
+and r53 = [R];data;[W];po;[R] 
+and r54 = [W];fencerel(Fence.w.r);[W] 
+and r55 = [W];fencerel(Fence.r.w);[W] 
+and r56 = [W];fencerel(Fence.r.r);[W] 
+and r57 = [W];fencerel(Fence.rw.r);[W] 
+and r58 = [R];po;[XLr] 
+and r59 = [RL];po;[R] 
+and r60 = [AMO];po\(po-loc);[R] 
+and r61 = [XLr];po;[R] 
+and r62 = [W];po;[XLr] 
+and r63 = [W];po;[AMO] 
+and r64 = [XSc];po;[W] 
+and r65 = [XSc];po;[R] 
+
+let ppo = 
+ r1
+| r2
+| r3
+| r4
+| r5
+| r6
+| r7
+| r8
+| r9
+| r10
+| r11
+| r12
+| r13
+| r14
+| r15
+| r16
+| r17
+| r18
+| r19
+| r20
+| r21
+| r22
+| r23
+| r24
+| r25
+| r26
+| r27
+| r28
+| r29
+| r30
+| r31
+| r32
+| r33
+| r34
+| r35
+| r36
+| r37
+| r38
+| r39
+| r40
+| r41
+| r42
+| r43
+| r44
+| r45
+| r46
+| r47
+| r48
+| r49
+| r50
+| r51
+| r52
+| r53
+| r54
+| r55
+| r56
+| r57
+| r58
+| r59
+| r60
+| r61
+| r62
+| r63
+| r64
+| r65
+
+
+(**********)
+(* Axioms *)
+(**********)
+
+(* Sc per location *)
+acyclic co|rf|fr|po-loc as Coherence
+
+(* Main model axiom *)
+acyclic co|rfe|fr|ppo as Model
+
+(* Atomicity axiom *)
+empty rmw & (fre;coe) as Atomic

@@ -1,0 +1,13 @@
+RISCV /home/whq/Desktop/code_list/slide/src/slide/../output/test_ppo/new_test
+ {0:x6=x; 0:x10=y; 1:x6=y; 1:x8=x; }
+        P0         |      P1       ;
+ori x5, x0, 1      | ori x5, x0, 2 ;
+sw x5, 0(x6)       | sw x5, 0(x6)  ;
+lr.w x7, 0(x6)     | fence rw, rw  ;
+ori x8, x0, 2      | lw x7, 0(x8)  ;
+sc.w x12, x8, (x6) |               ;
+ori x9, x0, 1      |               ;
+sw x9, 0(x10)      |               ;
+lw x11, 0(x10)     |               ;
+
+exists (0:x11=2/\0:x7=1/\1:x7=0) /\ 0:x12=1

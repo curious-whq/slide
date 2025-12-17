@@ -1,0 +1,17 @@
+[INFO] cmd: herd7 /home/whq/Desktop/slide/src/slide/../output/test_ppo/17/new_test_0_17.litmus -model /home/whq/Desktop/slide/src/slide/../../tests/input/CAT/riscv-complete.cat, time cost: 2.384185791015625e-06
+
+Test /home/whq/Desktop/slide/src/slide/../output/test_ppo/17/new_test_0_17 Allowed
+States 4
+0:x5=0; 0:x13=0;
+0:x5=0; 0:x13=1;
+0:x5=1; 0:x13=0;
+0:x5=1; 0:x13=1;
+Ok
+Witnesses
+Positive: 1 Negative: 3
+Condition exists (0:x5=1 /\ 0:x13=0)
+Observation /home/whq/Desktop/slide/src/slide/../output/test_ppo/17/new_test_0_17 Sometimes 1 3
+Time /home/whq/Desktop/slide/src/slide/../output/test_ppo/17/new_test_0_17 0.01
+Hash=4fb15b7d1dec632a2957c2c5c9699d99
+
+[INFO] total time cost: 0.02863

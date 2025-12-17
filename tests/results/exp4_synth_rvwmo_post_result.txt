@@ -1,0 +1,26 @@
+search ppo time: 4679.0443251132965s
+synth litmus test time: 2274.4749488830566s
+R;po-loc\(fri;W;rfi)\(fri;W;po-loc)\(po-loc;W;rfi)\(po-loc;W;po-loc)\(rsw);R
+AQ;po;W
+AQ;po;R
+AQRL;po;R
+AQRL;po;W
+R;po;RL;rfi;R;ctrl;W
+W;po;RL
+R;po;RL
+R;po;AQRL
+XLr;rmw;XSc
+R;addr;W
+R;addr;R
+R;data;W
+R;ctrl;W
+R;addr;W;rfi;R
+R;addr;W;rfi;R;addr;W
+R;data;W;rfi;R
+R;data;W;rfi;R;addr;R
+R;addr;R;po;W
+R;addr;W;po;W
+RL;po;AQ
+XSc;rfi;R
+XSc;rfi;R;addr;W
+time:  752.2848398685455s

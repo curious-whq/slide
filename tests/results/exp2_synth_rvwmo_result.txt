@@ -1,0 +1,15 @@
+R;po-loc\(fri;W;rfi)\(po-loc;W;rfi)\(fri;W;po-loc)\(po-loc;W;po-loc)\(rsw);R
+R;addr;R;po;W
+R;addr;W;rfi;R
+R;addr;W;rfi;R;addr;R
+R;data;W;rfi;R
+R;data;W;rfi;R;addr;W
+W;po;RL
+AQRL;po;W
+R;po;RL;rfi;R;ctrl;W
+R;po;AQRL
+AQRL;po;R
+AQ;po;W
+R;po;RL
+AQ;po;R
+time:  130.83842730522156

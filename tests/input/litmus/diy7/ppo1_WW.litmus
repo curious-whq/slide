@@ -1,0 +1,16 @@
+RISCV PosWW
+"PosWW Rfe Fence.rw.rwdRR Fence.rw.rwdRR Fre"
+Generator=diyone7 (version 7.56)
+Com=Rf Fr
+Orig=PosWW Rfe Fence.rw.rwdRR Fence.rw.rwdRR Fre
+{
+0:x6=x;
+1:x6=x; 1:x8=y;
+}
+ P0          | P1          ;
+ ori x5,x0,1 | lw x5,0(x6) ;
+ sw x5,0(x6) | fence rw,rw ;
+ ori x7,x0,2 | lw x7,0(x8) ;
+ sw x7,0(x6) | fence rw,rw ;
+             | lw x9,0(x6) ;
+exists (x=2 /\ 1:x5=2 /\ 1:x9=0)

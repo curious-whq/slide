@@ -1,0 +1,15 @@
+R;addr;W;po;R
+R;addr;R;po;R
+R;data;W;po;R
+R;po;XLr
+RL;po;R
+AMO;po;R
+XLr;po;R
+AMO;po;W
+R;po;AMO
+XLr;po;W
+W;po;XLr
+XSc;po;R
+W;po;AMO
+XSc;po;W
+time:  246.4571554660797

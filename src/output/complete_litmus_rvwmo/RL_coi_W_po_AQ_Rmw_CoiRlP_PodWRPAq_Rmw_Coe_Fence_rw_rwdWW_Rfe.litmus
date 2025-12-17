@@ -1,0 +1,19 @@
+RISCV RL_coi_W_po_AQ_Rmw_CoiRlP_PodWRPAq_Rmw_Coe_Fence_rw_rwdWW_Rfe
+"LxSxPRl CoiRlP PodWRPAq LxSxAqP Coe Fence.rw.rwdWW Rfe"
+Generator=diyone7 (version 7.56)
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Co Rf
+Orig=LxSxPRl CoiRlP PodWRPAq LxSxAqP Coe Fence.rw.rwdWW Rfe
+{
+0:x5=x; 0:x9=y;
+1:x6=y; 1:x8=x;
+}
+ P0                        | P1          ;
+ ori x7,x0,2               | ori x5,x0,2 ;
+ amoswap.w.rl x6,x7,(x5)   | sw x5,0(x6) ;
+ ori x8,x0,3               | fence rw,rw ;
+ sw x8,0(x5)               | ori x7,x0,1 ;
+ ori x11,x0,1              | sw x7,0(x8) ;
+ amoswap.w.aq x10,x11,(x9) |             ;
+ lw x12,0(x9)              |             ;
+exists (0:x12=2 /\ 0:x6=1)

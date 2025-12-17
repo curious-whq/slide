@@ -1,0 +1,18 @@
+search ppo time: 464.239049911499s
+synth litmus test time: 13.592167854309082s
+R;fence_r_w;R
+R;fence_w_rw;R
+R;fence_rw_r;W
+R;fence_r_r;W
+R;fence_w_r;W
+W;fence_r_w;R
+R;fence_w_rw;W
+W;fence_rw_r;W
+W;fence_r_w;W
+W;fence_r_r;W
+W;fence_w_r;W
+XLr;po;R
+AMO;po;W
+W;po;XLr
+W;po;AMO
+time:  48.16050672531128s

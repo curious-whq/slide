@@ -1,0 +1,14 @@
+W;fence_r_rw;W
+W;fence_rw_w;R
+W;fence_r_rw;R
+R;fence_w_w;W
+R;fence_rw_w;R
+R;fence_w_r;R
+W;fence_tso;R
+W;fence_r_r;R
+XLr;po;W
+R;po;XLr
+W;po;AQ
+RL;po;W
+AMO;po;AMO
+time: 13.591457605361938

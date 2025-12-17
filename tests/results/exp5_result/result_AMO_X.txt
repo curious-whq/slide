@@ -1,0 +1,12 @@
+R;po;XLr
+RL;po;R
+AMO;po;R
+XLr;po;R
+AMO;po;W
+R;po;AMO
+XLr;po;W
+W;po;XLr
+XSc;po;R
+W;po;AMO
+XSc;po;W
+time:  247.499431848526

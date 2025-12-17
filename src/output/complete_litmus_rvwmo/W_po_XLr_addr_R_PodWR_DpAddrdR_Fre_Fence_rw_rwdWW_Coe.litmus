@@ -1,0 +1,11 @@
+RISCV W_po_XLr_addr_R_PodWR_DpAddrdR_Fre_Fence_rw_rwdWW_Coe
+ {0:x6=x; 0:x8=y; 0:x11=z; 1:x6=z; 1:x8=x; }
+       P0        |      P1       ;
+ori x5, x0, 2    | ori x5, x0, 1 ;
+sw x5, 0(x6)     | sw x5, 0(x6)  ;
+lr.w x7, 0(x8)   | fence rw, rw  ;
+xor x9, x7, x7   | ori x7, x0, 1 ;
+add x12, x11, x9 | sw x7, 0(x8)  ;
+lw x10, 0(x12)   | lw x9, 0(x8)  ;
+
+exists (0:x10=0/\1:x9=2)

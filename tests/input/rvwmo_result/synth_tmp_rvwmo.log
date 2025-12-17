@@ -1,0 +1,1123 @@
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.r.rwdWW/2+2W+fence.r.rw+fence.rw.rw.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.430511474609375e-06
+
+Test 2+2W+fence.r.rw+fence.rw.rw Allowed
+States 3
+x=1; y=1;
+x=1; y=2;
+x=2; y=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (x=2 /\ y=2)
+Observation 2+2W+fence.r.rw+fence.rw.rw Never 0 3
+Time 2+2W+fence.r.rw+fence.rw.rw 0.00
+Hash=a7509a533addb42e9842c4cdfd0b6daf
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.r.rwdWW/R+fence.r.rw+fence.rw.rw.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.430511474609375e-06
+
+Test R+fence.r.rw+fence.rw.rw Allowed
+States 3
+1:x7=0; y=1;
+1:x7=1; y=1;
+1:x7=1; y=2;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (y=2 /\ 1:x7=0)
+Observation R+fence.r.rw+fence.rw.rw Never 0 3
+Time R+fence.r.rw+fence.rw.rw 0.00
+Hash=c748344ed283d48a218e08a5302e82d5
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.rw.wdWR/R+fence.rw.rw+fence.rw.w.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 2.384185791015625e-06
+
+Test R+fence.rw.rw+fence.rw.w Allowed
+States 3
+1:x7=0; y=1;
+1:x7=1; y=1;
+1:x7=1; y=2;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (y=2 /\ 1:x7=0)
+Observation R+fence.rw.rw+fence.rw.w Never 0 3
+Time R+fence.rw.rw+fence.rw.w 0.00
+Hash=56fbae85a03085a30fbb27794a5d6e30
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.rw.wdWR/R+fence.w.w+fence.rw.w.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.430511474609375e-06
+
+Test R+fence.w.w+fence.rw.w Allowed
+States 3
+1:x7=0; y=1;
+1:x7=1; y=1;
+1:x7=1; y=2;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (y=2 /\ 1:x7=0)
+Observation R+fence.w.w+fence.rw.w Never 0 3
+Time R+fence.w.w+fence.rw.w 0.00
+Hash=e4077fef403a7810411e79c2b9799d5f
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.r.rwdWR/R+fence.w.w+fence.r.rw.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.1920928955078125e-06
+
+Test R+fence.w.w+fence.r.rw Allowed
+States 3
+1:x7=0; y=1;
+1:x7=1; y=1;
+1:x7=1; y=2;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (y=2 /\ 1:x7=0)
+Observation R+fence.w.w+fence.r.rw Never 0 3
+Time R+fence.w.w+fence.r.rw 0.00
+Hash=3e7a720b4ee7eb8c81992b747da45af7
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.r.rwdWR/R+fence.rw.rw+fence.r.rw.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 9.5367431640625e-07
+
+Test R+fence.rw.rw+fence.r.rw Allowed
+States 3
+1:x7=0; y=1;
+1:x7=1; y=1;
+1:x7=1; y=2;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (y=2 /\ 1:x7=0)
+Observation R+fence.rw.rw+fence.r.rw Never 0 3
+Time R+fence.rw.rw+fence.r.rw 0.00
+Hash=9066634a64ee19ef0460d806e17ad88a
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.w.wdRW/S+fence.rw.rw+fence.w.w.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 9.5367431640625e-07
+
+Test S+fence.rw.rw+fence.w.w Allowed
+States 3
+1:x5=0; x=1;
+1:x5=0; x=2;
+1:x5=1; x=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (x=2 /\ 1:x5=1)
+Observation S+fence.rw.rw+fence.w.w Never 0 3
+Time S+fence.rw.rw+fence.w.w 0.00
+Hash=965c7026a3abc49e46b1439d43cdf2d4
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.r.rwdWW/MP+fence.r.rw+fence.rw.rw.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.430511474609375e-06
+
+Test MP+fence.r.rw+fence.rw.rw Allowed
+States 3
+1:x5=0; 1:x7=0;
+1:x5=0; 1:x7=1;
+1:x5=1; 1:x7=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (1:x5=1 /\ 1:x7=0)
+Observation MP+fence.r.rw+fence.rw.rw Never 0 3
+Time MP+fence.r.rw+fence.rw.rw 0.00
+Hash=3a3898e0375af69be7d5532e8cff1875
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.rw.wdRR/MP+fence.rw.rw+fence.rw.w.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.9073486328125e-06
+
+Test MP+fence.rw.rw+fence.rw.w Allowed
+States 3
+1:x5=0; 1:x7=0;
+1:x5=0; 1:x7=1;
+1:x5=1; 1:x7=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (1:x5=1 /\ 1:x7=0)
+Observation MP+fence.rw.rw+fence.rw.w Never 0 3
+Time MP+fence.rw.rw+fence.rw.w 0.00
+Hash=53e8f3f64ca614ec4aea6b61fa45d1fc
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.rw.wdWR/SB+fence.rw.w+fence.rw.rw.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 2.6226043701171875e-06
+
+Test SB+fence.rw.w+fence.rw.rw Allowed
+States 3
+0:x7=0; 1:x7=1;
+0:x7=1; 1:x7=0;
+0:x7=1; 1:x7=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (0:x7=0 /\ 1:x7=0)
+Observation SB+fence.rw.w+fence.rw.rw Never 0 3
+Time SB+fence.rw.w+fence.rw.rw 0.00
+Hash=236d0d5fabae476364ea120be22b7b98
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.r.rwdWW/2+2W+fence.r.rw+fence.rw.w.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 9.5367431640625e-07
+
+Test 2+2W+fence.r.rw+fence.rw.w Allowed
+States 3
+x=1; y=1;
+x=1; y=2;
+x=2; y=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (x=2 /\ y=2)
+Observation 2+2W+fence.r.rw+fence.rw.w Never 0 3
+Time 2+2W+fence.r.rw+fence.rw.w 0.00
+Hash=f5901720f28c5dd1ae44044c2cee8f6b
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.rw.wdRR/MP+fence.rw.ws.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.6689300537109375e-06
+
+Test MP+fence.rw.ws Allowed
+States 3
+1:x5=0; 1:x7=0;
+1:x5=0; 1:x7=1;
+1:x5=1; 1:x7=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (1:x5=1 /\ 1:x7=0)
+Observation MP+fence.rw.ws Never 0 3
+Time MP+fence.rw.ws 0.00
+Hash=1969416413b3dc01cc320793585eb336
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.r.rwdWW/S+fence.r.rw+fence.rw.rw.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 7.152557373046875e-07
+
+Test S+fence.r.rw+fence.rw.rw Allowed
+States 3
+1:x5=0; x=1;
+1:x5=0; x=2;
+1:x5=1; x=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (x=2 /\ 1:x5=1)
+Observation S+fence.r.rw+fence.rw.rw Never 0 3
+Time S+fence.r.rw+fence.rw.rw 0.00
+Hash=bbdc7f77578f84739562fe1f6af926eb
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.r.rwdWR/SB+fence.r.rws.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.430511474609375e-06
+
+Test SB+fence.r.rws Allowed
+States 3
+0:x7=0; 1:x7=1;
+0:x7=1; 1:x7=0;
+0:x7=1; 1:x7=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (0:x7=0 /\ 1:x7=0)
+Observation SB+fence.r.rws Never 0 3
+Time SB+fence.r.rws 0.00
+Hash=4d58e428f27da99854b8f12d02475bd9
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.w.wdRW/LB+fence.r.rw+fence.w.w.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.430511474609375e-06
+
+Test LB+fence.r.rw+fence.w.w Allowed
+States 3
+0:x5=0; 1:x5=0;
+0:x5=0; 1:x5=1;
+0:x5=1; 1:x5=0;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (0:x5=1 /\ 1:x5=1)
+Observation LB+fence.r.rw+fence.w.w Never 0 3
+Time LB+fence.r.rw+fence.w.w 0.00
+Hash=72ae45a25b9715155f696d58418e52f6
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.rw.wdWR/R+fence.rw.ws.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 9.5367431640625e-07
+
+Test R+fence.rw.ws Allowed
+States 3
+1:x7=0; y=1;
+1:x7=1; y=1;
+1:x7=1; y=2;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (y=2 /\ 1:x7=0)
+Observation R+fence.rw.ws Never 0 3
+Time R+fence.rw.ws 0.00
+Hash=e7c4754b2bf1f495bc697c144d86202e
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.r.rwdWW/S+fence.r.rws.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 9.5367431640625e-07
+
+Test S+fence.r.rws Allowed
+States 3
+1:x5=0; x=1;
+1:x5=0; x=2;
+1:x5=1; x=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (x=2 /\ 1:x5=1)
+Observation S+fence.r.rws Never 0 3
+Time S+fence.r.rws 0.00
+Hash=0830f70397d20b275a5441b10a172165
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.w.wdRW/S+fence.w.ws.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 7.152557373046875e-07
+
+Test S+fence.w.ws Allowed
+States 3
+1:x5=0; x=1;
+1:x5=0; x=2;
+1:x5=1; x=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (x=2 /\ 1:x5=1)
+Observation S+fence.w.ws Never 0 3
+Time S+fence.w.ws 0.00
+Hash=4eb3767d375989211f8560ce771f050b
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.w.wdRW/LB+fence.w.ws.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.1920928955078125e-06
+
+Test LB+fence.w.ws Allowed
+States 3
+0:x5=0; 1:x5=0;
+0:x5=0; 1:x5=1;
+0:x5=1; 1:x5=0;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (0:x5=1 /\ 1:x5=1)
+Observation LB+fence.w.ws Never 0 3
+Time LB+fence.w.ws 0.00
+Hash=92f66eecd2702c8f57935df21405f596
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.w.wdRW/LB+fence.w.w+fence.rw.w.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.1920928955078125e-06
+
+Test LB+fence.w.w+fence.rw.w Allowed
+States 3
+0:x5=0; 1:x5=0;
+0:x5=0; 1:x5=1;
+0:x5=1; 1:x5=0;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (0:x5=1 /\ 1:x5=1)
+Observation LB+fence.w.w+fence.rw.w Never 0 3
+Time LB+fence.w.w+fence.rw.w 0.00
+Hash=f232fac7811961b0aa79d89036a60011
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.r.rwdWR/R+fence.rw.w+fence.r.rw.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 2.1457672119140625e-06
+
+Test R+fence.rw.w+fence.r.rw Allowed
+States 3
+1:x7=0; y=1;
+1:x7=1; y=1;
+1:x7=1; y=2;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (y=2 /\ 1:x7=0)
+Observation R+fence.rw.w+fence.r.rw Never 0 3
+Time R+fence.rw.w+fence.r.rw 0.00
+Hash=cb9c16d28489407174d2c84d29f5dc9b
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.w.wdRW/LB+fence.w.w+fence.rw.rw.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.430511474609375e-06
+
+Test LB+fence.w.w+fence.rw.rw Allowed
+States 3
+0:x5=0; 1:x5=0;
+0:x5=0; 1:x5=1;
+0:x5=1; 1:x5=0;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (0:x5=1 /\ 1:x5=1)
+Observation LB+fence.w.w+fence.rw.rw Never 0 3
+Time LB+fence.w.w+fence.rw.rw 0.00
+Hash=acc43bbbfed7fca120cf6ce690e85afa
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.rw.wdRR/MP+fence.w.w+fence.rw.w.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 7.152557373046875e-07
+
+Test MP+fence.w.w+fence.rw.w Allowed
+States 3
+1:x5=0; 1:x7=0;
+1:x5=0; 1:x7=1;
+1:x5=1; 1:x7=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (1:x5=1 /\ 1:x7=0)
+Observation MP+fence.w.w+fence.rw.w Never 0 3
+Time MP+fence.w.w+fence.rw.w 0.00
+Hash=2603587749bc252e867e204c8ee2bd41
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.r.rwdWR/SB+fence.r.rw+fence.rw.rw.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.430511474609375e-06
+
+Test SB+fence.r.rw+fence.rw.rw Allowed
+States 3
+0:x7=0; 1:x7=1;
+0:x7=1; 1:x7=0;
+0:x7=1; 1:x7=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (0:x7=0 /\ 1:x7=0)
+Observation SB+fence.r.rw+fence.rw.rw Never 0 3
+Time SB+fence.r.rw+fence.rw.rw 0.00
+Hash=20cb281a9255c3ff1d1054d8c96f2e3d
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.r.rwdWW/S+fence.r.rw+fence.rw.w.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.430511474609375e-06
+
+Test S+fence.r.rw+fence.rw.w Allowed
+States 3
+1:x5=0; x=1;
+1:x5=0; x=2;
+1:x5=1; x=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (x=2 /\ 1:x5=1)
+Observation S+fence.r.rw+fence.rw.w Never 0 3
+Time S+fence.r.rw+fence.rw.w 0.00
+Hash=9f06be9f9be641e120c362b1f37b4993
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/HAND/MP+fence.rw.rw+ctrlfence.w.r.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.6689300537109375e-06
+
+Test MP+fence.rw.rw+ctrlfence.w.r Allowed
+States 3
+1:x5=0; 1:x9=0;
+1:x5=0; 1:x9=1;
+1:x5=1; 1:x9=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (1:x5=1 /\ 1:x9=0)
+Observation MP+fence.rw.rw+ctrlfence.w.r Never 0 3
+Time MP+fence.rw.rw+ctrlfence.w.r 0.00
+Hash=3fc4f9e75491dc892998b2734f8eeede
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.r.rwdWW/2+2W+fence.r.rw+fence.w.w.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 2.1457672119140625e-06
+
+Test 2+2W+fence.r.rw+fence.w.w Allowed
+States 3
+x=1; y=1;
+x=1; y=2;
+x=2; y=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (x=2 /\ y=2)
+Observation 2+2W+fence.r.rw+fence.w.w Never 0 3
+Time 2+2W+fence.r.rw+fence.w.w 0.00
+Hash=6debde3cf1455890788ef1500430666b
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.w.wdRW/S+fence.rw.w+fence.w.w.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.9073486328125e-06
+
+Test S+fence.rw.w+fence.w.w Allowed
+States 3
+1:x5=0; x=1;
+1:x5=0; x=2;
+1:x5=1; x=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (x=2 /\ 1:x5=1)
+Observation S+fence.rw.w+fence.w.w Never 0 3
+Time S+fence.rw.w+fence.w.w 0.00
+Hash=d84aeef7e4115b6a917599baea9dc41a
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.r.rwdWW/2+2W+fence.r.rws.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 2.1457672119140625e-06
+
+Test 2+2W+fence.r.rws Allowed
+States 3
+x=1; y=1;
+x=1; y=2;
+x=2; y=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (x=2 /\ y=2)
+Observation 2+2W+fence.r.rws Never 0 3
+Time 2+2W+fence.r.rws 0.00
+Hash=c80d7cac9c074d1688b14a12403152ad
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.rw.wdWR/SB+fence.rw.ws.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.1920928955078125e-06
+
+Test SB+fence.rw.ws Allowed
+States 3
+0:x7=0; 1:x7=1;
+0:x7=1; 1:x7=0;
+0:x7=1; 1:x7=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (0:x7=0 /\ 1:x7=0)
+Observation SB+fence.rw.ws Never 0 3
+Time SB+fence.rw.ws 0.00
+Hash=4cdf3c7af33d70faebe970bd8a8d312a
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.r.rwdWW/MP+fence.r.rws.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 7.152557373046875e-07
+
+Test MP+fence.r.rws Allowed
+States 3
+1:x5=0; 1:x7=0;
+1:x5=0; 1:x7=1;
+1:x5=1; 1:x7=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (1:x5=1 /\ 1:x7=0)
+Observation MP+fence.r.rws Never 0 3
+Time MP+fence.r.rws 0.00
+Hash=fb890e134d99b5978b6e27085658c032
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.w.wdRW/LB+fence.w.w+ctrl.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.1920928955078125e-06
+
+Test LB+fence.w.w+ctrl Allowed
+States 3
+0:x5=0; 1:x5=0;
+0:x5=0; 1:x5=1;
+0:x5=1; 1:x5=0;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (0:x5=1 /\ 1:x5=1)
+Observation LB+fence.w.w+ctrl Never 0 3
+Time LB+fence.w.w+ctrl 0.00
+Hash=821d9ae6daf8ec20cd6af0e196e01319
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.r.rwdWW/S+fence.r.rw+addr.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.1920928955078125e-06
+
+Test S+fence.r.rw+addr Allowed
+States 3
+1:x5=0; x=1;
+1:x5=0; x=2;
+1:x5=1; x=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (x=2 /\ 1:x5=1)
+Observation S+fence.r.rw+addr Never 0 3
+Time S+fence.r.rw+addr 0.00
+Hash=25fb9933403682c12fd4820b7c8fe82d
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.r.rwdWW/MP+fence.r.rw+addr.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.430511474609375e-06
+
+Test MP+fence.r.rw+addr Allowed
+States 3
+1:x5=0; 1:x8=0;
+1:x5=0; 1:x8=1;
+1:x5=1; 1:x8=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (1:x5=1 /\ 1:x8=0)
+Observation MP+fence.r.rw+addr Never 0 3
+Time MP+fence.r.rw+addr 0.00
+Hash=764aa123d24d6c87c4f6b58e52bf556b
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.w.wdRW/LB+fence.w.w+addr.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 7.152557373046875e-07
+
+Test LB+fence.w.w+addr Allowed
+States 3
+0:x5=0; 1:x5=0;
+0:x5=0; 1:x5=1;
+0:x5=1; 1:x5=0;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (0:x5=1 /\ 1:x5=1)
+Observation LB+fence.w.w+addr Never 0 3
+Time LB+fence.w.w+addr 0.00
+Hash=1ad6ba15e8c8ee7d274479d3bfa61d57
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.r.rwdWW/S+fence.r.rw+data.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.430511474609375e-06
+
+Test S+fence.r.rw+data Allowed
+States 3
+1:x5=0; x=1;
+1:x5=0; x=2;
+1:x5=1; x=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (x=2 /\ 1:x5=1)
+Observation S+fence.r.rw+data Never 0 3
+Time S+fence.r.rw+data 0.00
+Hash=8767ca446075b194b3b5876fbe98fc4f
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/HAND/R+fence.w.w+fence.tso.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.1920928955078125e-06
+
+Test R+fence.w.w+fence.tso Allowed
+States 3
+1:x7=0; y=1;
+1:x7=1; y=1;
+1:x7=1; y=2;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (y=2 /\ 1:x7=0)
+Observation R+fence.w.w+fence.tso Never 0 3
+Time R+fence.w.w+fence.tso 0.00
+Hash=38542ff103339787c33f0463146e96ed
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.r.rwdWW/S+fence.r.rw+ctrl.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 9.5367431640625e-07
+
+Test S+fence.r.rw+ctrl Allowed
+States 3
+1:x5=0; x=1;
+1:x5=0; x=2;
+1:x5=1; x=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (x=2 /\ 1:x5=1)
+Observation S+fence.r.rw+ctrl Never 0 3
+Time S+fence.r.rw+ctrl 0.00
+Hash=1c7ec880edcd11e3189cb2f75e4f2dfb
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/RELAX/Fence.w.wdRW/LB+fence.w.w+data.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.1920928955078125e-06
+
+Test LB+fence.w.w+data Allowed
+States 3
+0:x5=0; 1:x5=0;
+0:x5=0; 1:x5=1;
+0:x5=1; 1:x5=0;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (0:x5=1 /\ 1:x5=1)
+Observation LB+fence.w.w+data Never 0 3
+Time LB+fence.w.w+data 0.00
+Hash=a6a6585714844d25f768fdee9626abd8
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/FENCE.TSO/2/R+fence.tsos.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.430511474609375e-06
+
+Test R+fence.tsos Allowed
+States 3
+1:x7=0; y=1;
+1:x7=1; y=1;
+1:x7=1; y=2;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (y=2 /\ 1:x7=0)
+Observation R+fence.tsos Never 0 3
+Time R+fence.tsos 0.00
+Hash=19e64d9dc83e42ed7bce5273c95db86d
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/FENCE.TSO/2/SB+fence.tsos.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 9.5367431640625e-07
+
+Test SB+fence.tsos Allowed
+States 3
+0:x7=0; 1:x7=1;
+0:x7=1; 1:x7=0;
+0:x7=1; 1:x7=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (0:x7=0 /\ 1:x7=0)
+Observation SB+fence.tsos Never 0 3
+Time SB+fence.tsos 0.00
+Hash=4d63bf35caec0ab5c3a94ea62666147d
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/HAND/SB+rfi-fence.r.rs.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 2.1457672119140625e-06
+
+Test SB+rfi-fence.r.rs Allowed
+States 3
+0:x7=1; 0:x8=0; 1:x7=1; 1:x8=1;
+0:x7=1; 0:x8=1; 1:x7=1; 1:x8=0;
+0:x7=1; 0:x8=1; 1:x7=1; 1:x8=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (0:x7=1 /\ 0:x8=0 /\ 1:x7=1 /\ 1:x8=0)
+Observation SB+rfi-fence.r.rs Never 0 3
+Time SB+rfi-fence.r.rs 0.00
+Hash=e9c1322813877f0db0ab612fc38d070c
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/HAND/ISA02.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 7.152557373046875e-07
+
+Test ISA02 Allowed
+States 3
+0:x10=1; 0:x11=0; 1:x12=1; 1:x13=1;
+0:x10=1; 0:x11=1; 1:x12=1; 1:x13=0;
+0:x10=1; 0:x11=1; 1:x12=1; 1:x13=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (0:x10=1 /\ 0:x11=0 /\ 1:x12=1 /\ 1:x13=0)
+Observation ISA02 Never 0 3
+Time ISA02 0.00
+Hash=7ae69cc5a3ccf9c5bde7c1b639db18b0
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/HAND/LB+addr+addrpx-poxp+VAR.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 9.5367431640625e-07
+
+Test LB+addr+addrpx-poxp+VAR Allowed
+States 4
+0:x5=0; 1:x5=0; 1:x11=1;
+0:x5=0; 1:x5=1; 1:x11=1;
+0:x5=1; 1:x5=0; 1:x11=1;
+0:x5=1; 1:x5=1; 1:x11=1;
+Ok
+Witnesses
+Positive: 1 Negative: 3
+Condition exists (0:x5=1 /\ 1:x5=1)
+Observation LB+addr+addrpx-poxp+VAR Sometimes 1 3
+Time LB+addr+addrpx-poxp+VAR 0.00
+Hash=3b31dc1dae279fea280f1553ee21c92d
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/HAND/SB+fence.rw.rw+ctrlfence.r.r.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.9073486328125e-06
+
+Test SB+fence.rw.rw+ctrlfence.r.r Allowed
+States 5
+0:x7=0; 1:x7=0; 1:x8=0; 1:x12=1; y=1;
+0:x7=0; 1:x7=0; 1:x8=1; 1:x12=0; y=0;
+0:x7=0; 1:x7=0; 1:x8=1; 1:x12=1; y=0;
+0:x7=1; 1:x7=0; 1:x8=0; 1:x12=0; y=1;
+0:x7=1; 1:x7=0; 1:x8=0; 1:x12=1; y=1;
+No
+Witnesses
+Positive: 0 Negative: 5
+Condition exists (y=1 /\ 0:x7=0 /\ 1:x8=0 /\ 1:x7=0 /\ 1:x12=0)
+Observation SB+fence.rw.rw+ctrlfence.r.r Never 0 5
+Time SB+fence.rw.rw+ctrlfence.r.r 0.00
+Hash=8f8d55dcde4eb384a08c9dd7553b0c13
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/ATOMICS/RELAX/PodRWXP/LB+fence.rw.rw+poxp.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.430511474609375e-06
+
+Test LB+fence.rw.rw+poxp Allowed
+States 6
+0:x5=0; 1:x6=0; 1:x7=0; y=1;
+0:x5=0; 1:x6=0; 1:x7=1; y=1;
+0:x5=0; 1:x6=1; 1:x7=0; y=1;
+0:x5=0; 1:x6=1; 1:x7=1; y=1;
+0:x5=1; 1:x6=0; 1:x7=0; y=1;
+0:x5=1; 1:x6=0; 1:x7=1; y=1;
+No
+Witnesses
+Positive: 0 Negative: 6
+Condition exists (y=1 /\ 0:x5=1 /\ 1:x7=0 /\ 1:x6=1)
+Observation LB+fence.rw.rw+poxp Never 0 6
+Time LB+fence.rw.rw+poxp 0.00
+Hash=cc08634651f8bff661bf749aa08edba3
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/ATOMICS/RELAX/PodRWPX/LB+fence.rw.rw+popx.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.9073486328125e-06
+
+Test LB+fence.rw.rw+popx Allowed
+States 5
+0:x5=0; 1:x5=0; 1:x9=0; 1:x10=0; x=1;
+0:x5=0; 1:x5=0; 1:x9=0; 1:x10=1; x=0;
+0:x5=0; 1:x5=1; 1:x9=0; 1:x10=0; x=1;
+0:x5=0; 1:x5=1; 1:x9=0; 1:x10=1; x=0;
+0:x5=1; 1:x5=0; 1:x9=0; 1:x10=0; x=1;
+No
+Witnesses
+Positive: 0 Negative: 5
+Condition exists (x=1 /\ 0:x5=1 /\ 1:x10=0 /\ 1:x5=1 /\ 1:x9=0)
+Observation LB+fence.rw.rw+popx Never 0 5
+Time LB+fence.rw.rw+popx 0.00
+Hash=b41d69dd7c74c10db5bea304689ca57e
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/ATOMICS/RELAX/PodRWPX/S+fence.rw.rw+popx.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 2.1457672119140625e-06
+
+Test S+fence.rw.rw+popx Allowed
+States 6
+1:x5=0; 1:x9=0; 1:x10=0; x=2;
+1:x5=0; 1:x9=0; 1:x10=1; x=2;
+1:x5=0; 1:x9=2; 1:x10=0; x=1;
+1:x5=0; 1:x9=2; 1:x10=1; x=2;
+1:x5=1; 1:x9=2; 1:x10=0; x=1;
+1:x5=1; 1:x9=2; 1:x10=1; x=2;
+No
+Witnesses
+Positive: 0 Negative: 6
+Condition exists (x=2 /\ 1:x10=0 /\ 1:x5=1 /\ 1:x9=0)
+Observation S+fence.rw.rw+popx Never 0 6
+Time S+fence.rw.rw+popx 0.00
+Hash=9e742b49156342b6d435565f7e01ed60
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/ATOMICS/RELAX/PodRWXP/S+fence.rw.rw+poxp.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 9.5367431640625e-07
+
+Test S+fence.rw.rw+poxp Allowed
+States 6
+1:x6=0; 1:x7=0; x=1; y=1;
+1:x6=0; 1:x7=0; x=2; y=1;
+1:x6=0; 1:x7=1; x=1; y=1;
+1:x6=0; 1:x7=1; x=2; y=1;
+1:x6=1; 1:x7=0; x=1; y=1;
+1:x6=1; 1:x7=1; x=1; y=1;
+No
+Witnesses
+Positive: 0 Negative: 6
+Condition exists (x=2 /\ y=1 /\ 1:x7=0 /\ 1:x6=1)
+Observation S+fence.rw.rw+poxp Never 0 6
+Time S+fence.rw.rw+poxp 0.00
+Hash=e059673e24de0f35f97f982bdd03a2bb
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/FENCE.TSO/2/SB+fence.tso+fence.tsoxp.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.1920928955078125e-06
+
+Test SB+fence.tso+fence.tsoxp Allowed
+States 5
+0:x7=0; 1:x7=0; 1:x8=0; 1:x9=1; y=1;
+0:x7=0; 1:x7=0; 1:x8=1; 1:x9=0; y=0;
+0:x7=0; 1:x7=0; 1:x8=1; 1:x9=1; y=0;
+0:x7=1; 1:x7=0; 1:x8=0; 1:x9=0; y=1;
+0:x7=1; 1:x7=0; 1:x8=0; 1:x9=1; y=1;
+No
+Witnesses
+Positive: 0 Negative: 5
+Condition exists (y=1 /\ 0:x7=0 /\ 1:x8=0 /\ 1:x7=0 /\ 1:x9=0)
+Observation SB+fence.tso+fence.tsoxp Never 0 5
+Time SB+fence.tso+fence.tsoxp 0.00
+Hash=8838bbe584aa0032ea90b9b662ccb649
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/FENCE.TSO/2/R+fence.tsoxp+fence.tso.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.430511474609375e-06
+
+Test R+fence.tsoxp+fence.tso Allowed
+States 5
+0:x7=0; 0:x8=0; 1:x7=0; x=1; y=1;
+0:x7=0; 0:x8=0; 1:x7=1; x=1; y=1;
+0:x7=0; 0:x8=0; 1:x7=1; x=1; y=2;
+0:x7=0; 0:x8=1; 1:x7=0; x=0; y=1;
+0:x7=0; 0:x8=1; 1:x7=0; x=0; y=2;
+No
+Witnesses
+Positive: 0 Negative: 5
+Condition exists (x=1 /\ y=2 /\ 0:x8=0 /\ 0:x7=0 /\ 1:x7=0)
+Observation R+fence.tsoxp+fence.tso Never 0 5
+Time R+fence.tsoxp+fence.tso 0.00
+Hash=9aa73f019ae6241ebaa48bbabd432038
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/ATOMICS/RELAX/PodRWPX/LB+ctrl+popx.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.6689300537109375e-06
+
+Test LB+ctrl+popx Allowed
+States 5
+0:x5=0; 1:x5=0; 1:x9=0; 1:x10=0; x=1;
+0:x5=0; 1:x5=0; 1:x9=0; 1:x10=1; x=0;
+0:x5=0; 1:x5=1; 1:x9=0; 1:x10=0; x=1;
+0:x5=0; 1:x5=1; 1:x9=0; 1:x10=1; x=0;
+0:x5=1; 1:x5=0; 1:x9=0; 1:x10=0; x=1;
+No
+Witnesses
+Positive: 0 Negative: 5
+Condition exists (x=1 /\ 0:x5=1 /\ 1:x10=0 /\ 1:x5=1 /\ 1:x9=0)
+Observation LB+ctrl+popx Never 0 5
+Time LB+ctrl+popx 0.00
+Hash=d6c97eed3b9ef1f2c083e0ee13572949
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/FENCE.TSO/2/SB+fence.tso+fence.tsopx.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 9.5367431640625e-07
+
+Test SB+fence.tso+fence.tsopx Allowed
+States 6
+0:x7=0; 1:x8=1; 1:x9=0; x=1;
+0:x7=0; 1:x8=1; 1:x9=1; x=1;
+0:x7=1; 1:x8=0; 1:x9=0; x=1;
+0:x7=1; 1:x8=0; 1:x9=1; x=1;
+0:x7=1; 1:x8=1; 1:x9=0; x=1;
+0:x7=1; 1:x8=1; 1:x9=1; x=1;
+No
+Witnesses
+Positive: 0 Negative: 6
+Condition exists (x=1 /\ 0:x7=0 /\ 1:x9=0 /\ 1:x8=0)
+Observation SB+fence.tso+fence.tsopx Never 0 6
+Time SB+fence.tso+fence.tsopx 0.00
+Hash=f0204f675a893b20bf63beb36cce4117
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/FENCE.TSO/2/2+2W+fence.tso+fence.tsopx.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 9.5367431640625e-07
+
+Test 2+2W+fence.tso+fence.tsopx Allowed
+States 6
+1:x9=0; 1:x10=0; x=2; y=1;
+1:x9=0; 1:x10=1; x=2; y=1;
+1:x9=2; 1:x10=0; x=1; y=1;
+1:x9=2; 1:x10=0; x=1; y=2;
+1:x9=2; 1:x10=1; x=2; y=1;
+1:x9=2; 1:x10=1; x=2; y=2;
+No
+Witnesses
+Positive: 0 Negative: 6
+Condition exists (x=2 /\ y=2 /\ 1:x10=0 /\ 1:x9=0)
+Observation 2+2W+fence.tso+fence.tsopx Never 0 6
+Time 2+2W+fence.tso+fence.tsopx 0.00
+Hash=16a7e401e783cf35c3058c218ca2ed27
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/FENCE.TSO/2/R+fence.tso+fence.tsopx.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 9.5367431640625e-07
+
+Test R+fence.tso+fence.tsopx Allowed
+States 6
+1:x8=0; 1:x9=0; x=1; y=1;
+1:x8=0; 1:x9=1; x=1; y=1;
+1:x8=1; 1:x9=0; x=1; y=1;
+1:x8=1; 1:x9=0; x=1; y=2;
+1:x8=1; 1:x9=1; x=1; y=1;
+1:x8=1; 1:x9=1; x=1; y=2;
+No
+Witnesses
+Positive: 0 Negative: 6
+Condition exists (x=1 /\ y=2 /\ 1:x9=0 /\ 1:x8=0)
+Observation R+fence.tso+fence.tsopx Never 0 6
+Time R+fence.tso+fence.tsopx 0.00
+Hash=60a21bfa13e7ab5ebc6af6d22568588a
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/FENCE.TSO/2/R+fence.tsopx+fence.tso.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.1920928955078125e-06
+
+Test R+fence.tsopx+fence.tso Allowed
+States 6
+0:x8=0; 0:x9=0; 1:x7=1; y=2;
+0:x8=0; 0:x9=1; 1:x7=1; y=2;
+0:x8=2; 0:x9=0; 1:x7=0; y=1;
+0:x8=2; 0:x9=0; 1:x7=1; y=1;
+0:x8=2; 0:x9=1; 1:x7=0; y=2;
+0:x8=2; 0:x9=1; 1:x7=1; y=2;
+No
+Witnesses
+Positive: 0 Negative: 6
+Condition exists (y=2 /\ 0:x9=0 /\ 0:x8=0 /\ 1:x7=0)
+Observation R+fence.tsopx+fence.tso Never 0 6
+Time R+fence.tsopx+fence.tso 0.01
+Hash=c30248d3faca6b2a26024ecdd39e8516
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/ATOMICS/RELAX/PodRWXP/LB+addr+poxp.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.430511474609375e-06
+
+Test LB+addr+poxp Allowed
+States 6
+0:x5=0; 1:x6=0; 1:x7=0; y=1;
+0:x5=0; 1:x6=0; 1:x7=1; y=1;
+0:x5=0; 1:x6=1; 1:x7=0; y=1;
+0:x5=0; 1:x6=1; 1:x7=1; y=1;
+0:x5=1; 1:x6=0; 1:x7=0; y=1;
+0:x5=1; 1:x6=0; 1:x7=1; y=1;
+No
+Witnesses
+Positive: 0 Negative: 6
+Condition exists (y=1 /\ 0:x5=1 /\ 1:x7=0 /\ 1:x6=1)
+Observation LB+addr+poxp Never 0 6
+Time LB+addr+poxp 0.01
+Hash=ab4bd4a20ed2eae6be0c6c1bb97092a0
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/ATOMICS/RELAX/PodRWXP/LB+data+poxp.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.430511474609375e-06
+
+Test LB+data+poxp Allowed
+States 6
+0:x5=0; 1:x6=0; 1:x7=0; y=1;
+0:x5=0; 1:x6=0; 1:x7=1; y=1;
+0:x5=0; 1:x6=1; 1:x7=0; y=1;
+0:x5=0; 1:x6=1; 1:x7=1; y=1;
+0:x5=1; 1:x6=0; 1:x7=0; y=1;
+0:x5=1; 1:x6=0; 1:x7=1; y=1;
+No
+Witnesses
+Positive: 0 Negative: 6
+Condition exists (y=1 /\ 0:x5=1 /\ 1:x7=0 /\ 1:x6=1)
+Observation LB+data+poxp Never 0 6
+Time LB+data+poxp 0.01
+Hash=568ce348f91175a2c484504a4c629f33
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/ATOMICS/RELAX/PodRWPX/LB+addr+popx.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 9.5367431640625e-07
+
+Test LB+addr+popx Allowed
+States 5
+0:x5=0; 1:x5=0; 1:x9=0; 1:x10=0; x=1;
+0:x5=0; 1:x5=0; 1:x9=0; 1:x10=1; x=0;
+0:x5=0; 1:x5=1; 1:x9=0; 1:x10=0; x=1;
+0:x5=0; 1:x5=1; 1:x9=0; 1:x10=1; x=0;
+0:x5=1; 1:x5=0; 1:x9=0; 1:x10=0; x=1;
+No
+Witnesses
+Positive: 0 Negative: 5
+Condition exists (x=1 /\ 0:x5=1 /\ 1:x10=0 /\ 1:x5=1 /\ 1:x9=0)
+Observation LB+addr+popx Never 0 5
+Time LB+addr+popx 0.00
+Hash=dd1e68db6f43d3160c987f994e82e2bc
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/ATOMICS/RELAX/PodRWPX/LB+data+popx.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 9.5367431640625e-07
+
+Test LB+data+popx Allowed
+States 5
+0:x5=0; 1:x5=0; 1:x9=0; 1:x10=0; x=1;
+0:x5=0; 1:x5=0; 1:x9=0; 1:x10=1; x=0;
+0:x5=0; 1:x5=1; 1:x9=0; 1:x10=0; x=1;
+0:x5=0; 1:x5=1; 1:x9=0; 1:x10=1; x=0;
+0:x5=1; 1:x5=0; 1:x9=0; 1:x10=0; x=1;
+No
+Witnesses
+Positive: 0 Negative: 5
+Condition exists (x=1 /\ 0:x5=1 /\ 1:x10=0 /\ 1:x5=1 /\ 1:x9=0)
+Observation LB+data+popx Never 0 5
+Time LB+data+popx 0.00
+Hash=0104ca6ca46fca404c9ec434aaff6f6d
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/ATOMICS/RELAX/PodRWXP/LB+ctrl+poxp.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.1920928955078125e-06
+
+Test LB+ctrl+poxp Allowed
+States 6
+0:x5=0; 1:x6=0; 1:x7=0; y=1;
+0:x5=0; 1:x6=0; 1:x7=1; y=1;
+0:x5=0; 1:x6=1; 1:x7=0; y=1;
+0:x5=0; 1:x6=1; 1:x7=1; y=1;
+0:x5=1; 1:x6=0; 1:x7=0; y=1;
+0:x5=1; 1:x6=0; 1:x7=1; y=1;
+No
+Witnesses
+Positive: 0 Negative: 6
+Condition exists (y=1 /\ 0:x5=1 /\ 1:x7=0 /\ 1:x6=1)
+Observation LB+ctrl+poxp Never 0 6
+Time LB+ctrl+poxp 0.01
+Hash=b3c68d78102be26004036332f1bf54c6
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/HAND/ISA-MP-DEP-SUCCESS-SWAP-SIMPLE.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.6689300537109375e-06
+
+Test ISA-MP-DEP-SUCCESS-SWAP-SIMPLE Allowed
+States 6
+1:x3=0; 1:x4=0; 1:x5=0;
+1:x3=0; 1:x4=0; 1:x5=2;
+1:x3=0; 1:x4=1; 1:x5=0;
+1:x3=0; 1:x4=1; 1:x5=2;
+1:x3=1; 1:x4=0; 1:x5=2;
+1:x3=1; 1:x4=1; 1:x5=2;
+No
+Witnesses
+Positive: 0 Negative: 6
+Condition exists (1:x3=1 /\ 1:x5=0)
+Observation ISA-MP-DEP-SUCCESS-SWAP-SIMPLE Never 0 6
+Time ISA-MP-DEP-SUCCESS-SWAP-SIMPLE 0.00
+Hash=112786d93f220d6c412de56d025fecfd
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/HAND/LB+data+datapx-dataxp.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 7.152557373046875e-07
+
+Test LB+data+datapx-dataxp Allowed
+States 6
+0:x5=0; 1:x5=0; 1:x10=0; z=1;
+0:x5=0; 1:x5=0; 1:x10=1; z=0;
+0:x5=0; 1:x5=1; 1:x10=0; z=1;
+0:x5=0; 1:x5=1; 1:x10=1; z=0;
+0:x5=1; 1:x5=0; 1:x10=0; z=1;
+0:x5=1; 1:x5=0; 1:x10=1; z=0;
+No
+Witnesses
+Positive: 0 Negative: 6
+Condition exists (z=1 /\ 0:x5=1 /\ 1:x10=0 /\ 1:x5=1)
+Observation LB+data+datapx-dataxp Never 0 6
+Time LB+data+datapx-dataxp 0.01
+Hash=aa02d2a2822ef1ea9735e875dc6b5e1e
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/HAND/LB+addr+addrpx-poxp+VAR2.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 7.152557373046875e-07
+
+Test LB+addr+addrpx-poxp+VAR2 Allowed
+States 6
+0:x5=0; 1:x5=0; 1:x11=0;
+0:x5=0; 1:x5=0; 1:x11=1;
+0:x5=0; 1:x5=1; 1:x11=0;
+0:x5=0; 1:x5=1; 1:x11=1;
+0:x5=1; 1:x5=0; 1:x11=0;
+0:x5=1; 1:x5=0; 1:x11=1;
+No
+Witnesses
+Positive: 0 Negative: 6
+Condition exists (0:x5=1 /\ 1:x5=1 /\ not (1:x11=0))
+Observation LB+addr+addrpx-poxp+VAR2 Never 0 6
+Time LB+addr+addrpx-poxp+VAR2 0.01
+Hash=3cf37efaaa2c713e4a4a294b387f5dc6
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/HAND/ISA-MP-DEP-SUCCESS-SWAP.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.1920928955078125e-06
+
+Test ISA-MP-DEP-SUCCESS-SWAP Allowed
+States 6
+1:x2=0; 1:x4=0; 1:x5=0;
+1:x2=0; 1:x4=0; 1:x5=2;
+1:x2=0; 1:x4=1; 1:x5=0;
+1:x2=0; 1:x4=1; 1:x5=2;
+1:x2=1; 1:x4=0; 1:x5=2;
+1:x2=1; 1:x4=1; 1:x5=2;
+No
+Witnesses
+Positive: 0 Negative: 6
+Condition exists (1:x2=1 /\ 1:x5=0)
+Observation ISA-MP-DEP-SUCCESS-SWAP Never 0 6
+Time ISA-MP-DEP-SUCCESS-SWAP 0.01
+Hash=d7c579555c774de19c7dcaf4d48b05f6
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/AMO_X0_2_THREAD/SB+popaqs+NEW.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.9073486328125e-06
+
+Test SB+popaqs+NEW Allowed
+States 3
+0:x7=0; 1:x7=1;
+0:x7=1; 1:x7=0;
+0:x7=1; 1:x7=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (0:x7=0 /\ 1:x7=0)
+Observation SB+popaqs+NEW Never 0 3
+Time SB+popaqs+NEW 0.00
+Hash=82517ed4d8b46f4fc1c21850df921609
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/AMO_X0_2_THREAD/2+2W+porlps+NEW.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 9.5367431640625e-07
+
+Test 2+2W+porlps+NEW Allowed
+States 3
+x=1; y=1;
+x=1; y=2;
+x=2; y=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (x=2 /\ y=2)
+Observation 2+2W+porlps+NEW Never 0 3
+Time 2+2W+porlps+NEW 0.00
+Hash=4570c3047960e986bdc0614c7b93f249
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/AMO_X0_2_THREAD/S+porlp+poprl+NEW.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.430511474609375e-06
+
+Test S+porlp+poprl+NEW Allowed
+States 3
+1:x5=0; x=1;
+1:x5=0; x=2;
+1:x5=1; x=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (x=2 /\ 1:x5=1)
+Observation S+porlp+poprl+NEW Never 0 3
+Time S+porlp+poprl+NEW 0.00
+Hash=9742ad12766da9514ff955dd51226e66
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/AMO_X0_2_THREAD/2+2W+poprl+porlp+NEW.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 7.152557373046875e-07
+
+Test 2+2W+poprl+porlp+NEW Allowed
+States 3
+x=1; y=1;
+x=1; y=2;
+x=2; y=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (x=2 /\ y=2)
+Observation 2+2W+poprl+porlp+NEW Never 0 3
+Time 2+2W+poprl+porlp+NEW 0.00
+Hash=6fd3b4ebd5900433883d8630b1ed6711
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/AMO_X0_2_THREAD/2+2W+porlp+porlrl+NEW.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 9.5367431640625e-07
+
+Test 2+2W+porlp+porlrl+NEW Allowed
+States 3
+x=1; y=1;
+x=1; y=2;
+x=2; y=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (x=2 /\ y=2)
+Observation 2+2W+porlp+porlrl+NEW Never 0 3
+Time 2+2W+porlp+porlrl+NEW 0.00
+Hash=cdefe890e000e679bb9f6a79b550373b
+
+[INFO] cmd: eval $(opam env); herd7 /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/litmus/non-mixed-size/HAND/2+2Swap.litmus -model /home/whq/Desktop/code_list/slide/src/slide/../../tests/input/CAT/change/riscv-1.cat, time cost: 1.9073486328125e-06
+
+Test 2+2Swap Allowed
+States 3
+0:x10=0; 0:x11=0; 1:x10=1; 1:x11=2; x=1; y=2;
+0:x10=0; 0:x11=2; 1:x10=0; 1:x11=2; x=1; y=1;
+0:x10=1; 0:x11=2; 1:x10=0; 1:x11=0; x=2; y=1;
+No
+Witnesses
+Positive: 0 Negative: 3
+Condition exists (x=2 /\ y=2 /\ 0:x10=1 /\ 0:x11=0 /\ 1:x10=1 /\ 1:x11=0)
+Observation 2+2Swap Never 0 3
+Time 2+2Swap 0.01
+Hash=760e481b3c7b9ad1c78990727e5fcf50
+
+[INFO] total time cost: 1.271959
