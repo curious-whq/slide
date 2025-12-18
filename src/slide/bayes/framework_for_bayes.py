@@ -139,7 +139,6 @@ class RandomForestBO:
         # ===== 关键：加载 litmus 向量 =====
         self.litmus_to_vector_dict = self.load_litmus_vectors(litmus_vec_path)
 
-
         # ===== 一致性检查 =====
         for l in self.litmus_to_vector_dict:
             if l not in self.litmus_list:
@@ -200,7 +199,7 @@ class RandomForestBO:
 
         # -------- sigma == 0：退化为 exploitation --------
         ei[~mask] = np.maximum(mu[~mask] - eta, 0.0)
-        self.logger.info(f"Compute EI {litmus_name} get {ei}")
+        # self.logger.info(f"Compute EI {litmus_name} get {ei}")
         return ei
 
     def compute_ucb(self, candidate_vecs, beta=1.5):
@@ -282,9 +281,23 @@ class RandomForestBO:
                 best_ei = ei[idx]
                 best = (litmus, X[idx])
 
-        self.logger.info(f"BO Select Next: {best}")
+        self.logger.info(f"BO Select Next: {best}, ei: {best_ei}")
         return best
 
+    def self_check(self, vec, score):
+        X_sample = np.array(vec).reshape(1, -1)
+        preds = np.array([
+            est.predict(X_sample) for est in self.model.estimators_
+        ])
+
+        mu = preds.mean(axis=0)
+        self.fit()
+        preds = np.array([
+            est.predict(X_sample) for est in self.model.estimators_
+        ])
+
+        mu_after = preds.mean(axis=0)
+        self.logger.info(f"BO self check: {vec}, score: {score}, before: {mu}, after: {mu_after}")
 
 
 class LitmusRunnerForBayes(LitmusRunner):
@@ -311,6 +324,8 @@ class LitmusRunnerForBayes(LitmusRunner):
         self.cache = ResultCache(stat_log + ".cache.jsonl")
         self.error_cache = ErrorCache(stat_log + ".error.cache.jsonl")
         self.logger = get_logger(LOG_NAME)
+        self.cold_init = True
+
 
 
     def _initial_sample(self):
@@ -347,7 +362,7 @@ class LitmusRunnerForBayes(LitmusRunner):
         choice = self.bo.select_next()
         if choice is None:
             return None
-
+        self.cold_init = False
         litmus, full_vec = choice
         param_dim = self.ps.dim
         param_vec = full_vec[:param_dim]
@@ -378,6 +393,7 @@ class LitmusRunnerForBayes(LitmusRunner):
                 score = cached
                 print(f"[CACHE HIT] litmus={litmus}, score={score:.4f}")
             else:
+                # assert False
                 print(f"[CHIP RUN] litmus={litmus}, params={params.to_dict()}")
                 log_path, score = get_score(f"{litmus_path}/{litmus}.litmus", params, mode=self.mode)
                 if log_path is None:
@@ -406,7 +422,8 @@ class LitmusRunnerForBayes(LitmusRunner):
                 f"[DONE] score={score:.4f}, "
                 f"best[{litmus}]={self.bo.max_litmus_score[litmus]:.4f}"
             )
-
+            if not self.cold_init:
+                self.bo.self_check(param_vec+self.bo.litmus_to_vector_dict[litmus],score)
         return self.results
 
 

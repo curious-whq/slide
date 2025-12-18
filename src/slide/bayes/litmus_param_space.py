@@ -22,6 +22,7 @@ class LitmusParamSpace:
 
         # stride 是数值空间
         self.stride_list = [1]
+        self.dim = 11
 
     # --------------------------------------------------
     #   各维度取值范围（训练 RF 用）
