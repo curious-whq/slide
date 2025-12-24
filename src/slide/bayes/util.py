@@ -14,6 +14,7 @@ from src.slide.utils.cmd_util import run_cmd, run_cmd_and_log
 
 # 配置 SSH 登录信息
 host = "192.168.226.168"  # 远程服务器地址
+host = "10.42.0.131"
 port = 22  # SSH 端口
 username = "sipeed"  # SSH 用户名
 password = "sipeed"  # SSH 密码

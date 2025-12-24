@@ -10,6 +10,9 @@ max_litmus_repeats_per_iteration = 10
 run_time = 100000
 litmus_dir_path = '/home/whq/Desktop/code_list/perple_test/bayes'
 log_dir_path = '/home/whq/Desktop/code_list/perple_test/bayes_log'
+
+# litmus_dir_path = '/home/software/桌面/bayes/perple_test_riscv/bayes'
+# log_dir_path = '/home/software/桌面/bayes/perple_test_riscv/bayes_log'
 # litmus_dir_path = '/home/whq/Desktop/code_list/perple_test/qemu'
 # log_dir_path = '/home/whq/Desktop/code_list/perple_test/qemu_log'
 def run_litmus_and_return_score(litmus_file, config, has_perple, mode = "time", mach = "ssh"):

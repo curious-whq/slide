@@ -119,8 +119,8 @@ class ErrorCache:
 
 class RandomForestBO:
 
-    def __init__(self, param_space: LitmusParamSpace, litmus_list, n_estimators=200,
-                 litmus_vec_path="/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector.log"):
+    def __init__(self, param_space: LitmusParamSpace, litmus_list, litmus_vec_path, n_estimators=200,
+                 ):
         self.ps = param_space
         self.model = RandomForestRegressor(
             n_estimators=n_estimators,
@@ -313,7 +313,7 @@ class LitmusRunnerForBayes(LitmusRunner):
         super().__init__(litmus_list, [], stat_log, mode)
 
         self.ps = param_space
-        self.bo = RandomForestBO(param_space, litmus_list)
+        self.bo = RandomForestBO(param_space, litmus_list, litmus_vec_path)
 
         self.init_samples_per_litmus = init_samples_per_litmus
         self.bo_iters = bo_iters
@@ -466,6 +466,14 @@ litmus_path = "/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_nai
 stat_log = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log"
 dir_path = "/home/whq/Desktop/code_list/perple_test/bayes_log"
 log_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_stat_bayes.csv"
+litmus_vec_path="/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector.log"
+
+# litmus_path = "/home/software/桌面/bayes/perple_test_riscv/all_allow_litmus_C910_naive"
+# stat_log = "/home/software/桌面/bayes/perple_test_riscv/bayes_stat/log_record_bayes.log"
+# dir_path = "/home/software/桌面/bayes/perple_test_riscv/bayes_log"
+# log_path = "/home/software/桌面/bayes/perple_test_riscv/bayes_stat/log_stat_bayes.csv"
+# litmus_vec_path="/home/software/桌面/bayes/perple_test_riscv/bayes_stat/litmus_vector.log"
+
 if __name__ == "__main__":
     random.seed(SEED)
     np.random.seed(SEED)
