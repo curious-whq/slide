@@ -1,0 +1,299 @@
+import json
+import logging
+import os
+import random
+import time
+from collections import defaultdict
+from xgboost import XGBRegressor
+from scipy.stats import norm, spearmanr
+
+# 引入评估指标
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+
+from src.slide.bayes.litmus_param_space import LitmusParamSpace
+from src.slide.bayes.logger_util import setup_logger, get_logger
+from src.slide.bayes.util import get_files
+
+import torch
+from sklearn.ensemble import RandomForestRegressor
+import numpy as np
+
+SEED = 2025
+LOG_NAME = "bayes_eval"
+
+
+# ================= 类定义 =================
+
+class ResultCache:
+    def __init__(self, path):
+        self.path = path
+        self.data = {}
+        if os.path.exists(path):
+            with open(path, "r") as f:
+                for line in f:
+                    if not line.strip(): continue
+                    obj = json.loads(line)
+                    key = self._make_key(obj["litmus"], obj["param"])
+                    self.data[key] = obj["score"]
+        self.f = open(path, "a")
+
+    def _make_key(self, litmus, param_vec):
+        return f"{litmus}|" + ",".join(map(str, param_vec))
+
+    def get(self, litmus, param_vec):
+        return self.data.get(self._make_key(litmus, param_vec))
+
+    def add(self, litmus, param_vec, score):
+        pass
+
+
+class RandomForestBO:
+    def __init__(self, param_space: LitmusParamSpace, litmus_list, n_estimators=200,
+                 litmus_vec_path="/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector.log"):
+        self.ps = param_space
+        self.model = RandomForestRegressor(
+            n_estimators=n_estimators,
+            n_jobs=-1,  # 利用多核
+            max_features="sqrt",
+            min_samples_leaf=10,
+            random_state=SEED
+        )
+        # self.model = XGBRegressor(
+        #     n_estimators=n_estimators,
+        #     learning_rate=0.05,  # 学习率越低越稳，但需要更多 estimator
+        #     max_depth=6,  # 树深
+        #     subsample=0.8,  # 样本采样
+        #     colsample_bytree=0.8,  # 特征采样
+        #     n_jobs=-1,
+        #     random_state=SEED
+        # )
+        self.X = []
+        self.y = []
+        self.litmus_list = litmus_list
+        self.logger = get_logger(LOG_NAME)  # 获取 logger
+
+        # 加载向量
+        self.litmus_to_vector_dict = self.load_litmus_vectors(litmus_vec_path)
+
+    def load_litmus_vectors(self, path):
+        litmus_to_vec = {}
+        with open(path, "r") as f:
+            for line in f:
+                line = line.strip()
+                if not line or ":" not in line: continue
+                name, vec_str = line.split(":", 1)
+                vec = eval(vec_str)
+                litmus_to_vec[name] = list(vec)
+        return litmus_to_vec
+
+    def add(self, litmus_name, param_vec, score):
+        if litmus_name not in self.litmus_to_vector_dict:
+            return
+        litmus_vec = self.litmus_to_vector_dict[litmus_name]
+        self.X.append(list(param_vec) + list(litmus_vec))
+        self.y.append(score)
+
+    def fit(self):
+        self.logger.info(f"Start fitting...")
+        # ============ 关键修改 ============
+        # 使用 log1p (log(x+1)) 防止 x=0 报错，同时压缩数值
+        y_train_log = np.log1p(np.array(self.y))
+        self.model.fit(np.array(self.X), y_train_log)
+
+    def predict_one(self, litmus_name, param_vec):
+        if litmus_name not in self.litmus_to_vector_dict:
+            return None
+        litmus_vec = self.litmus_to_vector_dict[litmus_name]
+        feature = list(param_vec) + list(litmus_vec)
+        pred_log = self.model.predict([feature])[0]
+        # ============ 关键修改 ============
+        # 还原回去：exp(x) - 1
+        return np.expm1(pred_log)
+
+
+# ================= 主程序 =================
+
+# 配置路径
+litmus_path = "/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_naive"
+stat_log_base = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log"
+litmus_vec_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector.log"
+cache_file_path = stat_log_base + ".cache.jsonl"
+
+if __name__ == "__main__":
+    # 1. Setup Logger
+    random.seed(SEED)
+    np.random.seed(SEED)
+
+    # 日志文件命名
+    log_file_name = f"{stat_log_base}.check.run.log"
+    logger = setup_logger(
+        log_file=log_file_name,
+        level=logging.INFO,
+        name=LOG_NAME,
+        stdout=True
+    )
+    logger.info(f"=== Start Evaluation Run | Seed={SEED} ===")
+
+    # 2. 读取 Litmus List
+    logger.info("Reading litmus file list...")
+    full_litmus_list = get_files(litmus_path)
+    litmus_names = [path.split("/")[-1][:-7] for path in full_litmus_list]
+
+    # 3. 初始化 BO
+    param_space = LitmusParamSpace()
+    bo = RandomForestBO(
+        param_space,
+        litmus_names,
+        n_estimators=200,
+        litmus_vec_path=litmus_vec_path
+    )
+
+    # 4. 加载 Cache
+    logger.info(f"Loading data from {cache_file_path} ...")
+    all_data = []
+    if os.path.exists(cache_file_path):
+        with open(cache_file_path, "r") as f:
+            for line in f:
+                if line.strip():
+                    try:
+                        all_data.append(json.loads(line))
+                    except:
+                        pass
+    else:
+        logger.error("Cache file not found!")
+        exit(1)
+
+    total_count = len(all_data)
+    logger.info(f"Total records loaded: {total_count}")
+
+    if total_count <= 15000:
+        logger.warning("Data size <= 7000, splitting might be invalid based on request.")
+
+    # 5. 切分数据
+    train_data = all_data[:15000]
+    test_data = all_data[15000:]
+    logger.info(f"Train size: {len(train_data)}")
+    logger.info(f"Test size:  {len(test_data)}")
+
+    # 6. 构建训练集 & 训练
+    logger.info("Building training set...")
+    for item in train_data:
+        bo.add(item["litmus"], item["param"], item["score"])
+
+    bo.fit()
+
+    # ... (前面的代码不变) ...
+
+    # =========================================================
+    # 7. 评估逻辑：Per-Litmus Top-1 Accuracy
+    # =========================================================
+    logger.info("Evaluating on test set (Per-Litmus Ranking Check)...")
+
+    # 1. 将测试数据按 Litmus 名称分组
+    # 结构: groups[litmus_name] = [ {'param':..., 'actual':..., 'pred':...}, ... ]
+    groups = defaultdict(list)
+
+    # 临时列表用于计算整体指标
+    y_true_all = []
+    y_pred_all = []
+
+    # 遍历测试集进行预测并分组
+    for idx, item in enumerate(test_data):
+        litmus = item["litmus"]
+        param = item["param"]
+        score = item["score"]
+
+        # 预测
+        pred = bo.predict_one(litmus, param)
+
+        if pred is not None:
+            # 记录用于后续统计
+            record = {
+                'param': param,
+                'actual': score,
+                'pred': pred
+            }
+            groups[litmus].append(record)
+
+            y_true_all.append(score)
+            y_pred_all.append(pred)
+        else:
+            logger.warning(f"[SKIP] #{idx} {litmus} (Missing vector)")
+
+    # 2. 开始针对每个 Litmus Test 进行统计
+    total_litmus_cnt = 0  # 有效的 Litmus 文件数 (样本数>1)
+    top1_match_cnt = 0  # 预测第一名 = 真实第一名 的次数
+    top3_match_cnt = 0  # 真实第一名 在 预测前三名里 的次数
+
+    logger.info("=" * 60)
+    logger.info(
+        f"{'LITMUS NAME':<30} | {'SAMPLES':<5} | {'TOP-1 MATCH?':<12} | {'ACTUAL BEST':<10} | {'MODEL PICK':<10}")
+    logger.info("-" * 60)
+
+    for litmus, records in groups.items():
+        # 如果测试集里这个文件只有1条数据，那就没法比大小，跳过
+        if len(records) < 2:
+            continue
+
+        total_litmus_cnt += 1
+
+        # A. 找出【真实】分数最高的记录 (可能有多个并列最高，取第一个即可，或者逻辑上只要分数达到最高就算对)
+        # 按 actual 从大到小排序
+        records_sorted_by_actual = sorted(records, key=lambda x: x['actual'], reverse=True)
+        best_actual_record = records_sorted_by_actual[0]
+        max_actual_score = best_actual_record['actual']  # 真实能跑到的最高分
+
+        # B. 找出【模型预测】分数最高的记录
+        # 按 pred 从大到小排序
+        records_sorted_by_pred = sorted(records, key=lambda x: x['pred'], reverse=True)
+        best_pred_record = records_sorted_by_pred[0]  # 模型推荐去跑这个
+
+        # C. 判定 Top-1 是否命中
+        # 判定标准：模型推荐的那个参数，它的【真实分数】是否等于【该组数据的最大真实分数】
+        # (这样可以兼容有多个参数并列第一的情况)
+        is_top1_correct = (best_pred_record['actual'] >= max_actual_score)
+
+        if is_top1_correct:
+            top1_match_cnt += 1
+            match_str = "YES"
+        else:
+            match_str = "NO"
+
+        # D. 判定 Top-3 是否命中 (容错)
+        # 看看真实最高分的那个参数，是否出现在了模型预测列表的前3名里
+        # 注意：这里我们要找“真实最好的那个参数”是否被模型排到了前三
+        # 简化逻辑：模型推荐的前三个里，有没有一个能达到真实最高分的？
+        top3_preds = records_sorted_by_pred[:3]
+        is_top3_correct = any(r['actual'] >= max_actual_score for r in top3_preds)
+
+        if is_top3_correct:
+            top3_match_cnt += 1
+
+        # 打印日志 (只打印前10个或者打印错误的，防止刷屏)
+        # 这里为了演示，打印所有有效组
+        logger.info(
+            f"{litmus[:30]:<30} | {len(records):<5} | {match_str:<12} | {max_actual_score:<10.2f} | {best_pred_record['actual']:<10.2f}")
+
+    # 3. 汇总结果
+    if total_litmus_cnt > 0:
+        top1_acc = top1_match_cnt / total_litmus_cnt
+        top3_acc = top3_match_cnt / total_litmus_cnt
+
+        logger.info("=" * 60)
+        logger.info("       PER-LITMUS RANKING RESULTS       ")
+        logger.info("=" * 60)
+        logger.info(f"Total Unique Litmus Tests: {total_litmus_cnt}")
+        logger.info(f"Top-1 Accuracy:          {top1_acc * 100:.2f}% ({top1_match_cnt}/{total_litmus_cnt})")
+        logger.info(f"Top-3 Recall:            {top3_acc * 100:.2f}% ({top3_match_cnt}/{total_litmus_cnt})")
+        logger.info("-" * 60)
+
+        # 也可以顺便算一下全局的 Rho，作为辅助
+        y_true_all = np.array(y_true_all).reshape(-1)
+        y_pred_all = np.array(y_pred_all).reshape(-1)
+        res = spearmanr(y_true_all, y_pred_all)
+        rho = res.statistic if hasattr(res, 'statistic') else res[0]
+        logger.info(f"Global Spearman Rho:     {rho:.4f}")
+        logger.info("=" * 60)
+
+    else:
+        logger.warning("No litmus test groups with >1 samples found in test set.")

@@ -38,6 +38,7 @@ noalign_list = ["none", "all"] # default changing
 stride_list = [1]
 def to_dict_by_vector(vec):
     # [mem, barrier, alloc, detached, thread, launch, affinity, stride, contiguous, noalign, perple]
+    # [0,    2,       0,        1,       0,      1,      0,       0,       1,           1,     0]
     attr_dict = {}
     attr_dict["mem"] = mem_list[vec[0]]
     attr_dict["barrier"] = barrier_list[vec[1]]
