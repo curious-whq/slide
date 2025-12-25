@@ -163,6 +163,27 @@ class LitmusPipeline:
             self.compile_queue.task_done()
 
     # --- Worker 2: 上传器 (IO 密集型) ---
+    def _reconnect(self):
+        """内部辅助函数：强制重连 SSH 和 SFTP"""
+        print("[Uploader] Detected broken connection. Reconnecting...")
+        try:
+            # 1. 先尝试关闭旧连接（忽略错误）
+            if self.sftp_client: self.sftp_client.close()
+            if self.ssh_client: self.ssh_client.close()
+        except Exception:
+            pass
+
+        # 2. 重新建立连接 (把你的连接逻辑复制到这里，或者调用你类里已有的 connect 方法)
+        # 假设你有一个 setup_ssh() 或者类似的初始化逻辑
+        # self.setup_ssh()
+        # 下面是手动重连的示例：
+        import paramiko
+        self.ssh_client = paramiko.SSHClient()
+        self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        self.ssh_client.connect(hostname=self.host, username=self.username, password=self.password)  # 使用你的参数
+        self.sftp_client = self.ssh_client.open_sftp()
+        print("[Uploader] Reconnection successful.")
+
     def worker_uploader(self):
         while self.running:
             try:
@@ -171,13 +192,32 @@ class LitmusPipeline:
                 continue
 
             print(f"[Uploader] Uploading {task.local_exe_path} -> {task.remote_exe_path}")
-            try:
-                # 使用 sftp 上传
-                self.sftp_client.put(task.local_exe_path, task.remote_exe_path)
-                self.ssh_client.exec_command(f"chmod +x {task.remote_exe_path}")
-                self.run_queue.put(task)
-            except Exception as e:
-                print(f"[Error] Upload failed: {e}")
+
+            # === 增加重试循环 ===
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    # 1. 检查连接是否还活着 (可选，但推荐)
+                    if self.ssh_client.get_transport() is None or not self.ssh_client.get_transport().is_active():
+                        raise Exception("Transport is not active")
+
+                    # 2. 执行上传和命令
+                    self.sftp_client.put(task.local_exe_path, task.remote_exe_path)
+                    self.ssh_client.exec_command(f"chmod +x {task.remote_exe_path}")
+
+                    # 3. 成功后放入下一级队列并退出重试循环
+                    self.run_queue.put(task)
+                    break
+
+                except Exception as e:
+                    print(f"[Error] Upload failed (Attempt {attempt + 1}/{max_retries}): {e}")
+
+                    # 如果是最后一次尝试依然失败，则彻底放弃该任务（防止死循环）
+                    if attempt == max_retries - 1:
+                        print(f"[Error] Critical: Failed to upload {task.litmus_path} after retries.")
+                    else:
+                        # 否则，尝试重连，然后进行下一次循环
+                        self._reconnect()
 
             self.upload_queue.task_done()
 

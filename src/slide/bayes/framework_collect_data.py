@@ -215,7 +215,7 @@ litmus_path = "/home/software/桌面/bayes/perple_test_riscv/all_allow_litmus_C9
 stat_log = "/home/software/桌面/bayes/perple_test_riscv/bayes_stat/log_record_bayes.log"
 dir_path = "/home/software/桌面/bayes/perple_test_riscv/bayes_log"
 log_path = "/home/software/桌面/bayes/perple_test_riscv/bayes_stat/log_stat_bayes.csv"
-litmus_dir_path = '/home/software/桌面/bayes/perple_test_riscv/bayes_stat/log_stat_bayes.csv'
+litmus_dir_path = '/home/software/桌面/bayes/perple_test_riscv/bayes'
 
 # litmus_vec_path="/home/software/桌面/bayes/perple_test_riscv/bayes_stat/litmus_vector.log"
 
