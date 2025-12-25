@@ -107,7 +107,7 @@ class RandomGridRunner(LitmusRunner):
         self.pipeline.submit_task(
             litmus_path=litmus_file,
             params=params,
-            litmus_dir_path=dir_path,
+            litmus_dir_path=litmus_dir_path,
             log_dir_path=dir_path,
             run_time=1000
         )
@@ -178,7 +178,7 @@ class RandomGridRunner(LitmusRunner):
             if hasattr(task.params, '_temp_vec'):
                 param_vec = task.params._temp_vec
                 # 算分
-                score = self._parse_log_to_score(log_path, litmus_name, task.params.has_perple, self.mode)
+                score = self._parse_log_to_score(log_path, litmus_name, task.params.is_perple(), self.mode)
                 self.logger.info(
                     f"[DONE] {litmus_name} | Score: {score:.4f} | In-flight: {active_count} | Rem: {len(self.todo_queue)}")
 
@@ -209,15 +209,19 @@ class RandomGridRunner(LitmusRunner):
 # stat_log = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_random.log"
 # dir_path = "/home/whq/Desktop/code_list/perple_test/bayes_log"
 # log_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_stat_random.csv"
+# litmus_dir_path = '/home/whq/Desktop/code_list/perple_test/bayes'
 
 litmus_path = "/home/software/桌面/bayes/perple_test_riscv/all_allow_litmus_C910_naive"
 stat_log = "/home/software/桌面/bayes/perple_test_riscv/bayes_stat/log_record_bayes.log"
 dir_path = "/home/software/桌面/bayes/perple_test_riscv/bayes_log"
 log_path = "/home/software/桌面/bayes/perple_test_riscv/bayes_stat/log_stat_bayes.csv"
-litmus_vec_path="/home/software/桌面/bayes/perple_test_riscv/bayes_stat/litmus_vector.log"
+litmus_dir_path = '/home/software/桌面/bayes/perple_test_riscv/bayes_stat/log_stat_bayes.csv'
+
+# litmus_vec_path="/home/software/桌面/bayes/perple_test_riscv/bayes_stat/litmus_vector.log"
 
 
 # SSH 配置
+# host = "198.168.226.168"
 host = "10.42.0.131"
 port = 22
 username = "sipeed"

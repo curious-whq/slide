@@ -137,7 +137,7 @@ class LitmusPipeline:
             except queue.Empty:
                 continue
 
-            # print(f"[Compiler] Building {task.litmus_path}...")
+            print(f"[Compiler] Building {task.litmus_path}...")
 
             litmus_name = task.litmus_path.split("/")[-1][:-7]
             litmus_dir = os.path.join(task.litmus_dir_path, f"{litmus_name}_{str(task.params)}")
