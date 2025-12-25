@@ -26,6 +26,7 @@ class LitmusTask:
     remote_exe_path: str = None
     remote_log_path: str = None
     local_log_path: str = None
+    litmus_dir: str = None
 
 
 class LitmusPipeline:
@@ -147,7 +148,7 @@ class LitmusPipeline:
             litmus_name = task.litmus_path.split("/")[-1][:-7]
             litmus_dir = os.path.join(task.litmus_dir_path, f"{litmus_name}_{str(task.params)}")
             exe_path = os.path.join(litmus_dir, "run.exe")
-
+            task.litmus_dir = litmus_dir
             # 模拟检查或生成逻辑
             if not os.path.exists(exe_path):
                 # 1. 生成代码 (假设这是单线程极快操作)
@@ -207,84 +208,85 @@ class LitmusPipeline:
             self.upload_queue.task_done()
 
         # --- Worker 3: 执行器 (短链接模式) ---
-        def worker_runner(self):
-            while self.running:
+    def worker_runner(self):
+        while self.running:
+            try:
+                task = self.run_queue.get(timeout=2)
+            except queue.Empty:
+                continue
+
+            print(f"[Runner] >>> Running {task.unique_id}...")
+
+            with self.ssh_semaphore:
+                ssh_client = None
                 try:
-                    task = self.run_queue.get(timeout=2)
-                except queue.Empty:
-                    continue
+                    # 1. 现场连接
+                    ssh_client = self._get_fresh_ssh()
 
-                print(f"[Runner] >>> Running {task.unique_id}...")
+                    # 2. 执行命令
+                    cmd = f"{task.remote_exe_path} -s {task.run_time} > {task.remote_log_path} 2>&1"
+                    # exec_command 默认是不阻塞的，但我们需要等待结果
+                    stdin, stdout, stderr = ssh_client.exec_command(cmd)
 
-                with self.ssh_semaphore:
-                    ssh_client = None
-                    try:
-                        # 1. 现场连接
-                        ssh_client = self._get_fresh_ssh()
+                    # 3. 阻塞等待结束 (这是耗时步骤，但连接必须保持着)
+                    exit_status = stdout.channel.recv_exit_status()
 
-                        # 2. 执行命令
-                        cmd = f"{task.remote_exe_path} -s {task.run_time} > {task.remote_log_path} 2>&1"
-                        # exec_command 默认是不阻塞的，但我们需要等待结果
-                        stdin, stdout, stderr = ssh_client.exec_command(cmd)
+                    if exit_status == 0:
+                        self.download_queue.put(task)
+                    else:
+                        self.download_queue.put(task)
+                        print(f"[Runner] Failed {task.unique_id} status {exit_status}")
 
-                        # 3. 阻塞等待结束 (这是耗时步骤，但连接必须保持着)
-                        exit_status = stdout.channel.recv_exit_status()
+                except Exception as e:
+                    print(f"[Runner] Error: {e}")
+                finally:
+                    if ssh_client: ssh_client.close()
 
-                        if exit_status == 0:
-                            self.download_queue.put(task)
-                        else:
-                            self.download_queue.put(task)
-                            print(f"[Runner] Failed {task.unique_id} status {exit_status}")
-
-                    except Exception as e:
-                        print(f"[Runner] Error: {e}")
-                    finally:
-                        if ssh_client: ssh_client.close()
-
-                self.run_queue.task_done()
+            self.run_queue.task_done()
 
         # --- Worker 4: 下载器 (短链接模式) ---
-        def worker_downloader(self):
-            while self.running:
+    def worker_downloader(self):
+        while self.running:
+            try:
+                task = self.download_queue.get(timeout=2)
+            except queue.Empty:
+                continue
+
+            with self.ssh_semaphore:
+                ssh_client = None
+                sftp_client = None
                 try:
-                    task = self.download_queue.get(timeout=2)
-                except queue.Empty:
-                    continue
+                    # 1. 现场连接
+                    ssh_client = self._get_fresh_ssh()
+                    sftp_client = ssh_client.open_sftp()
 
-                with self.ssh_semaphore:
-                    ssh_client = None
-                    sftp_client = None
+                    litmus_name = task.litmus_path.split("/")[-1][:-7]
+                    task.local_log_path = os.path.join(
+                        task.log_dir_path,
+                        f"{litmus_name}_{str(task.params)}_{task.run_time}-{task.unique_id}.log"
+                    )
+
+                    # 2. 下载
+                    sftp_client.get(task.remote_log_path, task.local_log_path)
+
+                    # 3. 清理远程文件
                     try:
-                        # 1. 现场连接
-                        ssh_client = self._get_fresh_ssh()
-                        sftp_client = ssh_client.open_sftp()
+                        sftp_client.remove(task.remote_log_path)
+                        sftp_client.remove(task.remote_exe_path)
+                    except:
+                        pass
 
-                        litmus_name = task.litmus_path.split("/")[-1][:-7]
-                        task.local_log_path = os.path.join(
-                            task.log_dir_path,
-                            f"{litmus_name}_{str(task.params)}_{task.run_time}-{task.unique_id}.log"
-                        )
+                    # 4. 输出结果
+                    os.system(f"rm -rf {task.litmus_dir}")
+                    self.result_queue.put({'task': task, 'log_path': task.local_log_path})
 
-                        # 2. 下载
-                        sftp_client.get(task.remote_log_path, task.local_log_path)
+                except Exception as e:
+                    print(f"[Downloader] Error: {e}")
+                finally:
+                    if sftp_client: sftp_client.close()
+                    if ssh_client: ssh_client.close()
 
-                        # 3. 清理远程文件
-                        try:
-                            sftp_client.remove(task.remote_log_path)
-                            sftp_client.remove(task.remote_exe_path)
-                        except:
-                            pass
-
-                        # 4. 输出结果
-                        self.result_queue.put({'task': task, 'log_path': task.local_log_path})
-
-                    except Exception as e:
-                        print(f"[Downloader] Error: {e}")
-                    finally:
-                        if sftp_client: sftp_client.close()
-                        if ssh_client: ssh_client.close()
-
-                self.download_queue.task_done()
+            self.download_queue.task_done()
 
     def start(self, compiler_thread_count=4, downloader_thread_count=2):  # <--- 新增参数
         threads = []
