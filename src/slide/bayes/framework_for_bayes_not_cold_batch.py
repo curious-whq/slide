@@ -7,11 +7,12 @@ from collections import defaultdict
 
 from scipy.stats import norm
 
+from src.slide.bayes.LitmusPipeline import LitmusPipeline
 from src.slide.bayes.framework import LitmusRunner, get_score
 from src.slide.bayes.litmus_param_space import LitmusParamSpace
 from src.slide.bayes.litmus_params import LitmusParams
 from src.slide.bayes.logger_util import setup_logger, get_logger
-from src.slide.bayes.util import get_files, read_log_to_summary
+from src.slide.bayes.util import get_files, read_log_to_summary, parse_log_by_mode_perple, parse_log_by_mode
 import torch
 from sklearn.ensemble import RandomForestRegressor
 import numpy as np
@@ -260,29 +261,63 @@ class RandomForestBO:
             groups[litmus].append(vec)
         return groups
 
-    # 选 EI 最大的点作为下一次评估点
-    def select_next(self):
+    def select_batch_next(self, batch_size=8):
+        """
+        一次性选出 batch_size 个最有希望的候选点
+        限制：同一个 batch 内，同一个 litmus test 最多选一次（保证多样性）
+        """
         if len(self.X) == 0:
-            return None
+            return []
+
+        # 1. 确保模型是最新的
         self.fit()
 
-        cands = self.generate_candidates()
+        # 2. 生成大量候选点
+        # [关键修改]：为了凑够 batch_size 个不重复的 litmus，
+        # 我们采样的 litmus 数量必须 > batch_size。这里设为 batch_size * 2 比较稳妥。
+        # 如果可用的 litmus 总数少于 batch_size，sample_litmus 内部会自动处理上限。
+        n_sample_litmus = max(batch_size * 2, 10)
+        cands = self.generate_candidates(n_litmus=n_sample_litmus, n_param=500)
 
-        best = None
-        best_ei = -np.inf
+        # 3. 计算所有候选点的 EI
+        scored_candidates = []
 
+        # 按 litmus 分组计算 EI
         for litmus, vecs in self.groupby_litmus(cands).items():
+            X_arr = np.array(vecs)
+            ei_vals = self.compute_ei(X_arr, litmus)
 
-            X = vecs
-            ei = self.compute_ei(X, litmus)
-            idx = int(np.argmax(ei))
+            for i, vec in enumerate(vecs):
+                scored_candidates.append({
+                    "litmus": litmus,
+                    "vec": vec,
+                    "ei": ei_vals[i]
+                })
 
-            if ei[idx] > best_ei:
-                best_ei = ei[idx]
-                best = (litmus, X[idx])
+        # 4. 全局排序：按 EI 降序排列
+        scored_candidates.sort(key=lambda x: x["ei"], reverse=True)
 
-        self.logger.info(f"BO Select Next: {best}, ei: {best_ei}")
-        return best
+        # 5. [关键修改] 去重选择 Top-K
+        best_batch = []
+        seen_litmus = set()  # 用于记录本轮已经选过的 litmus
+
+        for item in scored_candidates:
+            # 如果凑够了就退出
+            if len(best_batch) >= batch_size:
+                break
+
+            litmus_name = item["litmus"]
+
+            # 如果这个 litmus 在本轮已经被选过了，直接跳过
+            if litmus_name in seen_litmus:
+                continue
+
+            # 没选过 -> 加入 batch
+            best_batch.append((litmus_name, item["vec"]))
+            seen_litmus.add(litmus_name)
+
+        self.logger.info(f"BO Batch Selected {len(best_batch)} unique candidates.")
+        return best_batch
 
     def self_check(self, vec, score):
         X_sample = np.array(vec).reshape(1, -1)
@@ -309,6 +344,10 @@ class LitmusRunnerForBayes(LitmusRunner):
         mode="time",
         init_samples_per_litmus=3,
         bo_iters=10000,
+        pipeline_host="192.168.1.105",
+        pipeline_user="root",
+        pipeline_pass="riscv",
+        pipeline_port=22
     ):
         super().__init__(litmus_list, [], stat_log, mode)
 
@@ -325,6 +364,54 @@ class LitmusRunnerForBayes(LitmusRunner):
         self.error_cache = ErrorCache(stat_log + ".error.cache.jsonl")
         self.logger = get_logger(LOG_NAME)
         self.cold_init = True
+
+        self.logger.info("Initializing Async Pipeline...")
+
+        self.pipeline = LitmusPipeline(
+            host=pipeline_host,
+            port=pipeline_port,
+            username=pipeline_user,
+            password=pipeline_pass,
+            remote_work_dir=remote_path # 确保板子上有这个目录
+        )
+        self.pipeline.start()
+
+    def _submit_one(self, litmus, vec):
+        params = self.ps.vector_to_params(vec)
+        params.set_riscv_gcc()
+        # [关键] 把 vector 挂载到 params 上，方便结果回来时找回
+        params._temp_vec = vec
+
+        litmus_file = f"{litmus_path}/{litmus}.litmus"
+
+        self.pipeline.submit_task(
+            litmus_path=litmus_file,
+            params=params,
+            litmus_dir_path=dir_path,  # 本地编译产物路径
+            log_dir_path=dir_path,  # 本地结果日志路径
+            run_time=1000  # 运行次数/时间
+        )
+
+    # === [新增] 辅助函数：解析 Log 算分 ===
+    def _parse_log_to_score(self, log_path, litmus_name, has_perple, mode):
+        """
+        以前 get_score 里既跑又算分，现在 pipeline 跑完了，这里只负责算分。
+        """
+        try:
+            # 这里的逻辑要从你原来的 get_score 或 read_log_to_summary 里提取
+            # 示例：
+            # res = read_log_to_summary(log_path)
+            # return calculate_metric(res)
+
+            # 模拟：假设 file size 代表分数 (请替换为你的真实逻辑)
+            # with open(log_path, 'r') as f: ...
+            if has_perple:
+                return log_path, parse_log_by_mode_perple(log_path, mode)
+            else:
+                return log_path, parse_log_by_mode(log_path, mode)
+        except Exception as e:
+            self.logger.error(f"Parse error {log_path}: {e}")
+            return -1
 
     def _preload_and_train(self):
         """
@@ -392,7 +479,7 @@ class LitmusRunnerForBayes(LitmusRunner):
             return None
 
         # ---------- BO decision ----------
-        choice = self.bo.select_next()
+        choice = self.bo.select_batch_next()
         if choice is None:
             return None
         self.cold_init = False
@@ -402,66 +489,158 @@ class LitmusRunnerForBayes(LitmusRunner):
 
         return litmus, param_vec
 
+        # === [重写] Run 方法 ===
     def run(self):
-        """
-        BO-driven execution loop
-        """
-        self.logger.info("=== Starting Over-Provisioning BO Loop ===")
-        TRAIN_TRIGGER = 5  # 每收回 5 个结果，就训练一次
-        SUBMIT_SIZE = 8  # 每次产生 8 个新任务 (净赚 +3)
-        MAX_QUEUE_SIZE = 20  # 队列最长只留 20 个
-        while True:
-            nxt = self.getNext()
-            if nxt is None:
+        self.logger.info("=== Starting Async BO Loop (Warm Start) ===")
+
+        # 配置参数
+        TRAIN_TRIGGER = 5  # 每收 5 个结果训练一次
+        SUBMIT_SIZE = 8  # 每次生成 8 个新任务
+        MAX_QUEUE_SIZE = 20  # 队列最大保持 20 个
+
+        # --- 1. 初始填充 (Pre-fill) ---
+        # 因为你有 _preload_and_train，模型已经训练过了 (Warm Start)
+        # 所以我们可以直接让 BO 推荐任务，而不需要随机采样！
+        self.logger.info("Pre-filling pipeline with BO suggestions...")
+
+        initial_batch = self.bo.select_batch_next(batch_size=20)
+
+        if not initial_batch:
+            self.logger.warning("BO returned no suggestions! Fallback to random.")
+            # 如果 BO 没吐出东西（极少见），手动随机填几个
+            # ... (添加随机填充逻辑) ...
+            assert False, "BO returned no suggestions!"
+        else:
+            for litmus, vec in initial_batch:
+                self._submit_one(litmus, vec)
+
+        # --- 2. 流式循环 ---
+        pending_results_buffer = []
+
+        # stream_results 是个生成器，会阻塞等待结果
+        for result in self.pipeline.stream_results():
+
+            # === A. 处理结果 ===
+            task = result['task']
+            log_path = result['log_path']
+            litmus_name = task.litmus_path.split("/")[-1][:-7]
+
+            # 找回 vector
+            if hasattr(task.params, '_temp_vec'):
+                param_vec = task.params._temp_vec
+            else:
+                self.logger.error("Lost vector info in task!")
+                continue
+
+            # 算分
+            score = self._parse_log_to_score(log_path, litmus_name, task.params.has_perple, self.mode)
+            self.logger.info(f"[FINISHED] {litmus_name} Score: {score:.4f}")
+
+            # 存入数据 (Cache + BO)
+            self.bo.add(litmus_name, param_vec, score)
+            self.cache.add(litmus_name, param_vec, score)
+            self.bo.litmus_run_count[litmus_name] += 1
+            self.total_runs += 1
+
+            # 加入缓冲区
+            pending_results_buffer.append(score)
+
+            # === B. 批次训练 & 更新 (满5个) ===
+            if len(pending_results_buffer) >= TRAIN_TRIGGER:
+                self.logger.info(f"Collected {len(pending_results_buffer)} results. Training...")
+
+                if self.total_runs < self.bo_iters:
+                    try:
+                        # 1. 训练模型并生成新任务 (一次生成8个)
+                        # 因为是 Warm Start，数据只会越来越多，BO 会越来越准
+                        new_batch = self.bo.select_batch_next(batch_size=SUBMIT_SIZE)
+
+                        # 2. 提交新任务
+                        for (nxt_litmus, nxt_vec) in new_batch:
+                            # 查重：如果 Cache 里已经有了，就没必要再跑了（虽然 select_batch 应该避免）
+                            if self.cache.get(nxt_litmus, nxt_vec) is None:
+                                self._submit_one(nxt_litmus, nxt_vec)
+
+                        self.logger.info(f"Submitted {len(new_batch)} new tasks.")
+
+                    except Exception as e:
+                        self.logger.error(f"BO Step Failed: {e}")
+
+                # 3. [关键] 优胜劣汰：清理 Compile Queue
+                # 丢弃积压的旧任务，保证板子跑的都是最新的
+                self.pipeline.keep_fresh(max_size=MAX_QUEUE_SIZE)
+
+                # 4. 清空缓冲区
+                pending_results_buffer.clear()
+
+            # 退出条件
+            if self.total_runs >= self.bo_iters:
                 break
 
-            litmus, param_vec = nxt
-            params = self.ps.vector_to_params(param_vec)
-            params.set_riscv_gcc()
-            print(f"[RUN] litmus={litmus}, params={params.to_dict()}")
-            if self.error_cache.has(litmus, param_vec):
-                self.logger.info(
-                    f"[SKIP-ERROR] litmus={litmus}, params={param_vec}"
-                )
-                continue
-            # ---------- 查 cache ----------
-            cached = self.cache.get(litmus, param_vec)
-            if cached is not None:
-                score = cached
-                print(f"[CACHE HIT] litmus={litmus}, score={score:.4f}")
-            else:
-                # assert False
-                print(f"[CHIP RUN] litmus={litmus}, params={params.to_dict()}")
-                log_path, score = get_score(f"{litmus_path}/{litmus}.litmus", params, mode=self.mode)
-                if log_path is None:
-                    self.logger.warning(
-                        f"[ERROR] litmus={litmus}, params={param_vec}, err=error"
-                    )
-                    self.error_cache.add(
-                        litmus,
-                        param_vec,
-                        error_type="runtime_error",
-                        error_msg="error",
-                    )
-                    continue
-                self.cache.add(litmus, param_vec, score)
-
-            self.logger.info(f"Score {litmus} is: {score}")
-
-            # 回传给 BO
-            self.bo.add(litmus, param_vec, score)
-            self.bo.litmus_run_count[litmus] += 1
-
-            self.total_runs += 1
-            self.results.append((litmus, params, score))
-
-            print(
-                f"[DONE] score={score:.4f}, "
-                f"best[{litmus}]={self.bo.max_litmus_score[litmus]:.4f}"
-            )
-            if not self.cold_init:
-                self.bo.self_check(param_vec+self.bo.litmus_to_vector_dict[litmus],score)
+        self.logger.info("Run finished. Waiting for pipeline...")
+        self.pipeline.wait_completion()
         return self.results
+
+    # def run(self):
+    #     """
+    #     BO-driven execution loop
+    #     """
+    #     self.logger.info("=== Starting Over-Provisioning BO Loop ===")
+    #     TRAIN_TRIGGER = 5  # 每收回 5 个结果，就训练一次
+    #     SUBMIT_SIZE = 8  # 每次产生 8 个新任务 (净赚 +3)
+    #     MAX_QUEUE_SIZE = 20  # 队列最长只留 20 个
+    #     while True:
+    #         nxt = self.getNext()
+    #         if nxt is None:
+    #             break
+    #
+    #         litmus, param_vec = nxt
+    #         params = self.ps.vector_to_params(param_vec)
+    #         params.set_riscv_gcc()
+    #         print(f"[RUN] litmus={litmus}, params={params.to_dict()}")
+    #         if self.error_cache.has(litmus, param_vec):
+    #             self.logger.info(
+    #                 f"[SKIP-ERROR] litmus={litmus}, params={param_vec}"
+    #             )
+    #             continue
+    #         # ---------- 查 cache ----------
+    #         cached = self.cache.get(litmus, param_vec)
+    #         if cached is not None:
+    #             score = cached
+    #             print(f"[CACHE HIT] litmus={litmus}, score={score:.4f}")
+    #         else:
+    #             # assert False
+    #             print(f"[CHIP RUN] litmus={litmus}, params={params.to_dict()}")
+    #             log_path, score = get_score(f"{litmus_path}/{litmus}.litmus", params, mode=self.mode)
+    #             if log_path is None:
+    #                 self.logger.warning(
+    #                     f"[ERROR] litmus={litmus}, params={param_vec}, err=error"
+    #                 )
+    #                 self.error_cache.add(
+    #                     litmus,
+    #                     param_vec,
+    #                     error_type="runtime_error",
+    #                     error_msg="error",
+    #                 )
+    #                 continue
+    #             self.cache.add(litmus, param_vec, score)
+    #
+    #         self.logger.info(f"Score {litmus} is: {score}")
+    #
+    #         # 回传给 BO
+    #         self.bo.add(litmus, param_vec, score)
+    #         self.bo.litmus_run_count[litmus] += 1
+    #
+    #         self.total_runs += 1
+    #         self.results.append((litmus, params, score))
+    #
+    #         print(
+    #             f"[DONE] score={score:.4f}, "
+    #             f"best[{litmus}]={self.bo.max_litmus_score[litmus]:.4f}"
+    #         )
+    #         if not self.cold_init:
+    #             self.bo.self_check(param_vec+self.bo.litmus_to_vector_dict[litmus],score)
+    #     return self.results
 
 
 
@@ -477,6 +656,12 @@ litmus_vec_path="/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vecto
 # dir_path = "/home/software/桌面/bayes/perple_test_riscv/bayes_log"
 # log_path = "/home/software/桌面/bayes/perple_test_riscv/bayes_stat/log_stat_bayes.csv"
 # litmus_vec_path="/home/software/桌面/bayes/perple_test_riscv/bayes_stat/litmus_vector.log"
+host = "192.168.226.168"  # 远程服务器地址
+# host = "10.42.0.131"
+port = 22  # SSH 端口
+username = "sipeed"  # SSH 用户名
+password = "sipeed"  # SSH 密码
+remote_path = "/home/sipeed/test"
 
 if __name__ == "__main__":
     random.seed(SEED)
@@ -496,6 +681,14 @@ if __name__ == "__main__":
     for litmus in litmus_list:
         print(litmus)
     param_space = LitmusParamSpace()
-    runner = LitmusRunnerForBayes(litmus_list, param_space, stat_log)
+    runner = LitmusRunnerForBayes(
+        litmus_list,
+        param_space,
+        stat_log,
+        pipeline_host=host,
+        pipeline_user=username,
+        pipeline_pass=password,
+        pipeline_port=port
+    )
     runner._preload_and_train()
     runner.run()

@@ -212,6 +212,9 @@ class LitmusParams:
                 setattr(self, name, int(value))
 
         return self
+    def append_by_dict(self, config):
+        for key, value in config.items():
+            setattr(self, key, value)
 
     def is_perple(self):
         if hasattr(self, "perple") and getattr(self, "perple") == True:

@@ -48,6 +48,29 @@ class LitmusParamSpace:
         bounds = self.get_bounds()
         return [random.randint(low, high) for (low, high) in bounds.values()]
 
+    def get_bound_vector(self):
+        vec_list = []
+        vec_list.append([0,2,0,0,0,0,2,0,0,0,0])
+        vec_list.append([1,2,0,0,0,0,2,0,0,0,0])
+        vec_list.append([0,0,0,0,0,0,2,0,0,0,0])
+        vec_list.append([0,1,0,0,0,0,2,0,0,0,0])
+        vec_list.append([0,3,0,0,0,0,2,0,0,0,0])
+        vec_list.append([0,4,0,0,0,0,2,0,0,0,0])
+        vec_list.append([0,5,0,0,0,0,2,0,0,0,0])
+        vec_list.append([0,6,0,0,0,0,2,0,0,0,0])
+        vec_list.append([0,2,1,0,0,0,2,0,0,0,0])
+        vec_list.append([0,2,0,1,0,0,2,0,0,0,0])
+        vec_list.append([0,2,0,0,1,0,2,0,0,0,0])
+        vec_list.append([0,2,0,0,2,0,2,0,0,0,0])
+        vec_list.append([0,2,0,0,0,1,2,0,0,0,0])
+        vec_list.append([0,2,0,0,0,0,1,0,0,0,0])
+        vec_list.append([0,2,0,0,0,0,3,0,0,0,0])
+        vec_list.append([0,2,0,0,0,0,4,0,0,0,0])
+        vec_list.append([0,2,0,0,0,0,0,0,0,0,0])
+        vec_list.append([0,2,0,0,0,0,2,0,1,0,0])
+        vec_list.append([0,2,0,0,0,0,2,0,0,1,0])
+        return vec_list
+
     # --------------------------------------------------
     # vector → parameter dict
     # --------------------------------------------------

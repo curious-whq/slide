@@ -134,7 +134,7 @@ class DNNRunner:
 litmus_path = "/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_naive"
 stat_log_base = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log"
 litmus_vec_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector.log"
-cache_file_path = stat_log_base + ".cache.jsonl"
+cache_file_path = stat_log_base + ".cache_sum.jsonl"
 
 
 def load_litmus_vectors(path):
@@ -197,7 +197,7 @@ if __name__ == "__main__":
     logger.info(f"Total valid samples: {len(X_all)} (Input Dim: {X_all.shape[1]})")
 
     # 4. 数据切分 (前 15000 训练，后 2000 测试)
-    SPLIT_IDX = 15000
+    SPLIT_IDX = 20000
 
     if len(X_all) <= SPLIT_IDX:
         logger.error(f"Not enough data! Only {len(X_all)} samples, needed > {SPLIT_IDX}")
@@ -255,31 +255,3 @@ if __name__ == "__main__":
     logger.info(f"Rank Correlation (Rho): {rho:.4f}")
     logger.info("-" * 40)
 
-    # 输出前 10 个对比
-    logger.info("First 10 Preds vs Actual:")
-    for p, a in zip(y_pred_flat[:10], y_test_flat[:10]):
-        logger.info(f"Pred: {p:10.2f} | Actual: {a:10.2f} | Diff: {abs(p - a):.2f}")
-
-        # ... (在日志输出之后) ...
-
-        # 验证：Top-K 召回率
-        # 看看模型预测最好的 50 个参数，实际上是不是真的好参数
-        k = 50
-        # 获取预测分数的排序索引（从大到小）
-        top_k_indices = np.argsort(y_pred_flat)[::-1][:k]
-
-        logger.info(f"Checking Top-{k} Recommendations...")
-        real_scores_of_top_k = y_test_flat[top_k_indices]
-
-        # 打印这 50 个被模型选中的参数的真实平均分
-        avg_real = np.mean(real_scores_of_top_k)
-        # 打印测试集所有数据的真实平均分
-        avg_global = np.mean(y_test_flat)
-
-        logger.info(f"Average Real Score of Top-{k} Candidates: {avg_real:.2f}")
-        logger.info(f"Average Real Score of All Test Data:      {avg_global:.2f}")
-
-        if avg_real > avg_global * 2:
-            logger.info(">>> SUCCESS: The model successfully identifies high-value parameters!")
-        else:
-            logger.info(">>> FAILURE: The model cannot distinguish good parameters.")

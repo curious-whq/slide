@@ -4,7 +4,7 @@ from src.slide.bayes.util import get_files, read_log_to_summary
 
 litmus_path = "/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_naive_perple"
 stat_log = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record.log"
-dir_path = "/home/whq/Desktop/code_list/perple_test/bayes_log"
+dir_path = "/home/whq/Desktop/code_list/perple_test/perple_log"
 log_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_stat.csv"
 if __name__ == "__main__":
     litmus_list = get_files(litmus_path)
@@ -20,4 +20,4 @@ if __name__ == "__main__":
     # runner = LitmusRunner(litmus_list, config_list, stat_log)
     # runner.run()
 
-    read_log_to_summary(dir_path, log_path)
+    read_log_to_summary(dir_path, log_path, stat_mode="time")

@@ -125,7 +125,7 @@ def compare_logs(log1_data, log2_data):
 with open('/home/whq/Desktop/code_list/perple_test/log_C910/log.txt', 'r') as f:
     log1_raw = f.read()
 
-with open('/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log.cache1.jsonl', 'r') as f:
+with open('/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log.cache_sum.jsonl', 'r') as f:
     log2_raw = f.read()
 
 # 剩下的代码调用 parse_log1, parse_log2 和 compare_logs 保持不变

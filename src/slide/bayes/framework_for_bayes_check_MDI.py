@@ -6,7 +6,13 @@ import time
 from collections import defaultdict
 from xgboost import XGBRegressor
 from scipy.stats import norm, spearmanr
-
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.inspection import permutation_importance
+from sklearn.inspection import permutation_importance
+from scipy.stats import spearmanr, pearsonr
+from sklearn.metrics import r2_score
+import seaborn as sns
 # 引入评估指标
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
@@ -22,6 +28,103 @@ SEED = 2025
 LOG_NAME = "bayes_eval"
 
 
+def visualize_model_analysis(bo, test_data, top_n=15):
+    """
+    生成三张图：
+    1. MDI Feature Importance
+    2. Permutation Feature Importance
+    3. Prediction vs Actual Scatter Plot
+    """
+    # 设置风格
+    sns.set(style="whitegrid")
+    plt.rcParams['font.sans-serif'] = ['SimHei', 'DejaVu Sans']  # 尝试支持中文，如果乱码请忽略
+    plt.rcParams['axes.unicode_minus'] = False
+
+    print("准备绘图数据...")
+
+    # --- 1. 准备数据 ---
+    # 提取测试集特征和标签
+    X_test = []
+    y_test_raw = []  # 真实值
+    y_pred_raw = []  # 预测值 (反变换后的)
+
+    # 辅助：获取特征名称
+    # 假设第一条数据存在，用来推断维度
+    sample_item = test_data[0]
+    n_params = len(sample_item['param'])
+    n_litmus = len(bo.litmus_to_vector_dict[sample_item['litmus']])
+
+    feature_names = [f"Param_{i}" for i in range(n_params)] + \
+                    [f"LitmusVec_{i}" for i in range(n_litmus)]
+
+    for item in test_data:
+        if item['litmus'] in bo.litmus_to_vector_dict:
+            l_vec = bo.litmus_to_vector_dict[item['litmus']]
+            feat = list(item['param']) + list(l_vec)
+            X_test.append(feat)
+            y_test_raw.append(item['score'])
+            # 预测 (注意：predict_one 内部已经做了 expm1)
+            pred = bo.predict_one(item['litmus'], item['param'])
+            y_pred_raw.append(pred)
+
+    X_test_np = np.array(X_test)
+    y_test_log = np.log1p(np.array(y_test_raw))  # 用于 Permutation Importance 计算 (需与训练目标一致)
+
+    # 创建画布：2行2列 (最后一个位置留空或画别的)
+    fig = plt.figure(figsize=(18, 12))
+    gs = fig.add_gridspec(2, 2)
+
+    # --- 图 1: MDI Feature Importance (模型内部权重) ---
+    ax1 = fig.add_subplot(gs[0, 0])
+    importances = bo.model.feature_importances_
+    # 排序
+    indices = np.argsort(importances)[::-1][:top_n]
+
+    sns.barplot(x=importances[indices], y=[feature_names[i] for i in indices], ax=ax1, palette="viridis")
+    ax1.set_title("MDI Feature Importance (Train Set)", fontsize=14)
+    ax1.set_xlabel("Importance Score")
+
+    # --- 图 2: Permutation Importance (测试集验证) ---
+    print("计算 Permutation Importance (这可能需要几秒钟)...")
+    ax2 = fig.add_subplot(gs[0, 1])
+    result = permutation_importance(
+        bo.model, X_test_np, y_test_log,
+        n_repeats=5, random_state=42, n_jobs=-1, scoring='neg_mean_squared_error'
+    )
+    perm_sorted_idx = result.importances_mean.argsort()[::-1][:top_n]
+
+    sns.barplot(x=result.importances_mean[perm_sorted_idx],
+                y=[feature_names[i] for i in perm_sorted_idx], ax=ax2, palette="magma")
+    ax2.set_title("Permutation Importance (Test Set)", fontsize=14)
+    ax2.set_xlabel("Decrease in Accuracy (MSE)")
+
+    # --- 图 3: Predicted vs Actual Scatter Plot (关键诊断) ---
+    ax3 = fig.add_subplot(gs[1, :])  # 占满第二行
+
+    # 计算指标
+    r2 = r2_score(y_test_raw, y_pred_raw)
+    rho, _ = spearmanr(y_test_raw, y_pred_raw)
+    pearson, _ = pearsonr(y_test_raw, y_pred_raw)
+
+    # 绘制散点
+    sns.scatterplot(x=y_test_raw, y=y_pred_raw, alpha=0.5, ax=ax3, color='royalblue', label='Samples')
+
+    # 绘制理想线 y=x
+    min_val = min(min(y_test_raw), min(y_pred_raw))
+    max_val = max(max(y_test_raw), max(y_pred_raw))
+    ax3.plot([min_val, max_val], [min_val, max_val], 'r--', linewidth=2, label='Ideal (y=x)')
+
+    ax3.set_title(f"Predicted vs Actual Score\nRho={rho:.4f} | R2={r2:.4f} | Pearson={pearson:.4f}", fontsize=16)
+    ax3.set_xlabel("Actual Score (True)", fontsize=12)
+    ax3.set_ylabel("Predicted Score (Model)", fontsize=12)
+    ax3.legend()
+    ax3.grid(True, linestyle='--', alpha=0.7)
+
+    plt.tight_layout()
+    save_path = "model_diagnosis.png"
+    plt.savefig(save_path, dpi=100)
+    print(f"\n[完成] 诊断图已保存至: {save_path}")
+    print("请查看该图片进行分析。")
 # ================= 类定义 =================
 
 class ResultCache:
@@ -117,7 +220,7 @@ class RandomForestBO:
 litmus_path = "/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_naive"
 stat_log_base = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log"
 litmus_vec_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector.log"
-cache_file_path = stat_log_base + ".cache.cleaned.jsonl"
+cache_file_path = stat_log_base + ".cache.jsonl"
 
 if __name__ == "__main__":
     # 1. Setup Logger
@@ -166,12 +269,12 @@ if __name__ == "__main__":
     total_count = len(all_data)
     logger.info(f"Total records loaded: {total_count}")
 
-    if total_count <= 10000:
+    if total_count <= 15000:
         logger.warning("Data size <= 7000, splitting might be invalid based on request.")
 
     # 5. 切分数据
-    train_data = all_data[:10000]
-    test_data = all_data[10000:]
+    train_data = all_data[:15000]
+    test_data = all_data[15000:]
     logger.info(f"Train size: {len(train_data)}")
     logger.info(f"Test size:  {len(test_data)}")
 
@@ -182,120 +285,19 @@ if __name__ == "__main__":
 
     bo.fit()
 
-    # ... (前面的代码不变) ...
+    logger.info("=== Starting Model Diagnosis & Visualization ===")
 
-    # =========================================================
-    # 7. 评估逻辑：Per-Litmus Top-1 Accuracy
-    # =========================================================
-    logger.info("Evaluating on test set (Per-Litmus Ranking Check)...")
+    # 引入可视化函数 (确保 visualize_model_analysis 已经定义或import)
+    try:
+        # 这个函数内部会计算 MDI 和 Permutation Importance，并画出图片
+        # 还会把关键指标打印在控制台，所以不需要外面那段冗余代码了
+        visualize_model_analysis(bo, test_data, top_n=15)
 
-    # 1. 将测试数据按 Litmus 名称分组
-    # 结构: groups[litmus_name] = [ {'param':..., 'actual':..., 'pred':...}, ... ]
-    groups = defaultdict(list)
+        logger.info("Visualization saved to 'model_diagnosis.png'. Check it for details.")
+    except Exception as e:
+        logger.error(f"Visualization failed: {e}")
+        import traceback
 
-    # 临时列表用于计算整体指标
-    y_true_all = []
-    y_pred_all = []
+        traceback.print_exc()
 
-    # 遍历测试集进行预测并分组
-    for idx, item in enumerate(test_data):
-        litmus = item["litmus"]
-        param = item["param"]
-        score = item["score"]
-
-        # 预测
-        pred = bo.predict_one(litmus, param)
-
-        if pred is not None:
-            # 记录用于后续统计
-            record = {
-                'param': param,
-                'actual': score,
-                'pred': pred
-            }
-            groups[litmus].append(record)
-
-            y_true_all.append(score)
-            y_pred_all.append(pred)
-        else:
-            logger.warning(f"[SKIP] #{idx} {litmus} (Missing vector)")
-
-    # 2. 开始针对每个 Litmus Test 进行统计
-    total_litmus_cnt = 0  # 有效的 Litmus 文件数 (样本数>1)
-    top1_match_cnt = 0  # 预测第一名 = 真实第一名 的次数
-    top3_match_cnt = 0  # 真实第一名 在 预测前三名里 的次数
-
-    logger.info("=" * 60)
-    logger.info(
-        f"{'LITMUS NAME':<30} | {'SAMPLES':<5} | {'TOP-1 MATCH?':<12} | {'ACTUAL BEST':<10} | {'MODEL PICK':<10}")
-    logger.info("-" * 60)
-
-    for litmus, records in groups.items():
-        # 如果测试集里这个文件只有1条数据，那就没法比大小，跳过
-        if len(records) < 2:
-            continue
-
-        total_litmus_cnt += 1
-
-        # A. 找出【真实】分数最高的记录 (可能有多个并列最高，取第一个即可，或者逻辑上只要分数达到最高就算对)
-        # 按 actual 从大到小排序
-        records_sorted_by_actual = sorted(records, key=lambda x: x['actual'], reverse=True)
-        best_actual_record = records_sorted_by_actual[0]
-        max_actual_score = best_actual_record['actual']  # 真实能跑到的最高分
-
-        # B. 找出【模型预测】分数最高的记录
-        # 按 pred 从大到小排序
-        records_sorted_by_pred = sorted(records, key=lambda x: x['pred'], reverse=True)
-        best_pred_record = records_sorted_by_pred[0]  # 模型推荐去跑这个
-        if max_actual_score == 0:
-            total_litmus_cnt -= 1
-            continue
-        # C. 判定 Top-1 是否命中
-        # 判定标准：模型推荐的那个参数，它的【真实分数】是否等于【该组数据的最大真实分数】
-        # (这样可以兼容有多个参数并列第一的情况)
-        is_top1_correct = (best_pred_record['actual'] >= max_actual_score)
-
-        if is_top1_correct:
-            top1_match_cnt += 1
-            match_str = "YES"
-        else:
-            match_str = "NO"
-
-        # D. 判定 Top-3 是否命中 (容错)
-        # 看看真实最高分的那个参数，是否出现在了模型预测列表的前3名里
-        # 注意：这里我们要找“真实最好的那个参数”是否被模型排到了前三
-        # 简化逻辑：模型推荐的前三个里，有没有一个能达到真实最高分的？
-        top3_preds = records_sorted_by_pred[:3]
-        is_top3_correct = any(r['actual'] >= max_actual_score for r in top3_preds)
-
-        if is_top3_correct:
-            top3_match_cnt += 1
-
-        # 打印日志 (只打印前10个或者打印错误的，防止刷屏)
-        # 这里为了演示，打印所有有效组
-        logger.info(
-            f"{litmus[:30]:<30} | {len(records):<5} | {match_str:<12} | {max_actual_score:<10.2f} | {best_pred_record['actual']:<10.2f}")
-
-    # 3. 汇总结果
-    if total_litmus_cnt > 0:
-        top1_acc = top1_match_cnt / total_litmus_cnt
-        top3_acc = top3_match_cnt / total_litmus_cnt
-
-        logger.info("=" * 60)
-        logger.info("       PER-LITMUS RANKING RESULTS       ")
-        logger.info("=" * 60)
-        logger.info(f"Total Unique Litmus Tests: {total_litmus_cnt}")
-        logger.info(f"Top-1 Accuracy:          {top1_acc * 100:.2f}% ({top1_match_cnt}/{total_litmus_cnt})")
-        logger.info(f"Top-3 Recall:            {top3_acc * 100:.2f}% ({top3_match_cnt}/{total_litmus_cnt})")
-        logger.info("-" * 60)
-
-        # 也可以顺便算一下全局的 Rho，作为辅助
-        y_true_all = np.array(y_true_all).reshape(-1)
-        y_pred_all = np.array(y_pred_all).reshape(-1)
-        res = spearmanr(y_true_all, y_pred_all)
-        rho = res.statistic if hasattr(res, 'statistic') else res[0]
-        logger.info(f"Global Spearman Rho:     {rho:.4f}")
-        logger.info("=" * 60)
-
-    else:
-        logger.warning("No litmus test groups with >1 samples found in test set.")
+    logger.info("=== All Done ===")

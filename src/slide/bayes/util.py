@@ -97,7 +97,7 @@ def parse_log_by_mode(log_path, mode = "time"): # time/frequency
     if not os.path.exists(log_path):
         return None
 
-    with open(log_path, "r") as fl:
+    with open(log_path, "r", errors="ignore") as fl:
         result_txt = fl.readlines()
         number = -1
         time = -1
