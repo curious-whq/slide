@@ -168,126 +168,362 @@ class LitmusPipeline:
             self.upload_queue.put(task)
             self.compile_queue.task_done()
 
+    # def worker_uploader(self):
+    #     while self.running:
+    #         try:
+    #             task = self.upload_queue.get(timeout=2)
+    #         except queue.Empty:
+    #             continue
+    #
+    #         print(f"[Uploader] Connecting & Uploading {task.unique_id}...")
+    #
+    #         # 使用 semaphore 控制并发连接数，防止 "Max Startups" 报错
+    #         with self.ssh_semaphore:
+    #             ssh_client = None
+    #             sftp_client = None
+    #             try:
+    #                 # 1. 现场建立连接
+    #                 ssh_client = self._get_fresh_ssh()
+    #                 sftp_client = ssh_client.open_sftp()
+    #
+    #                 # 2. 也是先创建远程目录（虽然有点冗余，但最保险）
+    #                 # 或者你可以在 Init 里只连一次创建目录，这里就不管了
+    #                 # sftp_client.mkdir(self.remote_work_dir) # 可能会报错如果已存在，忽略即可
+    #
+    #                 # 3. 传文件 & 改权限
+    #                 sftp_client.put(task.local_exe_path, task.remote_exe_path)
+    #                 ssh_client.exec_command(f"chmod +x {task.remote_exe_path}")
+    #
+    #                 # 4. 成功入队
+    #                 self.run_queue.put(task)
+    #
+    #             except Exception as e:
+    #                 print(f"[Uploader] Error on {task.unique_id}: {e}")
+    #                 # 失败了可以选择重试或者记录错误，这里简单处理
+    #             finally:
+    #                 # 【重要】用完必须关，否则文件句柄泄露
+    #                 if sftp_client: sftp_client.close()
+    #                 if ssh_client: ssh_client.close()
+    #
+    #         self.upload_queue.task_done()
     def worker_uploader(self):
+        # 建议设置一个单次最大批处理数量，防止一次hold住锁太久
+        BATCH_SIZE = 50
+
         while self.running:
+            # --- 1. 收集本批次要处理的任务 ---
+            batch_tasks = []
             try:
-                task = self.upload_queue.get(timeout=2)
-            except queue.Empty:
-                continue
+                # 阻塞等待第一个任务（如果队列为空，Worker 在这里休眠）
+                first_task = self.upload_queue.get(timeout=2)
+                batch_tasks.append(first_task)
 
-            print(f"[Uploader] Connecting & Uploading {task.unique_id}...")
-
-            # 使用 semaphore 控制并发连接数，防止 "Max Startups" 报错
-            with self.ssh_semaphore:
-                ssh_client = None
-                sftp_client = None
-                try:
-                    # 1. 现场建立连接
-                    ssh_client = self._get_fresh_ssh()
-                    sftp_client = ssh_client.open_sftp()
-
-                    # 2. 也是先创建远程目录（虽然有点冗余，但最保险）
-                    # 或者你可以在 Init 里只连一次创建目录，这里就不管了
-                    # sftp_client.mkdir(self.remote_work_dir) # 可能会报错如果已存在，忽略即可
-
-                    # 3. 传文件 & 改权限
-                    sftp_client.put(task.local_exe_path, task.remote_exe_path)
-                    ssh_client.exec_command(f"chmod +x {task.remote_exe_path}")
-
-                    # 4. 成功入队
-                    self.run_queue.put(task)
-
-                except Exception as e:
-                    print(f"[Uploader] Error on {task.unique_id}: {e}")
-                    # 失败了可以选择重试或者记录错误，这里简单处理
-                finally:
-                    # 【重要】用完必须关，否则文件句柄泄露
-                    if sftp_client: sftp_client.close()
-                    if ssh_client: ssh_client.close()
-
-            self.upload_queue.task_done()
-
-        # --- Worker 3: 执行器 (短链接模式) ---
-    def worker_runner(self):
-        while self.running:
-            try:
-                task = self.run_queue.get(timeout=2)
-            except queue.Empty:
-                continue
-
-            print(f"[Runner] >>> Running {task.unique_id}...")
-
-            with self.ssh_semaphore:
-                ssh_client = None
-                try:
-                    # 1. 现场连接
-                    ssh_client = self._get_fresh_ssh()
-
-                    # 2. 执行命令
-                    cmd = f"{task.remote_exe_path} -s {task.run_time} > {task.remote_log_path} 2>&1"
-                    # exec_command 默认是不阻塞的，但我们需要等待结果
-                    stdin, stdout, stderr = ssh_client.exec_command(cmd)
-
-                    # 3. 阻塞等待结束 (这是耗时步骤，但连接必须保持着)
-                    exit_status = stdout.channel.recv_exit_status()
-
-                    if exit_status == 0:
-                        self.download_queue.put(task)
-                    else:
-                        self.download_queue.put(task)
-                        print(f"[Runner] Failed {task.unique_id} status {exit_status}")
-
-                except Exception as e:
-                    print(f"[Runner] Error: {e}")
-                finally:
-                    if ssh_client: ssh_client.close()
-
-            self.run_queue.task_done()
-
-        # --- Worker 4: 下载器 (短链接模式) ---
-    def worker_downloader(self):
-        while self.running:
-            try:
-                task = self.download_queue.get(timeout=2)
-            except queue.Empty:
-                continue
-
-            with self.ssh_semaphore:
-                ssh_client = None
-                sftp_client = None
-                try:
-                    # 1. 现场连接
-                    ssh_client = self._get_fresh_ssh()
-                    sftp_client = ssh_client.open_sftp()
-
-                    litmus_name = task.litmus_path.split("/")[-1][:-7]
-                    task.local_log_path = os.path.join(
-                        task.log_dir_path,
-                        f"{litmus_name}_{str(task.params)}_{task.run_time}-{task.unique_id}.log"
-                    )
-
-                    # 2. 下载
-                    sftp_client.get(task.remote_log_path, task.local_log_path)
-
-                    # 3. 清理远程文件
+                # 尝试取出队列中剩余的所有任务（或者直到达到 BATCH_SIZE）
+                # 注意：这里使用 get_nowait()，它不会阻塞
+                while len(batch_tasks) < BATCH_SIZE:
                     try:
-                        sftp_client.remove(task.remote_log_path)
-                        sftp_client.remove(task.remote_exe_path)
-                    except:
-                        pass
+                        t = self.upload_queue.get_nowait()
+                        batch_tasks.append(t)
+                    except queue.Empty:
+                        break  # 队列空了，就处理手头这些
+            except queue.Empty:
+                continue  # 如果超时还没等到第一个任务，重新循环
 
-                    # 4. 输出结果
-                    os.system(f"rm -rf {task.litmus_dir}")
-                    self.result_queue.put({'task': task, 'log_path': task.local_log_path})
+            print(f"[Uploader] Processing batch of {len(batch_tasks)} tasks...")
 
-                except Exception as e:
-                    print(f"[Downloader] Error: {e}")
+            # --- 2. 建立一次连接，处理一批任务 ---
+            with self.ssh_semaphore:
+                ssh_client = None
+                sftp_client = None
+                try:
+                    # === 建立连接 (只做一次) ===
+                    ssh_client = self._get_fresh_ssh()
+                    sftp_client = ssh_client.open_sftp()
+
+                    # === 循环处理任务 ===
+                    for task in batch_tasks:
+                        try:
+                            print(f"  -> Uploading {task.unique_id}...")
+
+                            # 传输文件
+                            sftp_client.put(task.local_exe_path, task.remote_exe_path)
+                            # 修改权限 (复用 ssh 连接执行命令)
+                            ssh_client.exec_command(f"chmod +x {task.remote_exe_path}")
+
+                            # 成功入队到 Runner
+                            self.run_queue.put(task)
+
+                        except Exception as e_inner:
+                            # 单个任务失败，不要打断整个循环，记录错误即可
+                            print(f"[Uploader] Failed task {task.unique_id}: {e_inner}")
+                            # 这里可以做一些重试逻辑，或者把 task 丢回 upload_queue
+                        finally:
+                            # 标记该任务在 upload_queue 中已完成
+                            self.upload_queue.task_done()
+
+                except Exception as e_outer:
+                    # 如果是连接层面的大崩溃（比如 SSH 连不上），这批任务都需要处理
+                    print(f"[Uploader] Connection Error: {e_outer}")
+                    # 策略：因为还没上传成功，理论上应该把这批 batch_tasks 重新放回队列
+                    for task in batch_tasks:
+                        # 注意：这里需要防止死循环，实际工程中可能需要计数器
+                        self.upload_queue.put(task)
+                        self.upload_queue.task_done()  # 因为上面get出来了，这里要抵消
+
+                finally:
+                    # === 关闭连接 (只做一次) ===
+                    if sftp_client: sftp_client.close()
+                    if ssh_client: ssh_client.close()
+        # --- Worker 3: 执行器 (短链接模式) ---
+    # def worker_runner(self):
+    #     while self.running:
+    #         try:
+    #             task = self.run_queue.get(timeout=2)
+    #         except queue.Empty:
+    #             continue
+    #
+    #         print(f"[Runner] >>> Running {task.unique_id}...")
+    #
+    #         with self.ssh_semaphore:
+    #             ssh_client = None
+    #             try:
+    #                 # 1. 现场连接
+    #                 ssh_client = self._get_fresh_ssh()
+    #
+    #                 # 2. 执行命令
+    #                 cmd = f"{task.remote_exe_path} -s {task.run_time} > {task.remote_log_path} 2>&1"
+    #                 # exec_command 默认是不阻塞的，但我们需要等待结果
+    #                 stdin, stdout, stderr = ssh_client.exec_command(cmd)
+    #
+    #                 # 3. 阻塞等待结束 (这是耗时步骤，但连接必须保持着)
+    #                 exit_status = stdout.channel.recv_exit_status()
+    #
+    #                 if exit_status == 0:
+    #                     self.download_queue.put(task)
+    #                 else:
+    #                     self.download_queue.put(task)
+    #                     print(f"[Runner] Failed {task.unique_id} status {exit_status}")
+    #
+    #             except Exception as e:
+    #                 print(f"[Runner] Error: {e}")
+    #             finally:
+    #                 if ssh_client: ssh_client.close()
+    #
+    #         self.run_queue.task_done()
+    #
+    def worker_runner(self):
+        BATCH_SIZE = 50  # 同样限制一批最大处理数量
+
+        while self.running:
+            # --- 1. 收集本批次任务 ---
+            batch_tasks = []
+            try:
+                # 阻塞等待第一个
+                first_task = self.run_queue.get(timeout=2)
+                batch_tasks.append(first_task)
+
+                # 非阻塞捞取剩余任务
+                while len(batch_tasks) < BATCH_SIZE:
+                    try:
+                        t = self.run_queue.get_nowait()
+                        batch_tasks.append(t)
+                    except queue.Empty:
+                        break
+            except queue.Empty:
+                continue
+
+            print(f"[Runner] Processing batch of {len(batch_tasks)} tasks...")
+
+            # --- 2. 建立连接并批量执行 ---
+            with self.ssh_semaphore:
+                ssh_client = None
+                try:
+                    # 只建立一次连接
+                    ssh_client = self._get_fresh_ssh()
+
+                    tasks_to_requeue = []  # 用于存储因连接中断而未执行的任务
+
+                    for task in batch_tasks:
+                        try:
+                            print(f"  -> Running {task.unique_id}...")
+
+                            cmd = f"{task.remote_exe_path} -s {task.run_time} > {task.remote_log_path} 2>&1"
+
+                            # 复用 ssh_client 执行命令
+                            # 注意：这里会开启一个新的 Channel，但复用同一个 TCP 连接
+                            stdin, stdout, stderr = ssh_client.exec_command(cmd)
+
+                            # 阻塞等待该任务结束
+                            exit_status = stdout.channel.recv_exit_status()
+
+                            if exit_status != 0:
+                                print(f"[Runner] Task {task.unique_id} finished with status {exit_status}")
+
+                            # 无论成功失败，都算运行完了，交给下载器去拉日志
+                            self.download_queue.put(task)
+
+                            # 标记当前任务完成
+                            self.run_queue.task_done()
+
+                        except Exception as e_inner:
+                            # 如果是 SSH 连接断开了，后面的任务就没法跑了
+                            if isinstance(e_inner, (paramiko.SSHException, OSError)):
+                                print(f"[Runner] Connection lost at {task.unique_id}: {e_inner}")
+                                # 标记当前这个失败了，需要重试
+                                tasks_to_requeue.append(task)
+                                # 剩下的还没跑的任务也都要重试
+                                remaining_index = batch_tasks.index(task) + 1
+                                tasks_to_requeue.extend(batch_tasks[remaining_index:])
+                                break  # 跳出循环
+                            else:
+                                # 如果只是普通的逻辑错误，记录一下，不要卡住后面的
+                                print(f"[Runner] Logic Error on {task.unique_id}: {e_inner}")
+                                self.run_queue.task_done()
+
+                    # 如果有因为断连需要重试的任务，重新放回队列
+                    for t in tasks_to_requeue:
+                        self.run_queue.put(t)
+                        # 注意：get出来的时候计数器加了，这里重放进去算是新任务，
+                        # 但之前的 get 对应的 task_done 还是要调用的，为了防止死锁，
+                        # 简单做法是：对于未完成的任务，我们也调用 task_done() 抵消掉之前的 get，
+                        # 然后 put 进去当作全新的任务。
+                        self.run_queue.task_done()
+
+                except Exception as e_outer:
+                    print(f"[Runner] Critical Batch Error: {e_outer}")
+                    # 极端情况：连 SSH 都连不上，所有任务回滚
+                    for t in batch_tasks:
+                        self.run_queue.put(t)
+                        self.run_queue.task_done()
+                finally:
+                    if ssh_client: ssh_client.close()
+    #     # --- Worker 4: 下载器 (短链接模式) ---
+    # def worker_downloader(self):
+    #     while self.running:
+    #         try:
+    #             task = self.download_queue.get(timeout=2)
+    #         except queue.Empty:
+    #             continue
+    #
+    #         with self.ssh_semaphore:
+    #             ssh_client = None
+    #             sftp_client = None
+    #             try:
+    #                 # 1. 现场连接
+    #                 ssh_client = self._get_fresh_ssh()
+    #                 sftp_client = ssh_client.open_sftp()
+    #
+    #                 litmus_name = task.litmus_path.split("/")[-1][:-7]
+    #                 task.local_log_path = os.path.join(
+    #                     task.log_dir_path,
+    #                     f"{litmus_name}_{str(task.params)}_{task.run_time}-{task.unique_id}.log"
+    #                 )
+    #
+    #                 # 2. 下载
+    #                 sftp_client.get(task.remote_log_path, task.local_log_path)
+    #
+    #                 # 3. 清理远程文件
+    #                 try:
+    #                     sftp_client.remove(task.remote_log_path)
+    #                     sftp_client.remove(task.remote_exe_path)
+    #                 except:
+    #                     pass
+    #
+    #                 # 4. 输出结果
+    #                 os.system(f"rm -rf {task.litmus_dir}")
+    #                 self.result_queue.put({'task': task, 'log_path': task.local_log_path})
+    #
+    #             except Exception as e:
+    #                 print(f"[Downloader] Error: {e}")
+    #             finally:
+    #                 if sftp_client: sftp_client.close()
+    #                 if ssh_client: ssh_client.close()
+    #
+    #         self.download_queue.task_done()
+    def worker_downloader(self):
+        BATCH_SIZE = 50
+
+        while self.running:
+            # --- 1. 收集任务 ---
+            batch_tasks = []
+            try:
+                first_task = self.download_queue.get(timeout=2)
+                batch_tasks.append(first_task)
+                while len(batch_tasks) < BATCH_SIZE:
+                    try:
+                        t = self.download_queue.get_nowait()
+                        batch_tasks.append(t)
+                    except queue.Empty:
+                        break
+            except queue.Empty:
+                continue
+
+            print(f"[Downloader] Processing batch of {len(batch_tasks)} tasks...")
+
+            # --- 2. 批量下载 ---
+            with self.ssh_semaphore:
+                ssh_client = None
+                sftp_client = None
+                try:
+                    # 建立连接 (一次)
+                    ssh_client = self._get_fresh_ssh()
+                    sftp_client = ssh_client.open_sftp()
+
+                    tasks_to_requeue = []
+
+                    for task in batch_tasks:
+                        try:
+                            # 计算本地路径
+                            litmus_name = task.litmus_path.split("/")[-1][:-7]  # 假设你的命名逻辑
+                            task.local_log_path = os.path.join(
+                                task.log_dir_path,
+                                f"{litmus_name}_{str(task.params)}_{task.run_time}-{task.unique_id}.log"
+                            )
+
+                            # 执行下载
+                            # print(f"  -> Downloading {task.unique_id}...")
+                            sftp_client.get(task.remote_log_path, task.local_log_path)
+
+                            # 清理远程文件 (这也是 IO 操作，放这里顺手做了)
+                            try:
+                                sftp_client.remove(task.remote_log_path)
+                                sftp_client.remove(task.remote_exe_path)
+                            except IOError:
+                                pass  # 文件不存在就算了
+
+                            # 本地清理和输出结果
+                            os.system(f"rm -rf {task.litmus_dir}")  # 慎用 system，建议用 shutil.rmtree
+
+                            # 放入结果队列
+                            self.result_queue.put({'task': task, 'log_path': task.local_log_path})
+
+                            self.download_queue.task_done()
+
+                        except Exception as e_inner:
+                            # 同样处理连接中断的情况
+                            if isinstance(e_inner, (paramiko.SSHException, OSError)):
+                                print(f"[Downloader] Connection lost at {task.unique_id}: {e_inner}")
+                                tasks_to_requeue.append(task)
+                                remaining_index = batch_tasks.index(task) + 1
+                                tasks_to_requeue.extend(batch_tasks[remaining_index:])
+                                break
+                            else:
+                                print(f"[Downloader] Error on {task.unique_id}: {e_inner}")
+                                self.download_queue.task_done()
+
+                    # 重试逻辑
+                    for t in tasks_to_requeue:
+                        self.download_queue.put(t)
+                        self.download_queue.task_done()
+
+                except Exception as e_outer:
+                    print(f"[Downloader] Critical Batch Error: {e_outer}")
+                    for t in batch_tasks:
+                        self.download_queue.put(t)
+                        self.download_queue.task_done()
                 finally:
                     if sftp_client: sftp_client.close()
                     if ssh_client: ssh_client.close()
-
-            self.download_queue.task_done()
-
     def start(self, compiler_thread_count=4, downloader_thread_count=2):  # <--- 新增参数
         threads = []
 
