@@ -6,7 +6,7 @@ from src.slide.bayes.litmus_params import LitmusParams
 from src.slide.bayes.util import run_litmus_by_mode, parse_log_by_mode, parse_log_by_mode_perple
 
 litmus_repeats_per_iteration = 1 # Number of repeated executions for each litmus test per iteration
-max_litmus_repeats_per_iteration = 10
+max_litmus_repeats_per_iteration = 1
 run_time = 100000
 litmus_dir_path = '/home/whq/Desktop/code_list/perple_test/bayes'
 log_dir_path = '/home/whq/Desktop/code_list/perple_test/bayes_log'
@@ -42,8 +42,9 @@ def get_score(litmus_file, config:LitmusParams, mode = "time", mach = "ssh"): # 
                 continue
             scores.append(score)
 
-    return log_path, np.median(scores)
+    return log_path, -1
 
+    return log_path, np.median(scores)
 
 
 
@@ -124,6 +125,8 @@ class LitmusRunner:
             lit, cfg = task
             print(lit, cfg)
             log_path, score = get_score(lit, cfg, mode=self.mode)
+            print(log_path, score)
+            log_path = str(log_path)
             litmus_log_name = ('_').join(log_path.split("/")[-1].split("_")[:-1])
             print(litmus_log_name)
             self.record_to_log(litmus_log_name)

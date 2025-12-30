@@ -21,7 +21,7 @@ class LitmusParamSpace:
         self.noalign_list = ["none", "all"]
 
         # stride 是数值空间
-        self.stride_list = [1]
+        self.stride_list = [1, 31, 133]
         self.dim = 11
 
     # --------------------------------------------------
@@ -43,32 +43,39 @@ class LitmusParamSpace:
             "perple": (0, 0)  # to Fix
         }
 
-    def random_vector(self):
+    def random_vector(self, can_perple):
         """随机采样一个向量（整数编码）"""
         bounds = self.get_bounds()
-        return [random.randint(low, high) for (low, high) in bounds.values()]
+        while True:
+            item = [random.randint(low, high) for (low, high) in bounds.values()]
+            if item[10] != 0 and item[11] == 1:
+                continue
+            if not can_perple and item[11] == 1:
+                continue
+            return item
+        # return [random.randint(low, high) for (low, high) in bounds.values()]
 
     def get_bound_vector(self):
         vec_list = []
         vec_list.append([0,2,0,0,0,0,2,0,0,0,0])
-        vec_list.append([1,2,0,0,0,0,2,0,0,0,0])
+        vec_list.append([1,1,0,0,0,0,2,0,0,0,0])
         vec_list.append([0,0,0,0,0,0,2,0,0,0,0])
         vec_list.append([0,1,0,0,0,0,2,0,0,0,0])
         vec_list.append([0,3,0,0,0,0,2,0,0,0,0])
         vec_list.append([0,4,0,0,0,0,2,0,0,0,0])
         vec_list.append([0,5,0,0,0,0,2,0,0,0,0])
         vec_list.append([0,6,0,0,0,0,2,0,0,0,0])
-        vec_list.append([0,2,1,0,0,0,2,0,0,0,0])
-        vec_list.append([0,2,0,1,0,0,2,0,0,0,0])
-        vec_list.append([0,2,0,0,1,0,2,0,0,0,0])
-        vec_list.append([0,2,0,0,2,0,2,0,0,0,0])
-        vec_list.append([0,2,0,0,0,1,2,0,0,0,0])
-        vec_list.append([0,2,0,0,0,0,1,0,0,0,0])
-        vec_list.append([0,2,0,0,0,0,3,0,0,0,0])
-        vec_list.append([0,2,0,0,0,0,4,0,0,0,0])
-        vec_list.append([0,2,0,0,0,0,0,0,0,0,0])
-        vec_list.append([0,2,0,0,0,0,2,0,1,0,0])
-        vec_list.append([0,2,0,0,0,0,2,0,0,1,0])
+        vec_list.append([0,1,1,0,0,0,2,0,0,0,0])
+        vec_list.append([0,1,0,1,0,0,2,0,0,0,0])
+        vec_list.append([0,1,0,0,1,0,2,0,0,0,0])
+        vec_list.append([0,1,0,0,2,0,2,0,0,0,0])
+        vec_list.append([0,1,0,0,0,1,2,0,0,0,0])
+        vec_list.append([0,1,0,0,0,0,1,0,0,0,0])
+        vec_list.append([0,1,0,0,0,0,3,0,0,0,0])
+        vec_list.append([0,1,0,0,0,0,4,0,0,0,0])
+        vec_list.append([0,1,0,0,0,0,0,0,0,0,0])
+        vec_list.append([0,1,0,0,0,0,2,0,1,0,0])
+        vec_list.append([0,1,0,0,0,0,2,0,0,1,0])
         return vec_list
 
     # --------------------------------------------------

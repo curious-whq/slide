@@ -119,9 +119,10 @@ class ErrorCache:
 
 class RandomForestBO:
 
-    def __init__(self, param_space: LitmusParamSpace, litmus_list, n_estimators=200,
+    def __init__(self, param_space: LitmusParamSpace, litmus_list, can_perple_list, n_estimators=200,
                  litmus_vec_path="/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector.log"):
         self.ps = param_space
+        self.can_perple_list = can_perple_list
         self.model = RandomForestRegressor(
             n_estimators=n_estimators,
             n_jobs=1,
@@ -241,9 +242,9 @@ class RandomForestBO:
 
         for litmus in litmus_names:
             litmus_vector = self.litmus_to_vector_dict[litmus]
-
+            can_perple = True if litmus in self.can_perple_list else False
             for _ in range(n_param):
-                p = self.ps.random_vector()
+                p = self.ps.random_vector(can_perple)
                 candidates.append((litmus, list(p)+list(litmus_vector)))
 
 
@@ -306,14 +307,20 @@ class LitmusRunnerForBayes(LitmusRunner):
         litmus_list,
         param_space,
         stat_log,
+        can_perple_path,
         mode="time",
         init_samples_per_litmus=3,
         bo_iters=10000,
     ):
         super().__init__(litmus_list, [], stat_log, mode)
 
+        self.can_perple_list = []
+        with open(can_perple_path, "r") as f:
+            can_perple_list = f.readlines()
+            for can_perple in can_perple_list:
+                self.can_perple_list.append(can_perple.strip())
         self.ps = param_space
-        self.bo = RandomForestBO(param_space, litmus_list)
+        self.bo = RandomForestBO(param_space, litmus_list, self.can_perple_list)
 
         self.init_samples_per_litmus = init_samples_per_litmus
         self.bo_iters = bo_iters
@@ -331,7 +338,8 @@ class LitmusRunnerForBayes(LitmusRunner):
     def _initial_sample(self):
         for litmus in self.litmus_list:
             for _ in range(self.init_samples_per_litmus):
-                param_vec = self.ps.random_vector()
+                can_perple = True if litmus in self.can_perple_list else False
+                param_vec = self.ps.random_vector(can_perple= can_perple)
                 # params = self.ps.vector_to_params(param_vec)
 
                 yield litmus, param_vec
@@ -433,6 +441,7 @@ litmus_path = "/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_nai
 stat_log = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log"
 dir_path = "/home/whq/Desktop/code_list/perple_test/bayes_log"
 log_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_stat_bayes.csv"
+can_perple_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/can_perple.log"
 if __name__ == "__main__":
     random.seed(SEED)
     np.random.seed(SEED)
@@ -451,5 +460,5 @@ if __name__ == "__main__":
     for litmus in litmus_list:
         print(litmus)
     param_space = LitmusParamSpace()
-    runner = LitmusRunnerForBayes(litmus_list, param_space, stat_log)
+    runner = LitmusRunnerForBayes(litmus_list, param_space, stat_log, can_perple_path)
     runner.run()

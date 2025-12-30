@@ -1,6 +1,6 @@
 import json
 
-path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log.cache.jsonl"
+path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector2.jsonl"
 
 with open(path) as f:
     for lineno, line in enumerate(f, 1):

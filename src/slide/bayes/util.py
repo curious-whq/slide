@@ -45,11 +45,11 @@ def run_litmus_by_mode(litmus_path, params: LitmusParams, litmus_dir_path, log_d
         # run_cmd(f"qemu-riscv64 .{exe_path} -s {run_time} > {local_log}")
         return local_log
 
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-    ssh.connect(host, port, username, password)
-    sftp = ssh.open_sftp()
+    # ssh = paramiko.SSHClient()
+    # ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    #
+    # ssh.connect(host, port, username, password)
+    # sftp = ssh.open_sftp()
 
     if mode == "litmus7":
         assert False, "litmus7 not supported"  # todo
@@ -63,6 +63,7 @@ def run_litmus_by_mode(litmus_path, params: LitmusParams, litmus_dir_path, log_d
             if params.is_perple():
                 make_perple_cmd(litmus_dir, litmus_path)
             run_cmd(f"cd {litmus_dir};make")
+            return -1
             print(f"cd {litmus_dir};make")
         # exe_path = os.path.join(litmus_dir, f"run.exe")
 

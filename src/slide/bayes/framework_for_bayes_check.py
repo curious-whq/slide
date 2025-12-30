@@ -117,7 +117,7 @@ class RandomForestBO:
 litmus_path = "/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_naive"
 stat_log_base = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log"
 litmus_vec_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector.log"
-cache_file_path = stat_log_base + ".cache.cleaned.jsonl"
+cache_file_path = stat_log_base + ".cache_sum_norm.jsonl"
 
 if __name__ == "__main__":
     # 1. Setup Logger
@@ -170,8 +170,9 @@ if __name__ == "__main__":
         logger.warning("Data size <= 7000, splitting might be invalid based on request.")
 
     # 5. 切分数据
-    train_data = all_data[:10000]
-    test_data = all_data[10000:]
+    random.shuffle(all_data)
+    train_data = all_data[:60000]
+    test_data = all_data[60000:]
     logger.info(f"Train size: {len(train_data)}")
     logger.info(f"Test size:  {len(test_data)}")
 
@@ -247,7 +248,7 @@ if __name__ == "__main__":
         # 按 pred 从大到小排序
         records_sorted_by_pred = sorted(records, key=lambda x: x['pred'], reverse=True)
         best_pred_record = records_sorted_by_pred[0]  # 模型推荐去跑这个
-        if max_actual_score == 0:
+        if max_actual_score == 1:
             total_litmus_cnt -= 1
             continue
         # C. 判定 Top-1 是否命中
@@ -295,7 +296,50 @@ if __name__ == "__main__":
         res = spearmanr(y_true_all, y_pred_all)
         rho = res.statistic if hasattr(res, 'statistic') else res[0]
         logger.info(f"Global Spearman Rho:     {rho:.4f}")
+
+        # === 【新增代码】在这里计算并打印 R^2 ===
+        r2 = r2_score(y_true_all, y_pred_all)
+        mae = mean_absolute_error(y_true_all, y_pred_all)  # 既然引入了也可以顺便打出来
+        logger.info(f"Global R^2 Score:        {r2:.4f}")
+        logger.info(f"Global MAE:              {mae:.4f}")
+        # ======================================
         logger.info("=" * 60)
 
     else:
         logger.warning("No litmus test groups with >1 samples found in test set.")
+    # ==========================================
+    # 计算更真实的指标：平均组内 Rho (Mean Per-Litmus Rho)
+    # ==========================================
+    per_litmus_rhos = []
+
+    logger.info("-" * 60)
+    logger.info("Calculating Per-Litmus Spearman Correlation...")
+
+    for litmus, records in groups.items():
+        # 样本太少没法算相关性
+        if len(records) < 3:
+            continue
+
+        y_true_local = [r['actual'] for r in records]
+        y_pred_local = [r['pred'] for r in records]
+
+        # 如果所有真实值都一样（比如都是0），或者预测值都一样，相关性未定义
+        if len(set(y_true_local)) <= 1 or len(set(y_pred_local)) <= 1:
+            continue
+
+        # 计算单组的 Rho
+        rho_local, _ = spearmanr(y_true_local, y_pred_local)
+
+        # 排除 NaN
+        if not np.isnan(rho_local):
+            per_litmus_rhos.append(rho_local)
+
+    if per_litmus_rhos:
+        mean_rho = np.mean(per_litmus_rhos)
+        median_rho = np.median(per_litmus_rhos)
+        logger.info(f"Mean Per-Litmus Rho:   {mean_rho:.4f}")
+        logger.info(f"Median Per-Litmus Rho: {median_rho:.4f}")
+    else:
+        logger.warning("Not enough data to calculate per-litmus Rho.")
+
+    logger.info("=" * 60)

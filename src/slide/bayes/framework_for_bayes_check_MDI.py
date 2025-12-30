@@ -191,7 +191,9 @@ class RandomForestBO:
 
     def add(self, litmus_name, param_vec, score):
         if litmus_name not in self.litmus_to_vector_dict:
-            return
+            print("error",litmus_name)
+            assert False
+            # return
         litmus_vec = self.litmus_to_vector_dict[litmus_name]
         self.X.append(list(param_vec) + list(litmus_vec))
         self.y.append(score)
@@ -220,7 +222,7 @@ class RandomForestBO:
 litmus_path = "/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_naive"
 stat_log_base = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log"
 litmus_vec_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector.log"
-cache_file_path = stat_log_base + ".cache.jsonl"
+cache_file_path = stat_log_base + ".cache_sum_70_no.jsonl"
 
 if __name__ == "__main__":
     # 1. Setup Logger
@@ -273,8 +275,8 @@ if __name__ == "__main__":
         logger.warning("Data size <= 7000, splitting might be invalid based on request.")
 
     # 5. 切分数据
-    train_data = all_data[:15000]
-    test_data = all_data[15000:]
+    train_data = all_data[:50000]
+    test_data = all_data[50000:]
     logger.info(f"Train size: {len(train_data)}")
     logger.info(f"Test size:  {len(test_data)}")
 

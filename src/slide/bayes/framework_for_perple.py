@@ -11,13 +11,13 @@ if __name__ == "__main__":
     for litmus in litmus_list:
         print(litmus)
 
-    # config_list = [LitmusParams() for _ in litmus_list]
-    # vector = [-1,5,-1,-1,-1,-1,-1,-1,-1,-1,1]
-    # for item in config_list:
-    #     item.from_vector(vector)
-    #     item.apply_standard_form()
-    #
-    # runner = LitmusRunner(litmus_list, config_list, stat_log)
-    # runner.run()
+    config_list = [LitmusParams() for _ in litmus_list]
+    vector = [-1,5,-1,-1,-1,-1,-1,-1,-1,-1,1]
+    for item in config_list:
+        item.from_vector(vector)
+        item.apply_standard_form()
+
+    runner = LitmusRunner(litmus_list, config_list, stat_log)
+    runner.run()
 
     read_log_to_summary(dir_path, log_path, stat_mode="time")

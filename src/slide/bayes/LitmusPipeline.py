@@ -6,6 +6,7 @@ import queue
 import paramiko
 from dataclasses import dataclass
 
+from src.slide.perple.trans_cpp import filter_Thread
 from src.slide.utils.cmd_util import run_cmd
 
 
@@ -27,6 +28,7 @@ class LitmusTask:
     remote_log_path: str = None
     local_log_path: str = None
     litmus_dir: str = None
+    perp_dict: dict = None
 
 
 class LitmusPipeline:
@@ -124,10 +126,11 @@ class LitmusPipeline:
         ssh.exec_command(f"mkdir -p {self.remote_work_dir}")
         return ssh
 
-    def submit_task(self, litmus_path, params, litmus_dir_path, log_dir_path, run_time=100):
+    def submit_task(self, litmus_path, params, litmus_dir_path, log_dir_path, run_time=100, perp_dict=None):
         """提交任务入口"""
         task = LitmusTask(litmus_path, params, litmus_dir_path, log_dir_path, run_time)
         task.unique_id = str(uuid.uuid4())[:8]  # 生成短UUID防止文件名冲突
+        task.perp_dict = perp_dict
         self.compile_queue.put(task)
 
     # --- Worker 1: 编译器 (本地 CPU 密集型) ---
@@ -154,6 +157,8 @@ class LitmusPipeline:
                 # 1. 生成代码 (假设这是单线程极快操作)
                 run_cmd(task.params.to_litmus7_format(task.litmus_path, litmus_dir))
 
+                if task.params.is_perple():
+                    filter_Thread(f"{litmus_dir}/{litmus_name}.c", f"{litmus_dir}/{litmus_name}.c", task.litmus_path, task.prep_dict)
                 # 2. 核心修改点：使用 -j 参数并行编译
                 # 这里的 run_cmd 需要是你封装好的能够执行 shell 的函数
                 # 加上 > /dev/null 减少控制台 IO 输出，提高速度
@@ -397,49 +402,7 @@ class LitmusPipeline:
                         self.run_queue.task_done()
                 finally:
                     if ssh_client: ssh_client.close()
-    #     # --- Worker 4: 下载器 (短链接模式) ---
-    # def worker_downloader(self):
-    #     while self.running:
-    #         try:
-    #             task = self.download_queue.get(timeout=2)
-    #         except queue.Empty:
-    #             continue
-    #
-    #         with self.ssh_semaphore:
-    #             ssh_client = None
-    #             sftp_client = None
-    #             try:
-    #                 # 1. 现场连接
-    #                 ssh_client = self._get_fresh_ssh()
-    #                 sftp_client = ssh_client.open_sftp()
-    #
-    #                 litmus_name = task.litmus_path.split("/")[-1][:-7]
-    #                 task.local_log_path = os.path.join(
-    #                     task.log_dir_path,
-    #                     f"{litmus_name}_{str(task.params)}_{task.run_time}-{task.unique_id}.log"
-    #                 )
-    #
-    #                 # 2. 下载
-    #                 sftp_client.get(task.remote_log_path, task.local_log_path)
-    #
-    #                 # 3. 清理远程文件
-    #                 try:
-    #                     sftp_client.remove(task.remote_log_path)
-    #                     sftp_client.remove(task.remote_exe_path)
-    #                 except:
-    #                     pass
-    #
-    #                 # 4. 输出结果
-    #                 os.system(f"rm -rf {task.litmus_dir}")
-    #                 self.result_queue.put({'task': task, 'log_path': task.local_log_path})
-    #
-    #             except Exception as e:
-    #                 print(f"[Downloader] Error: {e}")
-    #             finally:
-    #                 if sftp_client: sftp_client.close()
-    #                 if ssh_client: ssh_client.close()
-    #
-    #         self.download_queue.task_done()
+
     def worker_downloader(self):
         BATCH_SIZE = 50
 
@@ -524,6 +487,7 @@ class LitmusPipeline:
                 finally:
                     if sftp_client: sftp_client.close()
                     if ssh_client: ssh_client.close()
+
     def start(self, compiler_thread_count=4, downloader_thread_count=2):  # <--- 新增参数
         threads = []
 

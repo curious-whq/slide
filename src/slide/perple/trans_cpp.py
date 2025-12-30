@@ -1,3 +1,4 @@
+import json
 import re
 
 from src.slide import config
@@ -19,6 +20,8 @@ reverse_func = '''
 } while (0)
 
 '''
+
+perple_path = '/home/whq/Desktop/code_list/perple_test/perple_json'
 
 def format_indent(code: str, indent_size: int = 2) -> str:
     """简单的缩进美化器，保证 for/if/asm 内的层次清晰"""
@@ -44,9 +47,9 @@ def format_indent(code: str, indent_size: int = 2) -> str:
     return "\n".join(formatted)
 
 
-def filter_Thread(input_file, output_file, litmus_file_path, thread_num = 2, mode = 'e'):
+def filter_Thread(input_file, output_file, litmus_file_path, perp_dict = None, thread_num = 2, mode = 'e'):
 
-
+    litmus_name = litmus_file_path.split("/")[-1][:-7]
     with open(input_file, 'r') as f:
         cpp_code = f.read()
     litmus_content = read_file(litmus_file_path)
@@ -82,8 +85,20 @@ def filter_Thread(input_file, output_file, litmus_file_path, thread_num = 2, mod
     if print_flag:
         for asm_code in asm_list:
             print(asm_code)
-    trans_dict = perpLE(litmus_content, asm_list, mode=mode)
-
+    if perp_dict is not None:
+        trans_dict = perp_dict
+    else:
+        trans_dict = perpLE(litmus_content, asm_list, mode=mode)
+    # if (mode == "h"):
+    #     try:
+    #         with open(f"{perple_path}/{litmus_name}.jsonl", 'w', encoding='utf-8') as jf:
+    #             # ensure_ascii=False 允许写入中文等非ASCII字符（虽然这里主要是代码）
+    #             # indent=4 会格式化输出，方便你打开文件查看代码结构
+    #             json.dump(trans_dict, jf, ensure_ascii=False, indent=4)
+    #         print(f"保存成功：{perple_path}/{litmus_name}.jsonl")
+    #     except IOError as e:
+    #         print(f"保存失败：{e}")
+    #     print("trans_dict", trans_dict)
 
     # 1. update all P-thread functions
     for thread_index in range(thread_num):

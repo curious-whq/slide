@@ -120,9 +120,10 @@ class ErrorCache:
 
 class RandomForestBO:
 
-    def __init__(self, param_space: LitmusParamSpace, litmus_list, litmus_vec_path, n_estimators=200,
+    def __init__(self, param_space: LitmusParamSpace, litmus_list, litmus_vec_path, can_perple_list, n_estimators=200,
                  ):
         self.ps = param_space
+        self.can_perple_list = can_perple_list
         self.model = RandomForestRegressor(
             n_estimators=n_estimators,
             n_jobs=1,
@@ -341,6 +342,8 @@ class LitmusRunnerForBayes(LitmusRunner):
         litmus_list,
         param_space,
         stat_log,
+        can_perple_path,
+        perple_dict_path,
         mode="time",
         init_samples_per_litmus=3,
         bo_iters=10000,
@@ -350,9 +353,19 @@ class LitmusRunnerForBayes(LitmusRunner):
         pipeline_port=22
     ):
         super().__init__(litmus_list, [], stat_log, mode)
-
+        self.can_perple_list = []
+        with open(can_perple_path, "r") as f:
+            can_perple_list = f.readlines()
+            for can_perple in can_perple_list:
+                self.can_perple_list.append(can_perple.strip())
+        perple_files = get_files(perple_dict_path, "jsonl")
+        self.perple_dict_list = {}
+        for perple_file in perple_files:
+            with open(perple_file, "r") as f:
+                loaded_dict = json.load(f)
+                self.perple_dict_list[perple_file.split("/")[-1][:-7]] = loaded_dict
         self.ps = param_space
-        self.bo = RandomForestBO(param_space, litmus_list, litmus_vec_path)
+        self.bo = RandomForestBO(param_space, litmus_list, litmus_vec_path, self.can_perple_list)
 
         self.init_samples_per_litmus = init_samples_per_litmus
         self.bo_iters = bo_iters
@@ -376,7 +389,7 @@ class LitmusRunnerForBayes(LitmusRunner):
         )
         self.pipeline.start()
 
-    def _submit_one(self, litmus, vec):
+    def _submit_one(self, litmus, vec, perp_dict):
         params = self.ps.vector_to_params(vec)
         params.set_riscv_gcc()
         # [关键] 把 vector 挂载到 params 上，方便结果回来时找回
@@ -384,12 +397,14 @@ class LitmusRunnerForBayes(LitmusRunner):
 
         litmus_file = f"{litmus_path}/{litmus}.litmus"
 
+
         self.pipeline.submit_task(
             litmus_path=litmus_file,
             params=params,
             litmus_dir_path=dir_path,  # 本地编译产物路径
             log_dir_path=dir_path,  # 本地结果日志路径
-            run_time=1000  # 运行次数/时间
+            run_time=100000,  # 运行次数/时间
+            perp_dict=perp_dict
         )
 
     # === [新增] 辅助函数：解析 Log 算分 ===
@@ -512,7 +527,7 @@ class LitmusRunnerForBayes(LitmusRunner):
             assert False, "BO returned no suggestions!"
         else:
             for litmus, vec in initial_batch:
-                self._submit_one(litmus, vec)
+                self._submit_one(litmus, vec, self.perple_dict_list.get(litmus, None))
 
         # --- 2. 流式循环 ---
         pending_results_buffer = []
@@ -559,7 +574,7 @@ class LitmusRunnerForBayes(LitmusRunner):
                         for (nxt_litmus, nxt_vec) in new_batch:
                             # 查重：如果 Cache 里已经有了，就没必要再跑了（虽然 select_batch 应该避免）
                             if self.cache.get(nxt_litmus, nxt_vec) is None:
-                                self._submit_one(nxt_litmus, nxt_vec)
+                                self._submit_one(nxt_litmus, nxt_vec, self.perple_dict_list.get(nxt_litmus, None))
 
                         self.logger.info(f"Submitted {len(new_batch)} new tasks.")
 
@@ -581,67 +596,6 @@ class LitmusRunnerForBayes(LitmusRunner):
         self.pipeline.wait_completion()
         return self.results
 
-    # def run(self):
-    #     """
-    #     BO-driven execution loop
-    #     """
-    #     self.logger.info("=== Starting Over-Provisioning BO Loop ===")
-    #     TRAIN_TRIGGER = 5  # 每收回 5 个结果，就训练一次
-    #     SUBMIT_SIZE = 8  # 每次产生 8 个新任务 (净赚 +3)
-    #     MAX_QUEUE_SIZE = 20  # 队列最长只留 20 个
-    #     while True:
-    #         nxt = self.getNext()
-    #         if nxt is None:
-    #             break
-    #
-    #         litmus, param_vec = nxt
-    #         params = self.ps.vector_to_params(param_vec)
-    #         params.set_riscv_gcc()
-    #         print(f"[RUN] litmus={litmus}, params={params.to_dict()}")
-    #         if self.error_cache.has(litmus, param_vec):
-    #             self.logger.info(
-    #                 f"[SKIP-ERROR] litmus={litmus}, params={param_vec}"
-    #             )
-    #             continue
-    #         # ---------- 查 cache ----------
-    #         cached = self.cache.get(litmus, param_vec)
-    #         if cached is not None:
-    #             score = cached
-    #             print(f"[CACHE HIT] litmus={litmus}, score={score:.4f}")
-    #         else:
-    #             # assert False
-    #             print(f"[CHIP RUN] litmus={litmus}, params={params.to_dict()}")
-    #             log_path, score = get_score(f"{litmus_path}/{litmus}.litmus", params, mode=self.mode)
-    #             if log_path is None:
-    #                 self.logger.warning(
-    #                     f"[ERROR] litmus={litmus}, params={param_vec}, err=error"
-    #                 )
-    #                 self.error_cache.add(
-    #                     litmus,
-    #                     param_vec,
-    #                     error_type="runtime_error",
-    #                     error_msg="error",
-    #                 )
-    #                 continue
-    #             self.cache.add(litmus, param_vec, score)
-    #
-    #         self.logger.info(f"Score {litmus} is: {score}")
-    #
-    #         # 回传给 BO
-    #         self.bo.add(litmus, param_vec, score)
-    #         self.bo.litmus_run_count[litmus] += 1
-    #
-    #         self.total_runs += 1
-    #         self.results.append((litmus, params, score))
-    #
-    #         print(
-    #             f"[DONE] score={score:.4f}, "
-    #             f"best[{litmus}]={self.bo.max_litmus_score[litmus]:.4f}"
-    #         )
-    #         if not self.cold_init:
-    #             self.bo.self_check(param_vec+self.bo.litmus_to_vector_dict[litmus],score)
-    #     return self.results
-
 
 
 
@@ -650,6 +604,8 @@ stat_log = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.
 dir_path = "/home/whq/Desktop/code_list/perple_test/bayes_log"
 log_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_stat_bayes.csv"
 litmus_vec_path="/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector.log"
+can_perple_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/can_perple.log"
+perple_dict_path = "/home/whq/Desktop/code_list/perple_test/perple_json"
 
 # litmus_path = "/home/software/桌面/bayes/perple_test_riscv/all_allow_litmus_C910_naive"
 # stat_log = "/home/software/桌面/bayes/perple_test_riscv/bayes_stat/log_record_bayes.log"
@@ -685,6 +641,8 @@ if __name__ == "__main__":
         litmus_list,
         param_space,
         stat_log,
+        can_perple_path,
+        perple_dict_path,
         pipeline_host=host,
         pipeline_user=username,
         pipeline_pass=password,

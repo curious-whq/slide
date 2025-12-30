@@ -46,7 +46,7 @@ def process_litmus_file(input_file, output_file):
 
 stat_log_base = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log"
 litmus_vec_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector.log"
-input_filename = stat_log_base + ".cache_sum.jsonl"
-output_filename = stat_log_base + ".cache_sum_sort.jsonl"  # 输出的新文件名
+input_filename = stat_log_base + ".cache_sum_70_no.jsonl"
+output_filename = stat_log_base + ".cache_sum_70_no_sort.jsonl"  # 输出的新文件名
 if __name__ == "__main__":
     process_litmus_file(input_filename, output_filename)

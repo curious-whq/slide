@@ -35,10 +35,10 @@ thread_list = ["std", "detached", "cached"] # default std
 launch_list = ["changing", "fixed"] # default changing
 affinity_list = ["none", "random", "incr1", "incr2", "incr3"]
 noalign_list = ["none", "all"] # default changing
-stride_list = [1]
+stride_list = [1, 31, 133]
 def to_dict_by_vector(vec):
     # [mem, barrier, alloc, detached, thread, launch, affinity, stride, contiguous, noalign, perple]
-    # [0,    2,       0,        1,       0,      1,      0,       0,       1,           1,     0]
+    # [0,    2,       0,        0,       0,      0,     2,       0,       0,           0,     0]
     attr_dict = {}
     attr_dict["mem"] = mem_list[vec[0]]
     attr_dict["barrier"] = barrier_list[vec[1]]
