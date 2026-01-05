@@ -4,18 +4,21 @@ import os
 import random
 import time
 from collections import defaultdict
-from xgboost import XGBRegressor
-from scipy.stats import norm, spearmanr
 
-# 引入评估指标
+# === 引入 GPyTorch 和 PyTorch ===
+import torch
+import gpytorch
+from torch.utils.data import TensorDataset, DataLoader
+
+# 引入评估指标和工具
+from sklearn.preprocessing import StandardScaler
+from scipy.stats import spearmanr
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 from src.slide.bayes.litmus_param_space import LitmusParamSpace
 from src.slide.bayes.logger_util import setup_logger, get_logger
 from src.slide.bayes.util import get_files
 
-import torch
-from sklearn.ensemble import RandomForestRegressor
 import numpy as np
 
 SEED = 2025
@@ -47,30 +50,45 @@ class ResultCache:
         pass
 
 
-class RandomForestBO:
-    def __init__(self, param_space: LitmusParamSpace, litmus_list, n_estimators=200,
+# ================= GPyTorch 模型定义 =================
+# 使用稀疏变分高斯过程 (SVGP) 来处理大数据量
+class SparseGPModel(gpytorch.models.ApproximateGP):
+    def __init__(self, inducing_points):
+        variational_distribution = gpytorch.variational.CholeskyVariationalDistribution(inducing_points.size(0))
+        variational_strategy = gpytorch.variational.VariationalStrategy(
+            self, inducing_points, variational_distribution, learn_inducing_locations=True
+        )
+        super(SparseGPModel, self).__init__(variational_strategy)
+        self.mean_module = gpytorch.means.ConstantMean()
+        self.covar_module = gpytorch.kernels.ScaleKernel(
+            gpytorch.kernels.MaternKernel(nu=2.5)
+        )
+
+    def forward(self, x):
+        mean_x = self.mean_module(x)
+        covar_x = self.covar_module(x)
+        return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
+
+
+class GPyTorchBO:
+    def __init__(self, param_space: LitmusParamSpace, litmus_list,
                  litmus_vec_path="/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector.log"):
         self.ps = param_space
-        self.model = RandomForestRegressor(
-            n_estimators=n_estimators,
-            n_jobs=-1,  # 利用多核
-            max_features="sqrt",
-            min_samples_leaf=10,
-            random_state=SEED
-        )
-        # self.model = XGBRegressor(
-        #     n_estimators=n_estimators,
-        #     learning_rate=0.05,  # 学习率越低越稳，但需要更多 estimator
-        #     max_depth=6,  # 树深
-        #     subsample=0.8,  # 样本采样
-        #     colsample_bytree=0.8,  # 特征采样
-        #     n_jobs=-1,
-        #     random_state=SEED
-        # )
+        self.logger = get_logger(LOG_NAME)
+
+        # 自动检测设备
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.logger.info(f"Using Device: {self.device}")
+
         self.X = []
         self.y = []
         self.litmus_list = litmus_list
-        self.logger = get_logger(LOG_NAME)  # 获取 logger
+
+        # GP 对尺度非常敏感，必须使用 StandardScaler
+        self.scaler = StandardScaler()
+
+        self.model = None
+        self.likelihood = None
 
         # 加载向量
         self.litmus_to_vector_dict = self.load_litmus_vectors(litmus_vec_path)
@@ -94,20 +112,98 @@ class RandomForestBO:
         self.y.append(score)
 
     def fit(self):
-        self.logger.info(f"Start fitting...")
-        # ============ 关键修改 ============
-        # 使用 log1p (log(x+1)) 防止 x=0 报错，同时压缩数值
-        y_train_log = np.log1p(np.array(self.y))
-        self.model.fit(np.array(self.X), y_train_log)
+        num_data = len(self.X)
+        self.logger.info(f"Start fitting GPyTorch SVGP (N={num_data})...")
+
+        # 1. 数据预处理
+        X_arr = np.array(self.X)
+        y_arr = np.array(self.y)
+
+        # 特征标准化
+        self.X_scaled = self.scaler.fit_transform(X_arr)
+
+        # 目标值 Log 变换 (log1p)
+        y_train_log = np.log1p(y_arr)
+
+        # 转换为 Tensor 并移动到 GPU
+        train_x = torch.tensor(self.X_scaled, dtype=torch.float32).to(self.device)
+        train_y = torch.tensor(y_train_log, dtype=torch.float32).to(self.device)
+
+        # 2. 初始化诱导点 (Inducing Points)
+        # 从训练数据中随机采样 500 个点作为诱导点，这大大降低了计算复杂度
+        num_inducing = 500
+        if num_data > num_inducing:
+            # 随机选择索引
+            inducing_idx = torch.randperm(num_data)[:num_inducing]
+            inducing_points = train_x[inducing_idx].clone()
+        else:
+            inducing_points = train_x.clone()
+
+        # 3. 初始化模型和似然
+        self.model = SparseGPModel(inducing_points=inducing_points).to(self.device)
+        self.likelihood = gpytorch.likelihoods.GaussianLikelihood().to(self.device)
+
+        # 4. 训练循环
+        self.model.train()
+        self.likelihood.train()
+
+        # 优化器
+        optimizer = torch.optim.Adam([
+            {'params': self.model.parameters()},
+            {'params': self.likelihood.parameters()},
+        ], lr=0.01)
+
+        # 损失函数 (Variational ELBO)
+        mll = gpytorch.mlls.VariationalELBO(self.likelihood, self.model, num_data=train_y.size(0))
+
+        # DataLoader 用于批量训练
+        train_dataset = TensorDataset(train_x, train_y)
+        train_loader = DataLoader(train_dataset, batch_size=1024, shuffle=True)
+
+        epochs = 60  # 针对50000数据，50-60轮通常足够收敛
+        start_time = time.time()
+
+        for i in range(epochs):
+            total_loss = 0
+            for x_batch, y_batch in train_loader:
+                optimizer.zero_grad()
+                output = self.model(x_batch)
+                loss = -mll(output, y_batch)
+                loss.backward()
+                optimizer.step()
+                total_loss += loss.item()
+
+            # 每 10 轮打印一次 Log
+            if (i + 1) % 10 == 0:
+                avg_loss = total_loss / len(train_loader)
+                self.logger.info(f"Epoch {i + 1}/{epochs} - Loss: {avg_loss:.4f}")
+
+        elapsed = time.time() - start_time
+        self.logger.info(f"GPyTorch Fitting done. Time: {elapsed:.2f}s")
 
     def predict_one(self, litmus_name, param_vec):
+        if self.model is None: return 0.0
         if litmus_name not in self.litmus_to_vector_dict:
             return None
+
         litmus_vec = self.litmus_to_vector_dict[litmus_name]
         feature = list(param_vec) + list(litmus_vec)
-        pred_log = self.model.predict([feature])[0]
-        # ============ 关键修改 ============
-        # 还原回去：exp(x) - 1
+
+        # 1. 预处理
+        # 必须先 scaler transform，再转 tensor
+        feature_scaled = self.scaler.transform(np.array([feature]))
+        test_x = torch.tensor(feature_scaled, dtype=torch.float32).to(self.device)
+
+        # 2. 预测模式
+        self.model.eval()
+        self.likelihood.eval()
+
+        with torch.no_grad():
+            preds = self.model(test_x)
+            # 获取均值 (Log 域)
+            pred_log = preds.mean.cpu().numpy()[0]
+
+        # 3. 还原回去：exp(x) - 1
         return np.expm1(pred_log)
 
 
@@ -116,35 +212,37 @@ class RandomForestBO:
 # 配置路径
 litmus_path = "/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_naive"
 stat_log_base = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log"
-litmus_vec_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector4_dnn_gt0.log"
+litmus_vec_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector4_two_tower_gt0.log"
 cache_file_path = stat_log_base + ".cache_sum_70_no_norm_for_graph.jsonl"
 
 if __name__ == "__main__":
     # 1. Setup Logger
     random.seed(SEED)
     np.random.seed(SEED)
+    torch.manual_seed(SEED)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(SEED)
 
     # 日志文件命名
-    log_file_name = f"{stat_log_base}.check.run.log"
+    log_file_name = f"{stat_log_base}.gpytorch_run.log"
     logger = setup_logger(
         log_file=log_file_name,
         level=logging.INFO,
         name=LOG_NAME,
         stdout=True
     )
-    logger.info(f"=== Start Evaluation Run | Seed={SEED} ===")
+    logger.info(f"=== Start Evaluation Run (GPyTorch SVGP) | Seed={SEED} ===")
 
     # 2. 读取 Litmus List
     logger.info("Reading litmus file list...")
     full_litmus_list = get_files(litmus_path)
     litmus_names = [path.split("/")[-1][:-7] for path in full_litmus_list]
 
-    # 3. 初始化 BO
+    # 3. 初始化 BO (使用 GPyTorchBO)
     param_space = LitmusParamSpace()
-    bo = RandomForestBO(
+    bo = GPyTorchBO(
         param_space,
         litmus_names,
-        n_estimators=200,
         litmus_vec_path=litmus_vec_path
     )
 
@@ -166,12 +264,9 @@ if __name__ == "__main__":
     total_count = len(all_data)
     logger.info(f"Total records loaded: {total_count}")
 
-    if total_count <= 10000:
-        logger.warning("Data size <= 7000, splitting might be invalid based on request.")
-
     # 5. 切分数据
     random.shuffle(all_data)
-    train_size = int(len(all_data)*0.7)
+    train_size = int(len(all_data) * 0.7)
     train_data = all_data[:train_size]
     test_data = all_data[train_size:]
     logger.info(f"Train size: {len(train_data)}")
@@ -182,34 +277,29 @@ if __name__ == "__main__":
     for item in train_data:
         bo.add(item["litmus"], item["param"], item["score"])
 
+    # 这里会调用 GPyTorch 的 Fit 流程
     bo.fit()
-
-    # ... (前面的代码不变) ...
 
     # =========================================================
     # 7. 评估逻辑：Per-Litmus Top-1 Accuracy
     # =========================================================
     logger.info("Evaluating on test set (Per-Litmus Ranking Check)...")
 
-    # 1. 将测试数据按 Litmus 名称分组
-    # 结构: groups[litmus_name] = [ {'param':..., 'actual':..., 'pred':...}, ... ]
     groups = defaultdict(list)
-
-    # 临时列表用于计算整体指标
     y_true_all = []
     y_pred_all = []
 
-    # 遍历测试集进行预测并分组
+    # 计时评估过程
+    eval_start = time.time()
+
     for idx, item in enumerate(test_data):
         litmus = item["litmus"]
         param = item["param"]
         score = item["score"]
 
-        # 预测
         pred = bo.predict_one(litmus, param)
 
         if pred is not None:
-            # 记录用于后续统计
             record = {
                 'param': param,
                 'actual': score,
@@ -219,13 +309,20 @@ if __name__ == "__main__":
 
             y_true_all.append(score)
             y_pred_all.append(pred)
+
+            # 打印进度
+            if (idx + 1) % 1000 == 0:
+                logger.info(f"Predicted {idx + 1}/{len(test_data)}...")
         else:
             logger.warning(f"[SKIP] #{idx} {litmus} (Missing vector)")
 
-    # 2. 开始针对每个 Litmus Test 进行统计
-    total_litmus_cnt = 0  # 有效的 Litmus 文件数 (样本数>1)
-    top1_match_cnt = 0  # 预测第一名 = 真实第一名 的次数
-    top3_match_cnt = 0  # 真实第一名 在 预测前三名里 的次数
+    eval_elapsed = time.time() - eval_start
+    logger.info(f"Evaluation prediction finished in {eval_elapsed:.2f}s")
+
+    # 统计逻辑保持不变
+    total_litmus_cnt = 0
+    top1_match_cnt = 0
+    top3_match_cnt = 0
 
     logger.info("=" * 60)
     logger.info(
@@ -233,28 +330,22 @@ if __name__ == "__main__":
     logger.info("-" * 60)
 
     for litmus, records in groups.items():
-        # 如果测试集里这个文件只有1条数据，那就没法比大小，跳过
         if len(records) < 2:
             continue
 
         total_litmus_cnt += 1
 
-        # A. 找出【真实】分数最高的记录 (可能有多个并列最高，取第一个即可，或者逻辑上只要分数达到最高就算对)
-        # 按 actual 从大到小排序
         records_sorted_by_actual = sorted(records, key=lambda x: x['actual'], reverse=True)
         best_actual_record = records_sorted_by_actual[0]
-        max_actual_score = best_actual_record['actual']  # 真实能跑到的最高分
+        max_actual_score = best_actual_record['actual']
 
-        # B. 找出【模型预测】分数最高的记录
-        # 按 pred 从大到小排序
         records_sorted_by_pred = sorted(records, key=lambda x: x['pred'], reverse=True)
-        best_pred_record = records_sorted_by_pred[0]  # 模型推荐去跑这个
+        best_pred_record = records_sorted_by_pred[0]
+
         if max_actual_score == 1:
             total_litmus_cnt -= 1
             continue
-        # C. 判定 Top-1 是否命中
-        # 判定标准：模型推荐的那个参数，它的【真实分数】是否等于【该组数据的最大真实分数】
-        # (这样可以兼容有多个参数并列第一的情况)
+
         is_top1_correct = (best_pred_record['actual'] >= max_actual_score)
 
         if is_top1_correct:
@@ -263,75 +354,56 @@ if __name__ == "__main__":
         else:
             match_str = "NO"
 
-        # D. 判定 Top-3 是否命中 (容错)
-        # 看看真实最高分的那个参数，是否出现在了模型预测列表的前3名里
-        # 注意：这里我们要找“真实最好的那个参数”是否被模型排到了前三
-        # 简化逻辑：模型推荐的前三个里，有没有一个能达到真实最高分的？
         top3_preds = records_sorted_by_pred[:3]
         is_top3_correct = any(r['actual'] >= max_actual_score for r in top3_preds)
 
         if is_top3_correct:
             top3_match_cnt += 1
 
-        # 打印日志 (只打印前10个或者打印错误的，防止刷屏)
-        # 这里为了演示，打印所有有效组
         logger.info(
             f"{litmus[:30]:<30} | {len(records):<5} | {match_str:<12} | {max_actual_score:<10.2f} | {best_pred_record['actual']:<10.2f}")
 
-    # 3. 汇总结果
     if total_litmus_cnt > 0:
         top1_acc = top1_match_cnt / total_litmus_cnt
         top3_acc = top3_match_cnt / total_litmus_cnt
 
         logger.info("=" * 60)
-        logger.info("       PER-LITMUS RANKING RESULTS       ")
+        logger.info("       PER-LITMUS RANKING RESULTS (GPyTorch SVGP)       ")
         logger.info("=" * 60)
         logger.info(f"Total Unique Litmus Tests: {total_litmus_cnt}")
         logger.info(f"Top-1 Accuracy:          {top1_acc * 100:.2f}% ({top1_match_cnt}/{total_litmus_cnt})")
         logger.info(f"Top-3 Recall:            {top3_acc * 100:.2f}% ({top3_match_cnt}/{total_litmus_cnt})")
         logger.info("-" * 60)
 
-        # 也可以顺便算一下全局的 Rho，作为辅助
         y_true_all = np.array(y_true_all).reshape(-1)
         y_pred_all = np.array(y_pred_all).reshape(-1)
         res = spearmanr(y_true_all, y_pred_all)
         rho = res.statistic if hasattr(res, 'statistic') else res[0]
         logger.info(f"Global Spearman Rho:     {rho:.4f}")
 
-        # === 【新增代码】在这里计算并打印 R^2 ===
         r2 = r2_score(y_true_all, y_pred_all)
-        mae = mean_absolute_error(y_true_all, y_pred_all)  # 既然引入了也可以顺便打出来
+        mae = mean_absolute_error(y_true_all, y_pred_all)
         logger.info(f"Global R^2 Score:        {r2:.4f}")
         logger.info(f"Global MAE:              {mae:.4f}")
-        # ======================================
         logger.info("=" * 60)
 
     else:
         logger.warning("No litmus test groups with >1 samples found in test set.")
-    # ==========================================
-    # 计算更真实的指标：平均组内 Rho (Mean Per-Litmus Rho)
-    # ==========================================
-    per_litmus_rhos = []
 
+    per_litmus_rhos = []
     logger.info("-" * 60)
     logger.info("Calculating Per-Litmus Spearman Correlation...")
 
     for litmus, records in groups.items():
-        # 样本太少没法算相关性
         if len(records) < 3:
             continue
-
         y_true_local = [r['actual'] for r in records]
         y_pred_local = [r['pred'] for r in records]
 
-        # 如果所有真实值都一样（比如都是0），或者预测值都一样，相关性未定义
         if len(set(y_true_local)) <= 1 or len(set(y_pred_local)) <= 1:
             continue
 
-        # 计算单组的 Rho
         rho_local, _ = spearmanr(y_true_local, y_pred_local)
-
-        # 排除 NaN
         if not np.isnan(rho_local):
             per_litmus_rhos.append(rho_local)
 

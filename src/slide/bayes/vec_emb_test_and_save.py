@@ -249,6 +249,9 @@ class RandomForestBO:
         return np.expm1(pred_log)
 
 
+# ==========================================
+# 4. 训练与推理函数 (修改：返回模型和归一化参数)
+# ==========================================
 def run_train_and_inference(X_train, y_train, X_test, embedding_dim=16, epochs=500):
     """
     X_train: (N_train, 13) - 手工特征
@@ -318,14 +321,16 @@ def run_train_and_inference(X_train, y_train, X_test, embedding_dim=16, epochs=5
         _, emb_test = model(xv_tensor.to(device))
         emb_test = emb_test.cpu().numpy()
 
-    return emb_train, emb_test
-
+    # === 7. [重要] 返回模型和归一化参数 ===
+    return emb_train, emb_test, model, X_mean, X_std
 # 配置路径
 litmus_path = "/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_naive"
 stat_log_base = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log"
 litmus_vec_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector.log"
 cache_file_path = stat_log_base + ".cache_sum_70_no_norm_for_graph.jsonl"
 
+inference_input_file = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector_aligned.log" # 请修改为你的新文件路径
+inference_output_file = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector4_dnn.log"
 # ==========================================
 # 1. 辅助类 (用于加载 13维 向量)
 # ==========================================
@@ -348,6 +353,100 @@ class VectorLoader:
                         pass
         else:
             print(f"Error: Vector file not found at {vector_path}")
+
+
+# ==========================================
+# 6. [新增] 新文件推理函数
+# ==========================================
+def generate_embeddings_for_new_manual_files(
+        trained_model,
+        train_mean,
+        train_std,
+        input_file_path,
+        output_file_path
+):
+    """
+    读取新的 manual vector 文件 -> 归一化 -> 推理 -> 保存
+    输入文件格式假设与 litmus_vector.log 一致: "Name:[v1, v2...]"
+    """
+    print(f"\n>>> 开始处理新 Manual Feature 文件...")
+    print(f"Input: {input_file_path}")
+
+    if not os.path.exists(input_file_path):
+        print(f"Error: Input file not found {input_file_path}")
+        return
+
+    # 1. 读取并解析数据
+    names = []
+    vectors = []
+
+    with open(input_file_path, "r") as f:
+        for line in f:
+            line = line.strip()
+            if not line or ":" not in line: continue
+
+            # 分割 Name 和 Vector
+            name_part, vec_str = line.split(":", 1)
+            try:
+                # 安全解析列表字符串
+                vec = eval(vec_str)
+                if isinstance(vec, (list, tuple)):
+                    names.append(name_part.strip())
+                    vectors.append(list(vec))
+            except:
+                print(f"Warning: Failed to parse line for {name_part}")
+                pass
+
+    if not vectors:
+        print("No valid vectors found in input file.")
+        return
+
+    print(f"Parsed {len(names)} vectors.")
+
+    # 2. 转换为 Numpy 数组
+    X_new = np.array(vectors)
+
+    # 检查维度
+    if X_new.shape[1] != train_mean.shape[0]:
+        print(f"Error: Dimension mismatch. Train: {train_mean.shape[0]}, New: {X_new.shape[1]}")
+        return
+
+    # 3. 归一化 (使用训练集的参数)
+    print("Normalizing using training statistics...")
+    X_new_norm = (X_new - train_mean) / train_std
+
+    # 4. 模型推理
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    trained_model.eval()
+
+    # 转 Tensor
+    x_tensor = torch.FloatTensor(X_new_norm).to(device)
+
+    # 使用 DataLoader 避免一次性数据过大
+    dataset = TensorDataset(x_tensor)
+    loader = DataLoader(dataset, batch_size=64, shuffle=False)
+
+    all_embeddings = []
+    print("Running inference...")
+    with torch.no_grad():
+        for batch in loader:
+            b_x = batch[0]
+            _, emb = trained_model(b_x)
+            all_embeddings.append(emb.cpu().numpy())
+
+    final_embeddings = np.vstack(all_embeddings)
+
+    # 5. 保存结果
+    print(f"Saving results to {output_file_path} ...")
+    with open(output_file_path, "w") as f_out:
+        for i, name in enumerate(names):
+            vec = final_embeddings[i].tolist()
+            # 格式: Name:[1.0, 2.0, ...]
+            vec_str = json.dumps(vec)
+            f_out.write(f"{name}:{vec_str}\n")
+
+    print("Done.")
+
 
 if __name__ == "__main__":
     random.seed(SEED)
@@ -426,7 +525,7 @@ if __name__ == "__main__":
 
     # 7. 训练 DNN 映射
     print("\n>>> Training DNN to refine Manual Features...")
-    emb_train, emb_test = run_train_and_inference(
+    emb_train, emb_test, trained_model, train_mean, train_std = run_train_and_inference(
         X_train, y_train, X_test,
         embedding_dim=16,
         epochs=500
@@ -446,3 +545,11 @@ if __name__ == "__main__":
     test_res = {name: emb_test[i].tolist() for i, name in enumerate(test_names)}
     with open("test_set_embeddings_manual.json", "w") as f:
         json.dump(test_res, f, indent=4)
+
+    generate_embeddings_for_new_manual_files(
+        trained_model,
+        train_mean,
+        train_std,
+        inference_input_file,
+        inference_output_file
+    )

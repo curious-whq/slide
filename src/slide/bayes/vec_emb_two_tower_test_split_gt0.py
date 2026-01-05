@@ -41,7 +41,7 @@ class LitmusFeatureExtractor:
     def __init__(self, ngram_range=(1, 3)):
         self.vectorizer = CountVectorizer(
             ngram_range=ngram_range,
-            token_pattern=r'(?u)\b\w[\w.]+\b',
+            token_pattern=r'(?u)\b\w[\w.]*\b',
             lowercase=False,
             max_features=2000  # 限制一下维度，防止 OOM，通常前2000个最关键
         )
@@ -62,18 +62,34 @@ class LitmusFeatureExtractor:
         return parsed_data
 
     def fit_transform(self, litmus_name_list, raw_structure_dict):
-        corpus = []
+        corpus_segmented = []
         for name in litmus_name_list:
             if name in raw_structure_dict:
-                corpus.append(raw_structure_dict[name])
+                # 1. 先按 SEP 切分成多个线程的指令序列
+                threads = raw_structure_dict[name].split("SEP")
+                # 2. 将每个线程作为独立的文档加入语料库
+                corpus_segmented.extend(threads)
             else:
-                corpus.append("")  # 缺失填空
+                corpus_segmented.append("")
 
-        # 返回密集矩阵
-        X = self.vectorizer.fit_transform(corpus).toarray()
+        # 3. 训练词库（此时 vectorizer 永远看不到跨线程的组合）
+        self.vectorizer.fit(corpus_segmented)
         self.feature_names = self.vectorizer.get_feature_names_out()
-        print(f"N-gram Feature Dim: {X.shape[1]}")
-        return X
+
+        # 4. 转换时，需要把同一个 litmus 程序的多个线程特征累加起来
+        final_X = []
+        for name in litmus_name_list:
+            if name in raw_structure_dict:
+                threads = raw_structure_dict[name].split("SEP")
+                # 提取该程序下所有线程的特征并求和
+                thread_vectors = self.vectorizer.transform(threads).toarray()
+                # sample_vector = thread_vectors.sum(axis=0)
+                sample_vector = np.prod(thread_vectors + 1, axis=0)
+                final_X.append(sample_vector)
+            else:
+                final_X.append(np.zeros(len(self.feature_names)))
+        print(np.array(final_X).shape)
+        return np.array(final_X)
 
 
 # ==========================================
@@ -337,7 +353,7 @@ def train_hybrid_model(graph_data_list, target_performances, num_relations, ngra
             _, emb = model(batch)
             all_embeddings.append(emb.cpu().numpy())
 
-    return np.vstack(all_embeddings)
+    return np.vstack(all_embeddings), model
 
 
 # ==========================================
@@ -357,10 +373,10 @@ def analyze_embedding_quality(embeddings, performances, method_name="My Embeddin
 # Main
 # ==========================================
 # 路径配置
-graph_json_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector2.jsonl"
+graph_json_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector2_gt0.jsonl"
 stat_log_base = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log"
-cache_file_path = stat_log_base + ".cache_sum_70_no_norm_for_graph.jsonl"
-litmus_cycle_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector3.log"  # 存放原始文本的文件
+cache_file_path = stat_log_base + ".cache_sum_70_no_norm_gt_0_for_graph.jsonl"
+litmus_cycle_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector3_gt0.log"  # 存放原始文本的文件
 
 # ==========================================
 # 完整集成版 Main
@@ -445,7 +461,7 @@ if __name__ == "__main__":
 
     # 7. 训练模型 (仅使用训练集)
     # 注意：这里的 target_performances 传入的是 train_perf
-    learned_train_emb = train_hybrid_model(
+    learned_train_emb, trained_model = train_hybrid_model(
         graph_data_list=train_graphs,
         target_performances=train_perf,
         num_relations=num_relations,
@@ -469,7 +485,7 @@ if __name__ == "__main__":
 
     # 这里演示如何直接获取测试集 Emb (通常建议修改 train_hybrid_model 返回 model)
     # 暂且为了代码完整性，我们重新跑一下 eval 逻辑:
-    def get_any_emb(model, data_list):
+    def get_any_emb(model, data_list, device):
         model.eval()
         loader = GeoDataLoader(data_list, batch_size=32, shuffle=False)
         all_e = []
@@ -488,7 +504,7 @@ if __name__ == "__main__":
     # learned_train_emb, trained_model = train_hybrid_model(...)
 
     # 如果不想改 train 函数，就在 train 函数内部把测试集逻辑加进去，如下：
-    learned_test_emb = []
+    learned_test_emb = get_any_emb(trained_model, test_graphs, device)
     # (此处建议在 train_hybrid_model 结尾处，对 test_graphs 同样做一次 model(batch) 并返回)
 
     # 9. 最终评估
@@ -501,7 +517,7 @@ if __name__ == "__main__":
     analyze_embedding_quality(learned_train_emb, train_perf, method_name="Train Set (Seen)")
 
     # 评估测试集 (需要你从训练函数拿回模型或在里面计算)
-    # analyze_embedding_quality(learned_test_emb, test_perf, method_name="Test Set (Unseen)")
+    analyze_embedding_quality(learned_test_emb, test_perf, method_name="Test Set (Unseen)")
     print("=" * 60)
 
     # 10. 保存测试集清单方便后续分析

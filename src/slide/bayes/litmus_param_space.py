@@ -1,3 +1,4 @@
+import itertools
 import random
 
 from src.slide.bayes.litmus_params import LitmusParams
@@ -126,3 +127,21 @@ class LitmusParamSpace:
             v = max(low, min(high, int(round(v))))
             clipped.append(v)
         return clipped
+
+    def get_all_combinations(self):
+        """
+        生成参数空间的全排列（笛卡尔积）。
+        返回一个列表，其中每个元素都是一个参数 list (vector)。
+        """
+        bounds = self.get_bounds()
+        # bounds.values() 返回的是 [(0,1), (0,6), ...]
+        # 我们需要把每个元组转成 range 对象： range(0, 2), range(0, 7)...
+        # 注意 range 的结束位需要 +1
+        ranges = [range(low, high + 1) for low, high in bounds.values()]
+
+        # 使用 itertools.product 生成笛卡尔积
+        # result 是一个迭代器，转成 list
+        all_vectors = list(itertools.product(*ranges))
+
+        # itertools.product 生成的是 tuple，为了保持和你之前 vector 一致，转成 list
+        return [list(vec) for vec in all_vectors]

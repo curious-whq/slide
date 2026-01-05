@@ -88,7 +88,7 @@ def process_log2_stream(log2_path, data1, output_path):
 
 file_path1 = '/home/whq/Desktop/code_list/perple_test/log_C910/log.txt'
 file_path2 = '/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log.cache_sum_70_no.jsonl'
-output_path = '/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log.cache_sum_70_no_norm.jsonl'
+output_path = '/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log.cache_sum_70_no_norm_gt_0.jsonl'
 
 try:
     # 1. 先把 Log1 全部读入内存做成字典

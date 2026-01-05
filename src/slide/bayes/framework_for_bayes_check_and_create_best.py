@@ -344,3 +344,97 @@ if __name__ == "__main__":
         logger.warning("Not enough data to calculate per-litmus Rho.")
 
     logger.info("=" * 60)
+
+    logger.info("=" * 60)
+    logger.info("STARTING EXHAUSTIVE SEARCH FOR BEST PARAMETERS")
+    logger.info("=" * 60)
+
+    # 1. 生成全量参数候选集 (约 20,160 个组合)
+    logger.info("Generating all possible parameter combinations...")
+    all_candidates = param_space.get_all_combinations()
+    logger.info(f"Total candidate combinations: {len(all_candidates)}")
+
+    # 2. 准备结果容器
+    # 格式: { "litmus_name": { "best_param": [...], "pred_score": 0.95 }, ... }
+    optimization_results = {}
+
+    # 3. 遍历所有 Litmus 文件进行预测
+    # 这里的 litmus_names 是你之前加载的所有测试用例列表
+    # 如果数量太多(比如几千个)，这一步可能需要几分钟
+
+    # 为了提升速度，我们将候选集转为 numpy array 一次，避免循环中重复转换
+    import numpy as np
+
+    # X_base_params: shape (N_candidates, 11)
+    X_base_params = np.array(all_candidates)
+
+    count = 0
+    total_tasks = len(litmus_names)
+
+    for litmus in litmus_names:
+        count += 1
+        if count % 100 == 0:
+            logger.info(f"Processing {count}/{total_tasks}...")
+
+        # 获取该 Litmus 对应的静态特征向量 (Litmus Vector)
+        if litmus not in bo.litmus_to_vector_dict:
+            logger.warning(f"Missing vector for {litmus}, skipping.")
+            continue
+
+        litmus_vec = bo.litmus_to_vector_dict[litmus]
+        # litmus_vec shape: (dim_vec, )
+
+        # --- 批量构造输入矩阵 ---
+        # 我们需要将 (1, dim_vec) 广播复制到 (N_candidates, dim_vec)
+        # 然后和 X_base_params 拼接
+
+        # 方法：利用 numpy 的广播机制或 tile
+        # 这里的 all_candidates 有 2万行，直接 python 循环拼 list 会慢，用 numpy 操作
+
+        # 构造 Litmus 特征矩阵: 形状 (N_candidates, len(litmus_vec))
+        # np.tile 会把向量重复 N 次
+        X_litmus_part = np.tile(litmus_vec, (len(X_base_params), 1))
+
+        # 拼接: [Params | LitmusVec]
+        # axis=1 表示横向拼接
+        X_batch = np.hstack([X_base_params, X_litmus_part])
+
+        # --- 批量预测 ---
+        # 模型输出的是 log1p 后的值
+        pred_logs = bo.model.predict(X_batch)
+
+        # --- 找最大值 ---
+        best_idx = np.argmax(pred_logs)
+        max_log_val = pred_logs[best_idx]
+
+        # 还原分数
+        best_score = np.expm1(max_log_val)
+        best_param_vec = all_candidates[best_idx]  # 从原始列表中取，保证格式纯净
+
+        # 记录结果
+        optimization_results[litmus] = {
+            "param": best_param_vec,
+            "pred_score": float(best_score)  # 转成 float 以便 json 序列化
+        }
+
+    # 4. 输出或保存结果
+    logger.info("=" * 60)
+    logger.info(f"Optimization Completed for {len(optimization_results)} files.")
+
+    # 保存到 JSON
+    output_file = "best_params_recommendation.json"
+    with open(output_file, "w") as f:
+        json.dump(optimization_results, f, indent=4)
+
+    logger.info(f"Results saved to {output_file}")
+
+    # 5. (可选) 打印几个示例看看
+    logger.info("Sample Recommendations:")
+    sample_keys = list(optimization_results.keys())[:5]
+    for k in sample_keys:
+        res = optimization_results[k]
+        # 把 param vector 转回人类可读的字典打印出来，方便检查
+        readable_param = param_space.vector_to_param_dict(res['param'])
+        logger.info(f"File: {k}")
+        logger.info(f"  -> Score: {res['pred_score']:.4f}")
+        logger.info(f"  -> Param: {readable_param}")

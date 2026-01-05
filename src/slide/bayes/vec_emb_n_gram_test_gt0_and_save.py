@@ -32,7 +32,91 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 import torch.nn.functional as F
+from sklearn.feature_extraction.text import CountVectorizer
+import re
 
+
+# ==========================================
+# 1. 特征提取 (修改：增加了 transform 方法)
+# ==========================================
+class LitmusFeatureExtractor:
+    def __init__(self, ngram_range=(1, 3)):
+        self.vectorizer = CountVectorizer(
+            ngram_range=ngram_range,
+            token_pattern=r'(?u)\b\w[\w.]*\b',
+            lowercase=False,
+            max_features=2000
+        )
+        self.feature_names = None
+
+    def parse_raw_lines(self, raw_lines):
+        parsed_data = {}
+        for line in raw_lines:
+            line = line.strip()
+            if not line: continue
+            if ":" in line:
+                parts = line.split(":", 1)
+                name = parts[0].strip()
+                body = parts[1].strip()
+                clean_body = body.replace("<SEP>", " SEP ")
+                clean_body = re.sub(r'\s+', ' ', clean_body).strip()
+                parsed_data[name] = clean_body
+        return parsed_data
+
+    def _prepare_corpus(self, litmus_name_list, raw_structure_dict):
+        """内部辅助函数：准备语料"""
+        corpus_segmented = []
+        for name in litmus_name_list:
+            if name in raw_structure_dict:
+                threads = raw_structure_dict[name].split("SEP")
+                corpus_segmented.extend(threads)
+            else:
+                corpus_segmented.append("")
+        return corpus_segmented
+
+    def _aggregate_vectors(self, litmus_name_list, raw_structure_dict, transformed_vectors):
+        """内部辅助函数：聚合线程向量"""
+        final_X = []
+        if hasattr(transformed_vectors, "toarray"):
+            transformed_vectors = transformed_vectors.toarray()
+
+        cursor = 0
+        for name in litmus_name_list:
+            if name in raw_structure_dict:
+                threads = raw_structure_dict[name].split("SEP")
+                num_threads = len(threads)
+                thread_vectors = transformed_vectors[cursor: cursor + num_threads]
+                # (Vec1 + 1) * (Vec2 + 1) ...
+                sample_vector = np.prod(thread_vectors + 1, axis=0)
+                final_X.append(sample_vector)
+                cursor += num_threads
+            else:
+                final_X.append(np.zeros(len(self.feature_names)))
+                cursor += 1
+        return np.array(final_X)
+
+    def fit_transform(self, litmus_name_list, raw_structure_dict):
+        # 1. 准备语料
+        corpus = self._prepare_corpus(litmus_name_list, raw_structure_dict)
+        # 2. 训练并转换
+        vecs = self.vectorizer.fit_transform(corpus)
+        self.feature_names = self.vectorizer.get_feature_names_out()
+        # 3. 聚合
+        return self._aggregate_vectors(litmus_name_list, raw_structure_dict, vecs)
+
+    def transform(self, litmus_name_list, raw_structure_dict):
+        """
+        [新增] 仅转换，不训练。用于推理新数据。
+        """
+        if self.feature_names is None:
+            raise ValueError("Vectorizer has not been fitted yet!")
+
+        # 1. 准备语料
+        corpus = self._prepare_corpus(litmus_name_list, raw_structure_dict)
+        # 2. 仅转换 (使用已有的词表)
+        vecs = self.vectorizer.transform(corpus)
+        # 3. 聚合
+        return self._aggregate_vectors(litmus_name_list, raw_structure_dict, vecs)
 
 # --- 自定义 Loss: 混合了数值误差和方向误差 ---
 class PearsonMSELoss(nn.Module):
@@ -251,43 +335,40 @@ class RandomForestBO:
 
 def run_train_and_inference(X_train, y_train, X_test, embedding_dim=16, epochs=500):
     """
-    X_train: (N_train, 13) - 手工特征
-    y_train: (N_train, 70) - 性能数据
-    X_test:  (N_test, 13)
+    X_train: (N_train, FeatDim)
+    y_train: (N_train, ParamDim)
+    X_test:  (N_test, FeatDim)
     """
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-    # === 1. 数据归一化 (防止泄漏) ===
-    # 仅使用训练集的均值和方差
+    # === 1. 数据归一化 (仅使用训练集统计量) ===
+    # 避免测试集信息泄露
     X_mean = X_train.mean(axis=0)
-    X_std = X_train.std(axis=0) + 1e-6  # 防止除零
+    X_std = X_train.std(axis=0) + 1e-6
 
     X_train_norm = (X_train - X_mean) / X_std
     X_test_norm = (X_test - X_mean) / X_std
 
-    # === 2. Log 变换 Performance ===
-    y_train_log = np.log1p(y_train)
-
-    # === 3. 转 Tensor ===
+    # === 2. 准备 Tensor ===
     xt_tensor = torch.FloatTensor(X_train_norm)
-    yt_tensor = torch.FloatTensor(y_train_log)
+    yt_tensor = torch.FloatTensor(np.log1p(y_train))  # Log1p 变换 Target
     xv_tensor = torch.FloatTensor(X_test_norm)
 
+    # DataLoader
     dataset = TensorDataset(xt_tensor, yt_tensor)
     dataloader = DataLoader(dataset, batch_size=64, shuffle=True)
 
-    # === 4. 初始化模型 ===
+    # === 3. 初始化模型 ===
     input_dim = X_train.shape[1]
     output_dim = y_train.shape[1]
 
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = LitmusEmbedder(input_dim, output_dim, embedding_dim).to(device)
-    optimizer = optim.Adam(model.parameters(), lr=0.002)
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
     criterion = PearsonMSELoss(alpha=0.7).to(device)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=20)
 
-    print(f"\n>>> Start Training (Input:{input_dim} -> Emb:{embedding_dim})...")
+    print(f"\n>>> Start Training (Device: {device})...")
 
-    # === 5. 训练 ===
+    # === 4. 训练循环 ===
     model.train()
     for epoch in range(epochs):
         total_loss = 0
@@ -307,8 +388,8 @@ def run_train_and_inference(X_train, y_train, X_test, embedding_dim=16, epochs=5
         if (epoch + 1) % 50 == 0:
             print(f"Epoch [{epoch + 1}/{epochs}], Loss: {avg_loss:.5f}")
 
-    # === 6. 推理 ===
-    print(">>> Generating embeddings...")
+    # === 5. 推理 (生成 Embedding) ===
+    print(">>> Generating embeddings for Train and Test sets...")
     model.eval()
 
     with torch.no_grad():
@@ -318,36 +399,96 @@ def run_train_and_inference(X_train, y_train, X_test, embedding_dim=16, epochs=5
         _, emb_test = model(xv_tensor.to(device))
         emb_test = emb_test.cpu().numpy()
 
-    return emb_train, emb_test
+    # === 6. [重要] 返回模型和归一化参数，以便后续推理新数据 ===
+    return emb_train, emb_test, model, X_mean, X_std
+
+
+# ==========================================
+# 6. 新增：新数据推理与保存函数
+# ==========================================
+def generate_embeddings_for_new_files(
+        trained_model,
+        feature_extractor,
+        train_mean,
+        train_std,
+        new_text_path,
+        output_file_path
+):
+    """
+    使用训练好的模型和特征提取器，处理全新的文件并保存向量
+    """
+    print(f"\n>>> 开始处理新数据推理 (N-gram + DNN)...")
+    print(f"Text File: {new_text_path}")
+
+    if not os.path.exists(new_text_path):
+        print(f"Error: Text file not found {new_text_path}")
+        return
+
+    # 1. 读取新文件
+    with open(new_text_path, "r") as f:
+        raw_lines = f.readlines()
+
+    # 2. 解析结构
+    # parse_raw_lines 返回的是 dict {name: body}
+    new_structure_map = feature_extractor.parse_raw_lines(raw_lines)
+    new_names_list = sorted(list(new_structure_map.keys()))
+
+    if len(new_names_list) == 0:
+        print("No valid litmus tests found in new file.")
+        return
+
+    print(f"Found {len(new_names_list)} unique tests in new file.")
+
+    # 3. 提取特征 (Transform Only)
+    print("Extracting N-gram features (using trained vocabulary)...")
+    X_new_raw = feature_extractor.transform(new_names_list, new_structure_map)
+
+    # 4. 归一化 (关键！使用训练集的参数)
+    print("Normalizing data using training statistics...")
+    X_new_norm = (X_new_raw - train_mean) / train_std
+
+    # 5. 模型推理
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    trained_model.eval()
+
+    # 转 Tensor
+    x_tensor = torch.FloatTensor(X_new_norm).to(device)
+
+    # DataLoader 处理 (防止数据量大爆显存)
+    dataset = TensorDataset(x_tensor)
+    loader = DataLoader(dataset, batch_size=64, shuffle=False)
+
+    all_embeddings = []
+    print("Running DNN inference...")
+    with torch.no_grad():
+        for batch in loader:
+            b_x = batch[0]  # TensorDataset 返回 tuple
+            _, emb = trained_model(b_x)
+            all_embeddings.append(emb.cpu().numpy())
+
+    final_embeddings = np.vstack(all_embeddings)
+
+    # 6. 保存结果
+    print(f"Saving results to {output_file_path} ...")
+    with open(output_file_path, "w") as f_out:
+        for i, name in enumerate(new_names_list):
+            vec = final_embeddings[i].tolist()
+            # 格式化: Name:[1.0, 2.0, ...]
+            vec_str = json.dumps(vec)
+            f_out.write(f"{name}:{vec_str}\n")
+
+    print("Done.")
 
 # 配置路径
 litmus_path = "/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_naive"
 stat_log_base = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log"
 litmus_vec_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector.log"
-cache_file_path = stat_log_base + ".cache_sum_70_no_norm_for_graph.jsonl"
+cache_file_path = stat_log_base + ".cache_sum_70_no_norm_gt_0_for_graph.jsonl"
+litmus_cycle_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector3.log"
 
-# ==========================================
-# 1. 辅助类 (用于加载 13维 向量)
-# ==========================================
-class VectorLoader:
-    """
-    简化版的加载器，只负责读取 litmus_vector.log
-    """
-    def __init__(self, vector_path):
-        self.litmus_to_vec = {}
-        if os.path.exists(vector_path):
-            with open(vector_path, "r") as f:
-                for line in f:
-                    line = line.strip()
-                    if not line or ":" not in line: continue
-                    name, vec_str = line.split(":", 1)
-                    try:
-                        vec = eval(vec_str)
-                        self.litmus_to_vec[name] = list(vec)
-                    except:
-                        pass
-        else:
-            print(f"Error: Vector file not found at {vector_path}")
+
+inference_text_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector3_aligned.log" # 请修改为你的新文件路径
+inference_output_file = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector4_ngram_gt0.log"
 
 if __name__ == "__main__":
     random.seed(SEED)
@@ -355,7 +496,7 @@ if __name__ == "__main__":
     torch.manual_seed(SEED)
 
     logger = setup_logger(f"{stat_log_base}.check.run.log", level=logging.INFO, name=LOG_NAME, stdout=True)
-    logger.info(f"=== Start Manual-Feature Evaluation (Split) | Seed={SEED} ===")
+    logger.info(f"=== Start N-gram DNN Split Evaluation | Seed={SEED} ===")
 
     # 1. 加载 Performance 数据
     logger.info("Loading performance data...")
@@ -374,75 +515,84 @@ if __name__ == "__main__":
         exit(1)
 
     all_litmus_list = sorted(list(unique_names))
+    logger.info(f"Total Unique Litmus Tests: {len(all_litmus_list)}")
 
-    # 2. 【核心修改】划分数据集 (按名字)
+    # 2. 【核心修改】划分训练集和测试集 (按名字划分)
     train_names, test_names = train_test_split(all_litmus_list, test_size=0.20, random_state=SEED)
-    logger.info(f"Total Programs: {len(all_litmus_list)}")
-    logger.info(f"Train Set: {len(train_names)} | Test Set: {len(test_names)}")
+    for test_name in test_names:
+        print(test_name)
+    logger.info(f"Train Set Size: {len(train_names)}")
+    logger.info(f"Test Set Size:  {len(test_names)}")
 
-    # 3. 加载 13维 手工向量
-    vec_loader = VectorLoader(litmus_vec_path)
-    logger.info(f"Loaded {len(vec_loader.litmus_to_vec)} vectors from file.")
-
-    # 4. 构建全量矩阵
-    # 统一参数列索引
+    # 3. 建立全局索引和矩阵
+    # 参数列统一
     all_params = sorted(list(set([str(item["param"]) for item in all_raw_data])))
     param_dict = {p: i for i, p in enumerate(all_params)}
     litmus_dict = {name: i for i, name in enumerate(all_litmus_list)}
 
-    full_perf = np.zeros((len(all_litmus_list), len(all_params)))
-    full_feat = np.zeros((len(all_litmus_list), 13))  # 假设手工向量是13维
-
-    # 填充 Performance 矩阵
+    # 构建 Full Performance Matrix
+    full_performance = np.zeros((len(all_litmus_list), len(all_params)))
     for item in all_raw_data:
         l_idx = litmus_dict[item["litmus"]]
         p_idx = param_dict[str(item["param"])]
-        full_perf[l_idx][p_idx] = item["score"]
+        full_performance[l_idx][p_idx] = item["score"]
 
-    # 填充 Feature 矩阵
-    for name, idx in litmus_dict.items():
-        if name in vec_loader.litmus_to_vec:
-            full_feat[idx] = np.array(vec_loader.litmus_to_vec[name])
-        else:
-            # 如果缺失向量，保持为0或处理
-            pass
+    # 4. 提取 N-gram 特征 (对全量 Litmus 提取以保证维度对齐)
+    logger.info("Extracting N-gram features...")
+    if os.path.exists(litmus_cycle_path):
+        with open(litmus_cycle_path, "r") as f:
+            raw_lines = f.readlines()
+        feature_extractor = LitmusFeatureExtractor(ngram_range=(1, 3))
+        structure_map = feature_extractor.parse_raw_lines(raw_lines)
 
-    # 5. 切分矩阵
-    train_idx = [litmus_dict[n] for n in train_names]
-    test_idx = [litmus_dict[n] for n in test_names]
+        # 传入所有 Litmus 名字，确保顺序与 full_performance 一致
+        full_X_ngram = feature_extractor.fit_transform(all_litmus_list, structure_map)
+    else:
+        logger.error("Litmus text file missing!")
+        exit(1)
 
-    for test_name in test_names:
-        print(f"Testing {test_name}")
-    X_train = full_feat[train_idx]
-    y_train = full_perf[train_idx]
+    # 5. 根据名字划分数据矩阵
+    train_indices = [litmus_dict[n] for n in train_names]
+    test_indices = [litmus_dict[n] for n in test_names]
 
-    X_test = full_feat[test_idx]
-    y_test = full_perf[test_idx]
+    X_train = full_X_ngram[train_indices]
+    y_train = full_performance[train_indices]
 
-    # 6. (可选) 评估原始手工向量的 Baseline
-    print("\n------------------------------------------------")
-    print("【Baseline】原始手工特征 (13维) 直接计算距离：")
-    analyze_embedding_quality(X_test, y_test, method_name="Raw Manual Features (Test Set)")
-
-    # 7. 训练 DNN 映射
-    print("\n>>> Training DNN to refine Manual Features...")
-    emb_train, emb_test = run_train_and_inference(
+    X_test = full_X_ngram[test_indices]
+    y_test = full_performance[test_indices]
+    analyze_embedding_quality(X_train, y_train, method_name="Raw N-gram Features(Train)")
+    analyze_embedding_quality(X_test, y_test, method_name="Raw N-gram Features(Test)")
+    # 6. 运行训练和推理
+    logger.info("Training DNN with N-gram features...")
+    emb_train, emb_test, trained_model, train_mean, train_std = run_train_and_inference(
         X_train, y_train, X_test,
         embedding_dim=16,
         epochs=500
     )
 
-    # 8. 最终评估
+    # 7. 评估结果
     print("\n" + "=" * 60)
-    print("【手工特征 + DNN 模型评估报告】")
+    print("【N-gram + DNN 模型评估报告】")
     print("-" * 60)
 
+    # 评估训练集
     analyze_embedding_quality(emb_train, y_train, method_name="Train Set (Seen)")
+
+    # 评估测试集 (关键指标)
     analyze_embedding_quality(emb_test, y_test, method_name="Test Set (Unseen)")
 
     print("=" * 60)
 
-    # 9. 保存
-    test_res = {name: emb_test[i].tolist() for i, name in enumerate(test_names)}
-    with open("test_set_embeddings_manual.json", "w") as f:
-        json.dump(test_res, f, indent=4)
+    # 8. 保存测试集结果
+
+    NEW_TEXT_PATH = inference_text_path
+    OUTPUT_FILE = inference_output_file
+
+    generate_embeddings_for_new_files(
+        trained_model,
+        feature_extractor,
+        train_mean,
+        train_std,
+        NEW_TEXT_PATH,
+        OUTPUT_FILE
+    )

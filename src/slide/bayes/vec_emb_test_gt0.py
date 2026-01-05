@@ -324,7 +324,7 @@ def run_train_and_inference(X_train, y_train, X_test, embedding_dim=16, epochs=5
 litmus_path = "/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_naive"
 stat_log_base = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log"
 litmus_vec_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector.log"
-cache_file_path = stat_log_base + ".cache_sum_70_no_norm_for_graph.jsonl"
+cache_file_path = stat_log_base + ".cache_sum_70_no_norm_gt_0_for_graph.jsonl"
 
 # ==========================================
 # 1. 辅助类 (用于加载 13维 向量)
