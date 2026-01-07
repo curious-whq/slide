@@ -19,6 +19,19 @@ import numpy as np
 
 SEED = 2025
 LOG_NAME = "bayes"
+
+def load_litmus_dict(json_file_path):
+    """
+    读取生成的 JSON 文件并返回字典
+    """
+    if not os.path.exists(json_file_path):
+        print(f"错误: 文件不存在 {json_file_path}")
+        return {}
+
+    with open(json_file_path, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+
 class ResultCache:
     def __init__(self, path):
         self.path = path
@@ -320,6 +333,7 @@ class LitmusRunnerForBayes(LitmusRunner):
         stat_log,
         can_perple_path,
         perple_dict_path,
+        standard_path,
         mode="time",
         init_samples_per_litmus=3,
         bo_iters=10000,
@@ -330,6 +344,7 @@ class LitmusRunnerForBayes(LitmusRunner):
     ):
         super().__init__(litmus_list, [], stat_log, mode)
         self.can_perple_list = []
+        standard_dict = load_litmus_dict(standard_path)
         with open(can_perple_path, "r") as f:
             can_perple_list = f.readlines()
             for can_perple in can_perple_list:
@@ -577,6 +592,8 @@ log_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_stat_bayes.cs
 litmus_vec_path="/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector_gt0.log"
 can_perple_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/can_perple.log"
 perple_dict_path = "/home/whq/Desktop/code_list/perple_test/perple_json"
+standard_path = './log1_positive_scores.json'
+
 
 # litmus_path = "/home/software/桌面/bayes/perple_test_riscv/all_allow_litmus_C910_naive"
 # stat_log = "/home/software/桌面/bayes/perple_test_riscv/bayes_stat/log_record_bayes.log"
@@ -584,6 +601,9 @@ perple_dict_path = "/home/whq/Desktop/code_list/perple_test/perple_json"
 # log_path = "/home/software/桌面/bayes/perple_test_riscv/bayes_stat/log_stat_bayes.csv"
 # can_perple_path = "/home/software/桌面/bayes/perple_test_riscv/bayes_stat/can_perple.log"
 # litmus_vec_path="/home/software/桌面/bayes/perple_test_riscv/bayes_stat/litmus_vector_gt0.log"
+# perple_dict_path = "home/software/桌面/bayes/perple_test_riscv/perple_json"
+# standard_path = './log1_positive_scores.json'
+
 host = "192.168.226.168"  # 远程服务器地址
 # host = "10.42.0.131"
 port = 22  # SSH 端口
