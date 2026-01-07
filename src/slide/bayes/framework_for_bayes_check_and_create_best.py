@@ -55,7 +55,7 @@ class RandomForestBO:
             n_estimators=n_estimators,
             n_jobs=-1,  # 利用多核
             max_features="sqrt",
-            min_samples_leaf=10,
+            min_samples_leaf=1,
             random_state=SEED
         )
         # self.model = XGBRegressor(
@@ -110,14 +110,43 @@ class RandomForestBO:
         # 还原回去：exp(x) - 1
         return np.expm1(pred_log)
 
+    def predict_batch(self, litmus_list, param_list):
+        """
+        批量预测方法
+        :param litmus_list: list of litmus names
+        :param param_list: list of param vectors
+        :return: predictions array, valid_indices (因为有些litmus可能没有vector)
+        """
+        X_batch = []
+        valid_indices = []
+
+        # 1. 构建特征矩阵
+        for i, (litmus, param) in enumerate(zip(litmus_list, param_list)):
+            if litmus in self.litmus_to_vector_dict:
+                litmus_vec = self.litmus_to_vector_dict[litmus]
+                X_batch.append(list(param) + list(litmus_vec))
+                valid_indices.append(i)
+
+        if not X_batch:
+            return [], []
+
+        # 2. 批量预测 (一次性调用，速度极大提升)
+        # 注意: np.array(X_batch) 依然有开销，但比循环调用 predict 快得多
+        X_batch_np = np.array(X_batch)
+        pred_log = self.model.predict(X_batch_np)
+
+        # 3. 还原对数
+        preds = np.expm1(pred_log)
+
+        return preds, valid_indices
 
 # ================= 主程序 =================
 
 # 配置路径
 litmus_path = "/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_naive"
 stat_log_base = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log"
-litmus_vec_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector4_dnn_gt0.log"
-cache_file_path = stat_log_base + ".cache_sum_70_no_norm_for_graph.jsonl"
+litmus_vec_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector4_two_tower_gt0.log"
+cache_file_path = stat_log_base + ".cache_sum_70_no_norm_gt_0_for_graph.jsonl"
 
 if __name__ == "__main__":
     # 1. Setup Logger
@@ -184,43 +213,62 @@ if __name__ == "__main__":
 
     bo.fit()
 
-    # ... (前面的代码不变) ...
+    logger.info("Evaluating on test set (Batch Mode)...")
 
-    # =========================================================
-    # 7. 评估逻辑：Per-Litmus Top-1 Accuracy
-    # =========================================================
-    logger.info("Evaluating on test set (Per-Litmus Ranking Check)...")
+    # 准备批量数据
+    test_litmus_names = [item["litmus"] for item in test_data]
+    test_params = [item["param"] for item in test_data]
+    test_scores = [item["score"] for item in test_data]
 
-    # 1. 将测试数据按 Litmus 名称分组
-    # 结构: groups[litmus_name] = [ {'param':..., 'actual':..., 'pred':...}, ... ]
+    # 使用优化后的批量预测 (如果没有修改类，可以在这里手动构建 X)
+    # 这里为了不修改你的类定义太多，我们在外部手动构建 Batch
+
+    X_test = []
+    indices_keep = []  # 记录哪些数据是有效的（能找到 vector 的）
+
+    # 1. 快速构建特征 (这一步是纯 Python 列表操作，很快)
+    for i, (l_name, p_vec) in enumerate(zip(test_litmus_names, test_params)):
+        if l_name in bo.litmus_to_vector_dict:
+            vec = bo.litmus_to_vector_dict[l_name]
+            X_test.append(list(p_vec) + list(vec))
+            indices_keep.append(i)
+
+    logger.info(f"Batch prediction prepared. Valid samples: {len(X_test)}/{len(test_data)}")
+
+    # 2. 执行批量预测 (最关键的加速步骤)
+    if len(X_test) > 0:
+        # 转换为 numpy array
+        X_test_np = np.array(X_test)
+
+        t0 = time.time()
+        pred_log = bo.model.predict(X_test_np)  # 只有一次 Python-C 交互
+        preds = np.expm1(pred_log)
+        logger.info(f"Prediction finished in {time.time() - t0:.4f}s")
+    else:
+        preds = []
+
+    # 3. 将结果重新映射回 Groups 结构
     groups = defaultdict(list)
-
-    # 临时列表用于计算整体指标
     y_true_all = []
     y_pred_all = []
 
-    # 遍历测试集进行预测并分组
-    for idx, item in enumerate(test_data):
+    # 使用 indices_keep 将预测结果对应回原始数据
+    for ptr, original_idx in enumerate(indices_keep):
+        item = test_data[original_idx]
         litmus = item["litmus"]
         param = item["param"]
-        score = item["score"]
+        actual_score = item["score"]
+        pred_score = preds[ptr]
 
-        # 预测
-        pred = bo.predict_one(litmus, param)
+        record = {
+            'param': param,
+            'actual': actual_score,
+            'pred': pred_score
+        }
+        groups[litmus].append(record)
 
-        if pred is not None:
-            # 记录用于后续统计
-            record = {
-                'param': param,
-                'actual': score,
-                'pred': pred
-            }
-            groups[litmus].append(record)
-
-            y_true_all.append(score)
-            y_pred_all.append(pred)
-        else:
-            logger.warning(f"[SKIP] #{idx} {litmus} (Missing vector)")
+        y_true_all.append(actual_score)
+        y_pred_all.append(pred_score)
 
     # 2. 开始针对每个 Litmus Test 进行统计
     total_litmus_cnt = 0  # 有效的 Litmus 文件数 (样本数>1)
@@ -344,11 +392,6 @@ if __name__ == "__main__":
         logger.warning("Not enough data to calculate per-litmus Rho.")
 
     logger.info("=" * 60)
-
-    logger.info("=" * 60)
-    logger.info("STARTING EXHAUSTIVE SEARCH FOR BEST PARAMETERS")
-    logger.info("=" * 60)
-
     # 1. 生成全量参数候选集 (约 20,160 个组合)
     logger.info("Generating all possible parameter combinations...")
     all_candidates = param_space.get_all_combinations()
@@ -422,7 +465,7 @@ if __name__ == "__main__":
     logger.info(f"Optimization Completed for {len(optimization_results)} files.")
 
     # 保存到 JSON
-    output_file = "best_params_recommendation.json"
+    output_file = "best_params_recommendation2.json"
     with open(output_file, "w") as f:
         json.dump(optimization_results, f, indent=4)
 

@@ -89,20 +89,20 @@ def filter_performance_log(log_file_path, valid_names, output_path):
 # ================= 配置与运行 =================
 
 # 1. 你的性能日志文件 (文件1, 格式 {"litmus": ..., "score": ...})
-perf_log_file = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log.cache_sum_70_no_norm_gt_0.jsonl"
+perf_log_file = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log.cache_sum_70_no.jsonl"
 
 # 2. 你的图数据文件 (文件2, 格式 [{"name": ..., "edges": ...}])
 # 这里的路径应该是你之前过滤生成的那个 filtered_result.json 或者原始的 graph json
-graph_data_file = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector2_gt0.jsonl"
+graph_data_file = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector2.jsonl"
 
 # 3. 输出文件路径
-output_file = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log.cache_sum_70_no_norm_gt_0_for_graph.jsonl"
+output_file = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log.cache_sum_70_no_for_graph.jsonl"
 
 if __name__ == "__main__":
     if os.path.exists(perf_log_file) and os.path.exists(graph_data_file):
         # 第一步：建立白名单
         valid_name_set = load_valid_names_from_graph_file(graph_data_file)
-
+        print(len(valid_name_set))
         # 第二步：过滤日志
         filter_performance_log(perf_log_file, valid_name_set, output_file)
     else:

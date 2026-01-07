@@ -352,7 +352,7 @@ class LitmusPipeline:
                         try:
                             print(f"  -> Running {task.unique_id}...")
 
-                            cmd = f"{task.remote_exe_path} -s {task.run_time} > {task.remote_log_path} 2>&1"
+                            cmd = f"timeout 10s {task.remote_exe_path} -s {task.run_time} > {task.remote_log_path} 2>&1"
 
                             # 复用 ssh_client 执行命令
                             # 注意：这里会开启一个新的 Channel，但复用同一个 TCP 连接

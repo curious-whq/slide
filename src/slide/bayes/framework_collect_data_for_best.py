@@ -223,7 +223,7 @@ dir_path = "/home/software/桌面/bayes/perple_test_riscv/bayes_log"
 litmus_dir_path = '/home/software/桌面/bayes/perple_test_riscv/bayes'
 
 # 指向你刚才生成的 JSON 文件
-json_recommendation_path = "best_params_recommendation.json"
+json_recommendation_path = "best_params_recommendation1.json"
 
 # SSH 配置
 host = "10.42.0.131"

@@ -507,7 +507,7 @@ stat_log_base = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_b
 cache_file_path = stat_log_base + ".cache_sum_70_no_norm_gt_0_for_graph.jsonl"
 litmus_cycle_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector3.log"  # 存放原始文本的文件
 
-inference_graph_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector2.jsonl" # 请修改为你的新文件路径
+inference_graph_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector2_gt0.jsonl" # 请修改为你的新文件路径
 inference_text_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector3.log"     # 请修改为你的新文件路径
 inference_output_file = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector4_gt0.log"
 # ==========================================

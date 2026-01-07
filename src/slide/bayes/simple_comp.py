@@ -73,8 +73,10 @@ def compare_logs(log1_data, log2_data):
     count = 0
     details = []
     summary = []
-    zero = 0
+    zero1 = 0
+    zero2 = 0
     all_zero = 0
+    not_zero = 0
     not_pass = []
     times1 = 0
     times2 = 0
@@ -87,7 +89,7 @@ def compare_logs(log1_data, log2_data):
             # 严格大于
             if score1 == score2 and score1 == 0:
                 all_zero += 1
-            if score2 > score1:
+            elif score2 > score1:
                 count += 1
                 details.append({
                     "test": test_name,
@@ -98,15 +100,21 @@ def compare_logs(log1_data, log2_data):
                     summary.append(score2/score1)
                     times1 = times1 + 3 / score1
                     times2 = times2 + 3 / score2
+                    not_zero += 1
                 else:
-                    zero += 1
-            elif score1 > score2 and score2 != 0:
+                    zero1 += 1
+            elif score1 > score2 and score2 != 0 and score2 != -1:
                 not_pass.append((test_name, score1, score2))
-                times2 = times2 + 3 / score1
-                times1 = times1 + 3 / score1
-            elif score2 == score1 and score2 != 0:
                 times2 = times2 + 3 / score2
                 times1 = times1 + 3 / score1
+                not_zero += 1
+            elif score2 == score1 and score2 != 0 and score2 != -1:
+                times2 = times2 + 3 / score2
+                times1 = times1 + 3 / score1
+                not_zero += 1
+            elif score2 == -1 or score2 == 0:
+                not_zero += 1
+                zero2 += 1
     if summary:
 
         mean_val = sum(summary) / len(summary)
@@ -114,7 +122,7 @@ def compare_logs(log1_data, log2_data):
     else:
         mean_val = 0
         median_val = 0
-    return count, details, mean_val, median_val, zero, all_zero, not_pass, times1, times2
+    return count, details, mean_val, median_val, zero1, zero2, all_zero, not_zero, not_pass, times1, times2
 
 # ==========================================
 # 这里填入你的数据进行测试
@@ -125,7 +133,9 @@ def compare_logs(log1_data, log2_data):
 with open('/home/whq/Desktop/code_list/perple_test/log_C910/log.txt', 'r') as f:
     log1_raw = f.read()
 
-with open('/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log.cache_sum_70_no.jsonl', 'r') as f:
+# with open('/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log.cache_sum_70_no.jsonl', 'r') as f:
+with open('/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log.cache_for_best5.jsonl',
+              'r') as f:
     log2_raw = f.read()
 
 # 剩下的代码调用 parse_log1, parse_log2 和 compare_logs 保持不变
@@ -134,7 +144,7 @@ data1 = parse_log1(log1_raw)
 data2 = parse_log2(log2_raw)
 
 # 执行比较
-result_count, result_details, mean_val, median_val, zero, all_zero, not_pass, times1, times2 = compare_logs(data1, data2)
+result_count, result_details, mean_val, median_val, zero1, zero2, all_zero, not_zero, not_pass, times1, times2 = compare_logs(data1, data2)
 
 print(f"--- 解析结果 ---")
 print(f"Log1 数据: {json.dumps(data1, indent=2)}")
@@ -156,7 +166,9 @@ for litmus_name, score1, score2 in not_pass:
 print(f"result_count: {result_count}")
 print(f"mean_val: {mean_val}")
 print(f"median_val: {median_val}")
-print(f"zero: {zero}")
+print(f"zero1: {zero1}")
+print(f"zero2: {zero2}")
+print(f"not_zero: {not_zero}")
 print(f"all_zero: {all_zero}")
 print(f"times1:{times1}")
 print(f"times2:{times2}")

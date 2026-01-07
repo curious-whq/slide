@@ -136,12 +136,17 @@ class RandomForestBO:
         self.litmus_to_vector_dict = {}
         self.litmus_list = litmus_list
         self.litmus_run_count = defaultdict(int)
-        self.max_runs_per_litmus = 10
+        self.max_runs_per_litmus = 150
 
         # ===== 关键：加载 litmus 向量 =====
         self.litmus_to_vector_dict = self.load_litmus_vectors(litmus_vec_path)
 
         # ===== 一致性检查 =====
+        missing_vecs = [l for l in self.litmus_list if l not in self.litmus_to_vector_dict]
+
+        if missing_vecs:
+            # 过滤列表：只保留那些有向量的
+            self.litmus_list = [l for l in self.litmus_list if l in self.litmus_to_vector_dict]
         for l in self.litmus_to_vector_dict:
             if l not in self.litmus_list:
                 raise ValueError(f"Missing vector for litmus: {l}")
@@ -175,34 +180,6 @@ class RandomForestBO:
     def fit(self):
         self.model.fit(np.array(self.X), np.array(self.y))
 
-    # EI 计算
-    def compute_ei(self, candidate_vecs, litmus_name):
-        C = np.array(candidate_vecs)
-
-        preds = np.array([
-            est.predict(C) for est in self.model.estimators_
-        ])
-
-        mu = preds.mean(axis=0)
-        sigma = preds.std(axis=0)
-
-        eta = self.max_litmus_score.get(litmus_name, -np.inf)
-
-        ei = np.zeros_like(mu)
-
-        # -------- sigma > 0：标准 EI --------
-        mask = sigma > 1e-8
-        if np.any(mask):
-            z = (mu[mask] - eta) / sigma[mask]
-            ei[mask] = (
-                    (mu[mask] - eta) * norm.cdf(z)
-                    + sigma[mask] * norm.pdf(z)
-            )
-
-        # -------- sigma == 0：退化为 exploitation --------
-        ei[~mask] = np.maximum(mu[~mask] - eta, 0.0)
-        # self.logger.info(f"Compute EI {litmus_name} get {ei}")
-        return ei
 
     def compute_ucb(self, candidate_vecs, beta=1.5):
         C = np.array(candidate_vecs)
@@ -245,27 +222,20 @@ class RandomForestBO:
             litmus_vector = self.litmus_to_vector_dict[litmus]
 
             for _ in range(n_param):
-                p = self.ps.random_vector()
+                can_perple = True if litmus in self.can_perple_list else False
+
+                p = self.ps.random_vector(can_perple = can_perple)
                 candidates.append((litmus, list(p)+list(litmus_vector)))
 
 
         return candidates
 
 
-    def groupby_litmus(self, cands):
-        """
-        cands: List[(litmus_name, full_vec)]
-        return: Dict[litmus_name, List[full_vec]]
-        """
-        groups = defaultdict(list)
-        for litmus, vec in cands:
-            groups[litmus].append(vec)
-        return groups
 
     def select_batch_next(self, batch_size=8):
         """
         一次性选出 batch_size 个最有希望的候选点
-        限制：同一个 batch 内，同一个 litmus test 最多选一次（保证多样性）
+        优化：批量计算 UCB，避免在循环中多次调用模型预测
         """
         if len(self.X) == 0:
             return []
@@ -274,46 +244,52 @@ class RandomForestBO:
         self.fit()
 
         # 2. 生成大量候选点
-        # [关键修改]：为了凑够 batch_size 个不重复的 litmus，
-        # 我们采样的 litmus 数量必须 > batch_size。这里设为 batch_size * 2 比较稳妥。
-        # 如果可用的 litmus 总数少于 batch_size，sample_litmus 内部会自动处理上限。
         n_sample_litmus = max(batch_size * 2, 10)
-        cands = self.generate_candidates(n_litmus=n_sample_litmus, n_param=500)
+        # cands 结构: List[(litmus_name, full_vector)]
+        cands = self.generate_candidates(n_litmus=n_sample_litmus, n_param=1000)
 
-        # 3. 计算所有候选点的 EI
+        if not cands:
+            return []
+
+        # ================= [优化开始] =================
+        # 3. 批量计算 UCB (Batch Compute)
+        # 不再按 litmus 分组计算，而是提取所有向量一次性计算
+
+        # 提取所有向量 (N, D)
+        all_vecs = [item[1] for item in cands]
+        X_all = np.array(all_vecs)
+
+        # 一次性计算所有点的 UCB
+        # 注意：UCB 只需要向量和 beta，不需要 litmus 名称
+        # 之前代码传入 litmus 给了 beta 参数是错误的
+        all_ucb_scores = self.compute_ucb(X_all, beta=1.96)
+
+        # 4. 组装结果
         scored_candidates = []
+        for i, (litmus, vec) in enumerate(cands):
+            scored_candidates.append({
+                "litmus": litmus,
+                "vec": vec,
+                "ei": all_ucb_scores[i]  # 这里直接取对应的分数
+            })
+        # ================= [优化结束] =================
 
-        # 按 litmus 分组计算 EI
-        for litmus, vecs in self.groupby_litmus(cands).items():
-            X_arr = np.array(vecs)
-            ei_vals = self.compute_ei(X_arr, litmus)
-
-            for i, vec in enumerate(vecs):
-                scored_candidates.append({
-                    "litmus": litmus,
-                    "vec": vec,
-                    "ei": ei_vals[i]
-                })
-
-        # 4. 全局排序：按 EI 降序排列
+        # 5. 全局排序：按分数降序排列
         scored_candidates.sort(key=lambda x: x["ei"], reverse=True)
 
-        # 5. [关键修改] 去重选择 Top-K
+        # 6. 去重选择 Top-K
         best_batch = []
-        seen_litmus = set()  # 用于记录本轮已经选过的 litmus
+        seen_litmus = set()
 
         for item in scored_candidates:
-            # 如果凑够了就退出
             if len(best_batch) >= batch_size:
                 break
 
             litmus_name = item["litmus"]
 
-            # 如果这个 litmus 在本轮已经被选过了，直接跳过
             if litmus_name in seen_litmus:
                 continue
 
-            # 没选过 -> 加入 batch
             best_batch.append((litmus_name, item["vec"]))
             seen_litmus.add(litmus_name)
 
@@ -475,13 +451,7 @@ class LitmusRunnerForBayes(LitmusRunner):
         else:
             self.logger.warning("Cache is empty in memory! BO will start from scratch (Cold Start).")
 
-    def _initial_sample(self):
-        for litmus in self.litmus_list:
-            for _ in range(self.init_samples_per_litmus):
-                param_vec = self.ps.random_vector()
-                # params = self.ps.vector_to_params(param_vec)
 
-                yield litmus, param_vec
 
     def getNext(self):
         """
@@ -548,14 +518,15 @@ class LitmusRunnerForBayes(LitmusRunner):
                 continue
 
             # 算分
-            score = self._parse_log_to_score(log_path, litmus_name, task.params.has_perple, self.mode)
+            _, score = self._parse_log_to_score(log_path, litmus_name, task.params.has_perple, self.mode)
             self.logger.info(f"[FINISHED] {litmus_name} Score: {score:.4f}")
 
             # 存入数据 (Cache + BO)
-            self.bo.add(litmus_name, param_vec, score)
-            self.cache.add(litmus_name, param_vec, score)
-            self.bo.litmus_run_count[litmus_name] += 1
-            self.total_runs += 1
+            if score != -1:
+                self.bo.add(litmus_name, param_vec, score)
+                self.cache.add(litmus_name, param_vec, score)
+                self.bo.litmus_run_count[litmus_name] += 1
+                self.total_runs += 1
 
             # 加入缓冲区
             pending_results_buffer.append(score)
@@ -603,7 +574,7 @@ litmus_path = "/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_nai
 stat_log = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log"
 dir_path = "/home/whq/Desktop/code_list/perple_test/bayes_log"
 log_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_stat_bayes.csv"
-litmus_vec_path="/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector.log"
+litmus_vec_path="/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector_gt0.log"
 can_perple_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/can_perple.log"
 perple_dict_path = "/home/whq/Desktop/code_list/perple_test/perple_json"
 
@@ -611,7 +582,8 @@ perple_dict_path = "/home/whq/Desktop/code_list/perple_test/perple_json"
 # stat_log = "/home/software/桌面/bayes/perple_test_riscv/bayes_stat/log_record_bayes.log"
 # dir_path = "/home/software/桌面/bayes/perple_test_riscv/bayes_log"
 # log_path = "/home/software/桌面/bayes/perple_test_riscv/bayes_stat/log_stat_bayes.csv"
-# litmus_vec_path="/home/software/桌面/bayes/perple_test_riscv/bayes_stat/litmus_vector.log"
+# can_perple_path = "/home/software/桌面/bayes/perple_test_riscv/bayes_stat/can_perple.log"
+# litmus_vec_path="/home/software/桌面/bayes/perple_test_riscv/bayes_stat/litmus_vector_gt0.log"
 host = "192.168.226.168"  # 远程服务器地址
 # host = "10.42.0.131"
 port = 22  # SSH 端口
