@@ -599,9 +599,9 @@ standard_path = './log1_positive_scores.json'
 # stat_log = "/home/software/桌面/bayes/perple_test_riscv/bayes_stat/log_record_bayes.log"
 # dir_path = "/home/software/桌面/bayes/perple_test_riscv/bayes_log"
 # log_path = "/home/software/桌面/bayes/perple_test_riscv/bayes_stat/log_stat_bayes.csv"
-# can_perple_path = "/home/software/桌面/bayes/perple_test_riscv/bayes_stat/can_perple.log"
+# can_perple_path = "./can_perple.log"
 # litmus_vec_path="/home/software/桌面/bayes/perple_test_riscv/bayes_stat/litmus_vector_gt0.log"
-# perple_dict_path = "home/software/桌面/bayes/perple_test_riscv/perple_json"
+# perple_dict_path = "./perple_json"
 # standard_path = './log1_positive_scores.json'
 
 host = "192.168.226.168"  # 远程服务器地址
