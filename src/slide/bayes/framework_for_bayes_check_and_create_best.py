@@ -54,8 +54,7 @@ class RandomForestBO:
         self.model = RandomForestRegressor(
             n_estimators=n_estimators,
             n_jobs=-1,  # 利用多核
-            max_features="sqrt",
-            min_samples_leaf=1,
+            min_samples_leaf=3,
             random_state=SEED
         )
         # self.model = XGBRegressor(
@@ -146,7 +145,7 @@ class RandomForestBO:
 litmus_path = "/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_naive"
 stat_log_base = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log"
 litmus_vec_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector4_two_tower_gt0.log"
-cache_file_path = stat_log_base + ".cache_sum_70_no_norm_gt_0_for_graph.jsonl"
+cache_file_path = stat_log_base + ".cache4_norm.jsonl"
 
 if __name__ == "__main__":
     # 1. Setup Logger
@@ -465,7 +464,7 @@ if __name__ == "__main__":
     logger.info(f"Optimization Completed for {len(optimization_results)} files.")
 
     # 保存到 JSON
-    output_file = "best_params_recommendation2.json"
+    output_file = "best_params_recommendation_final.json"
     with open(output_file, "w") as f:
         json.dump(optimization_results, f, indent=4)
 

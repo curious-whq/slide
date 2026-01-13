@@ -80,6 +80,7 @@ def compare_logs(log1_data, log2_data):
     not_pass = []
     times1 = 0
     times2 = 0
+    exp = 0
     # 遍历 Log2 中所有的测试 (因为我们要找的是 Log2 > Log1)
     for test_name, score2 in log2_data.items():
         # 只有当 Log1 中也有这个测试时才比较
@@ -113,8 +114,11 @@ def compare_logs(log1_data, log2_data):
                 times1 = times1 + 3 / score1
                 not_zero += 1
             elif score2 == -1 or score2 == 0:
+                if score2 == -1:
+                    exp += 1
                 not_zero += 1
                 zero2 += 1
+                print("zero2", test_name)
     if summary:
 
         mean_val = sum(summary) / len(summary)
@@ -122,7 +126,7 @@ def compare_logs(log1_data, log2_data):
     else:
         mean_val = 0
         median_val = 0
-    return count, details, mean_val, median_val, zero1, zero2, all_zero, not_zero, not_pass, times1, times2
+    return count, details, mean_val, median_val, zero1, zero2, all_zero, not_zero, not_pass, times1, times2, exp
 
 # ==========================================
 # 这里填入你的数据进行测试
@@ -134,7 +138,7 @@ with open('/home/whq/Desktop/code_list/perple_test/log_C910/log.txt', 'r') as f:
     log1_raw = f.read()
 
 # with open('/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log.cache_sum_70_no.jsonl', 'r') as f:
-with open('/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log.cache_for_best5.jsonl',
+with open('/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log.cache_for_best9.jsonl',
               'r') as f:
     log2_raw = f.read()
 
@@ -144,7 +148,7 @@ data1 = parse_log1(log1_raw)
 data2 = parse_log2(log2_raw)
 
 # 执行比较
-result_count, result_details, mean_val, median_val, zero1, zero2, all_zero, not_zero, not_pass, times1, times2 = compare_logs(data1, data2)
+result_count, result_details, mean_val, median_val, zero1, zero2, all_zero, not_zero, not_pass, times1, times2, exp = compare_logs(data1, data2)
 
 print(f"--- 解析结果 ---")
 print(f"Log1 数据: {json.dumps(data1, indent=2)}")
@@ -173,3 +177,4 @@ print(f"all_zero: {all_zero}")
 print(f"times1:{times1}")
 print(f"times2:{times2}")
 print(f"times1/times2:{times1/times2}")
+print(f"exp:{exp}")

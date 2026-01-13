@@ -17,7 +17,9 @@ from src.slide.bayes.util import get_files
 import torch
 from sklearn.ensemble import RandomForestRegressor
 import numpy as np
-
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
 SEED = 2025
 LOG_NAME = "bayes_eval"
 
@@ -146,7 +148,295 @@ class RandomForestBO:
 litmus_path = "/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_naive"
 stat_log_base = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log"
 litmus_vec_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector4_two_tower_gt0.log"
-cache_file_path = stat_log_base + ".cache_sum_70_no_norm_gt_0_for_graph.jsonl"
+cache_file_path = stat_log_base + ".cache4_norm_filter_same.jsonl"
+
+
+def analyze_ranking_quality(groups_data, output_dir="./analysis_plots"):
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    regret_list = []
+    rank_of_best_list = []
+
+    # 用于绘图的数据
+    plot_data = []
+
+    for litmus, records in groups_data.items():
+        if len(records) < 2: continue
+
+        # 1. 找到真实的最优值 (Ground Truth Best)
+        records_sorted_by_actual = sorted(records, key=lambda x: x['actual'], reverse=True)
+        gt_best_val = records_sorted_by_actual[0]['actual']
+
+        if gt_best_val <= 0: continue  # 避免除零
+
+        # 2. 找到模型预测的 Top-1 对应的真实值
+        records_sorted_by_pred = sorted(records, key=lambda x: x['pred'], reverse=True)
+        model_pick_val = records_sorted_by_pred[0]['actual']  # 注意：这里取的是被选中那个参数的【真实分】
+
+        # 3. 计算 Regret (性能回撤)
+        # 含义：相比于上帝视角的最佳，模型选出的配置慢了百分之多少？
+        # 如果是分数越高越好：(Best - Pick) / Best
+        regret = (gt_best_val - model_pick_val) / gt_best_val
+        regret_list.append(regret)
+
+        # 4. 计算真实最优解在预测列表里的排名 (Rank of Best)
+        # 也就是：模型把真正的第一名排到了第几位？
+        # 找到真实最佳那个参数在 records_sorted_by_pred 中的索引
+        # (可能有多个并列第一，找到任意一个即可)
+        best_params_set = set()
+        for r in records:
+            if r['actual'] == gt_best_val:
+                best_params_set.add(tuple(r['param']))
+
+        rank = -1
+        for idx, r in enumerate(records_sorted_by_pred):
+            if tuple(r['param']) in best_params_set:
+                rank = idx + 1  # 排名从1开始
+                break
+
+        if rank != -1:
+            # 归一化排名 (因为有的测试用例有100个参数，有的只有10个)
+            normalized_rank = rank / len(records)
+            rank_of_best_list.append(normalized_rank)
+
+    # === 打印诊断报告 ===
+    print("\n" + "=" * 40)
+    print("      DEEP DIAGNOSIS REPORT      ")
+    print("=" * 40)
+
+    regret_arr = np.array(regret_list)
+    print(f"Total Groups Analyzed: {len(regret_list)}")
+    print(f"Mean Performance Regret: {np.mean(regret_arr) * 100:.2f}%")
+    print(f"Median Performance Regret: {np.median(regret_arr) * 100:.2f}%")
+    print(f"90th Percentile Regret: {np.percentile(regret_arr, 90) * 100:.2f}%")
+    print("-" * 40)
+    print(
+        f"Zero Regret (Perfect Match): {np.sum(regret_arr == 0)} / {len(regret_arr)} ({np.mean(regret_arr == 0) * 100:.2f}%)")
+    print(
+        f"Low Regret (<5% loss):       {np.sum(regret_arr < 0.05)} / {len(regret_arr)} ({np.mean(regret_arr < 0.05) * 100:.2f}%)")
+
+    # === 绘图 1: Regret 分布直方图 ===
+    plt.figure(figsize=(10, 6))
+    sns.histplot(regret_arr, bins=50, kde=True, color='salmon')
+    plt.title("Performance Regret Distribution\n(How much performance do we lose by trusting the model?)")
+    plt.xlabel("Regret (0.0 = Optimal, 0.1 = 10% worse than optimal)")
+    plt.ylabel("Count of Litmus Tests")
+    plt.axvline(0.05, color='green', linestyle='--', label='5% Threshold')
+    plt.legend()
+    plt.savefig(os.path.join(output_dir, "regret_distribution.png"))
+    print(f"Plot saved: {os.path.join(output_dir, 'regret_distribution.png')}")
+
+    # === 绘图 2: 真实最优值的排名位置 ===
+    plt.figure(figsize=(10, 6))
+    sns.ecdfplot(rank_of_best_list)
+    plt.title("Where is the Real Best hiding?\n(CDF of Normalized Rank)")
+    plt.xlabel("Normalized Rank (0.0 = Top of list, 1.0 = Bottom of list)")
+    plt.ylabel("Proportion of Litmus Tests")
+    plt.grid(True)
+    plt.savefig(os.path.join(output_dir, "rank_location_cdf.png"))
+    print(f"Plot saved: {os.path.join(output_dir, 'rank_location_cdf.png')}")
+
+
+def deep_error_analysis(groups_data, output_dir="./analysis_plots"):
+    logger.info("Starting Deep Error Analysis...")
+
+    # 准备数据容器
+    # 每个点代表一个 Litmus Test Group
+    group_stats = []
+
+    for litmus, records in groups_data.items():
+        if len(records) < 5: continue  # 样本太少不分析
+
+        y_true = np.array([r['actual'] for r in records])
+        y_pred = np.array([r['pred'] for r in records])
+
+        # 1. 组内真实分数的变异系数 (CV = Std / Mean)
+        # 用来衡量：这组数据本身是否具有区分度？
+        # 如果 CV 很小（比如 0.01），说明所有参数跑分都差不多，预测不准很正常。
+        cv = np.std(y_true) / (np.mean(y_true) + 1e-6)
+
+        # 2. 组内预测分数的极差 (Range)
+        # 用来衡量：模型认为参数对结果的影响有多大？
+        pred_range_rel = (np.max(y_pred) - np.min(y_pred)) / (np.mean(y_pred) + 1e-6)
+
+        # 3. Top-1 是否命中
+        best_actual = np.max(y_true)
+        best_pred_idx = np.argmax(y_pred)
+        is_hit = (records[best_pred_idx]['actual'] >= best_actual)
+
+        # 4. 真实最优值的预测排名 (Normalized Rank)
+        # 越小越好 (0.0 = 第一名, 1.0 = 最后一名)
+        # 找到真实 best 对应的 预测 rank
+        sorted_indices = np.argsort(y_pred)[::-1]  # 预测值从大到小
+        best_record_indices = [i for i, r in enumerate(records) if r['actual'] == best_actual]
+
+        # 在预测排名里找真实最优
+        ranks = []
+        for target_idx in best_record_indices:
+            # np.where 返回的是 tuple
+            r = np.where(sorted_indices == target_idx)[0][0]
+            ranks.append(r)
+
+        best_rank_norm = min(ranks) / len(records)
+
+        group_stats.append({
+            "litmus": litmus,
+            "cv": cv,
+            "pred_range_rel": pred_range_rel,
+            "is_hit": is_hit,
+            "best_rank_norm": best_rank_norm,
+            "mean_score": np.mean(y_true)
+        })
+
+    df = pd.DataFrame(group_stats)
+
+    # === 分析 1: 数据的区分度 vs 预测准确率 ===
+    # 理论上：区分度(CV)越大，模型越容易学到 Top-1
+    plt.figure(figsize=(10, 6))
+    sns.scatterplot(data=df, x='cv', y='best_rank_norm', hue='is_hit', alpha=0.6)
+    plt.title("Difficulty vs Performance\n(X: Data Variance, Y: Rank of Best (Lower is better))")
+    plt.xlabel("Coefficient of Variation (How different are the params?)")
+    plt.ylabel("Normalized Rank of True Best (0.0=Top1, 1.0=Last)")
+    plt.axvline(x=0.05, color='r', linestyle='--', label='Low Variance Zone')
+    plt.legend()
+    plt.savefig(os.path.join(output_dir, "diagnosis_variance_vs_rank.png"))
+
+    # === 分析 2: 模型是否躺平 (Model Collapse) ===
+    # 检查模型预测的差异范围 (Pred Range) 是否过小
+    plt.figure(figsize=(10, 6))
+    sns.scatterplot(data=df, x='pred_range_rel', y='best_rank_norm', hue='is_hit', alpha=0.6)
+    plt.title("Model Confidence vs Performance\n(X: Predicted Relative Range, Y: Rank Error)")
+    plt.xlabel("Predicted Range (Max_Pred - Min_Pred) / Mean")
+    plt.ylabel("Normalized Rank of True Best")
+    plt.savefig(os.path.join(output_dir, "diagnosis_collapse_check.png"))
+
+    # === 统计输出 ===
+    low_var_groups = df[df['cv'] < 0.02]  # 变异系数小于 2% 的组
+    high_var_groups = df[df['cv'] >= 0.05]  # 变异系数大于 5% 的组
+
+    print("\n" + "=" * 40)
+    print("      ROOT CAUSE DIAGNOSIS      ")
+    print("=" * 40)
+    print(f"1. Low Variance Groups (Hard to distinguish, CV < 0.02): {len(low_var_groups)}")
+    print(f"   -> Top-1 Accuracy: {low_var_groups['is_hit'].mean() * 100:.2f}%")
+    print(f"   -> Avg Rank Error: {low_var_groups['best_rank_norm'].mean():.4f}")
+
+    print(f"2. High Variance Groups (Should be easier, CV > 0.05): {len(high_var_groups)}")
+    print(f"   -> Top-1 Accuracy: {high_var_groups['is_hit'].mean() * 100:.2f}%")
+    print(f"   -> Avg Rank Error: {high_var_groups['best_rank_norm'].mean():.4f}")
+
+    print("-" * 40)
+    print("3. Model Boldness Check (Is model predicting flat lines?)")
+    flat_prediction_cnt = len(df[df['pred_range_rel'] < 0.01])
+    print(
+        f"   -> Groups where model predicts <1% difference between Best & Worst param: {flat_prediction_cnt} / {len(df)}")
+
+    if flat_prediction_cnt > len(df) * 0.5:
+        print("   >>> WARNING: MODEL COLLAPSE DETECTED. The model is ignoring parameters!")
+    else:
+        print("   >>> Model is responsive to parameters.")
+
+
+def analyze_topk_recall(groups_data, output_dir="./analysis_plots"):
+    logger.info("Calculating Top-K Recall Curve...")
+
+    # K 的取值点
+    k_values = [1, 3, 5, 10, 20, 30, 50]
+    hits = {k: 0 for k in k_values}
+    total_groups = 0
+
+    for litmus, records in groups_data.items():
+        if len(records) < 2: continue
+        total_groups += 1
+
+        # 1. 找到真实最优的分数
+        max_actual = max(r['actual'] for r in records)
+
+        # 2. 按模型预测排序
+        # 注意：这里假设 score 越大越好。如果是越小越好，请改为 reverse=False
+        sorted_by_pred = sorted(records, key=lambda x: x['pred'], reverse=True)
+
+        # 3. 检查 Top-K 是否包含真实最优
+        for k in k_values:
+            # 取出前 K 个候选
+            candidates = sorted_by_pred[:k]
+            # 只要有一个候选的实际分数等于真实最优，就算命中
+            # (注意：允许并列第一)
+            if any(c['actual'] >= max_actual for c in candidates):
+                hits[k] += 1
+
+    # === 输出统计 ===
+    print("\n" + "=" * 40)
+    print("      TOP-K RECALL ANALYSIS      ")
+    print("=" * 40)
+    print(f"Total Test Groups: {total_groups}")
+
+    recall_rates = []
+    for k in k_values:
+        rate = hits[k] / total_groups
+        recall_rates.append(rate)
+        print(f"Top-{k:<2} Recall: {rate * 100:.2f}%  (Hit: {hits[k]}/{total_groups})")
+
+    # === 绘图 ===
+    plt.figure(figsize=(10, 6))
+    plt.plot(k_values, recall_rates, marker='o', linewidth=2, color='dodgerblue')
+    plt.title("Top-K Recall Curve\n(Probability of finding the True Best within Top-K recommendations)")
+    plt.xlabel("K (Number of candidates to verify)")
+    plt.ylabel("Recall Rate (Probability)")
+    plt.grid(True, which='both', linestyle='--', alpha=0.7)
+    plt.yticks(np.arange(0, 1.1, 0.1))
+
+    # 标出 Top-10 的点
+    if 10 in k_values:
+        idx = k_values.index(10)
+        val = recall_rates[idx]
+        plt.annotate(f'{val * 100:.1f}%', (10, val), textcoords="offset points", xytext=(0, 10), ha='center')
+
+    save_path = os.path.join(output_dir, "topk_recall_curve.png")
+    plt.savefig(save_path)
+    print(f"Plot saved: {save_path}")
+    print("=" * 40)
+
+
+def analyze_missed_top3_regret(groups_data):
+    missed_regrets = []
+
+    for litmus, records in groups_data.items():
+        if len(records) < 2: continue
+
+        # 1. 真实最优
+        max_actual = max(r['actual'] for r in records)
+
+        # 2. 预测 Top-3
+        sorted_by_pred = sorted(records, key=lambda x: x['pred'], reverse=True)
+        top3_preds = sorted_by_pred[:3]
+
+        # 3. 检查是否命中
+        hit = any(r['actual'] >= max_actual for r in top3_preds)
+
+        if not hit:
+            # 如果没命中，计算 Top-3 里能找到的最好成绩
+            best_in_top3 = max(r['actual'] for r in top3_preds)
+            # 计算回撤：(真实最优 - Top3最优) / 真实最优
+            regret = (max_actual - best_in_top3) / max_actual
+            missed_regrets.append(regret)
+
+    print("\n" + "=" * 40)
+    print("      MISSED CASE ANALYSIS      ")
+    print("=" * 40)
+    if len(missed_regrets) > 0:
+        arr = np.array(missed_regrets)
+        print(f"Total Missed Groups: {len(arr)}")
+        print(f"Avg Performance Loss:    {np.mean(arr) * 100:.2f}%")
+        print(f"Median Performance Loss: {np.median(arr) * 100:.2f}%")
+        print(f"Max Performance Loss:    {np.max(arr) * 100:.2f}%")
+        print("-" * 40)
+        print(f"Loss < 1% (Good Enough): {np.mean(arr < 0.01) * 100:.2f}% of missed cases")
+        print(f"Loss < 5% (Acceptable):  {np.mean(arr < 0.05) * 100:.2f}% of missed cases")
+    else:
+        print("Amazing! Top-3 Recall is 100%!")
+    print("=" * 40)
 
 if __name__ == "__main__":
     # 1. Setup Logger
@@ -394,3 +684,8 @@ if __name__ == "__main__":
         logger.warning("Not enough data to calculate per-litmus Rho.")
 
     logger.info("=" * 60)
+    analyze_ranking_quality(groups)
+    deep_error_analysis(groups, output_dir="./analysis_plots")
+
+    analyze_topk_recall(groups, output_dir="./analysis_plots")
+    analyze_missed_top3_regret(groups)

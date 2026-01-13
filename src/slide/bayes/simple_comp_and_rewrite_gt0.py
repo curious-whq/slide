@@ -109,8 +109,8 @@ def process_log2_with_filter(log2_path, data1, output_path, skip_log_path):
 # 主程序入口
 # ==========================================
 file_path1 = '/home/whq/Desktop/code_list/perple_test/log_C910/log.txt'
-file_path2 = '/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log.cache_sum_70_no.jsonl'
-output_path = '/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log.cache_sum_70_no_norm_gt_0.jsonl'
+file_path2 = '/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log.cache4.jsonl'
+output_path = '/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log.cache4_norm.jsonl'
 skip_log_path = '/home/whq/Desktop/code_list/perple_test/bayes_stat/filtered_litmus_log.txt'
 
 try:

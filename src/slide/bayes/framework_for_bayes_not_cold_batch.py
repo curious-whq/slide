@@ -131,10 +131,10 @@ class ErrorCache:
         self.f.write(json.dumps(record) + "\n")
         self.f.flush()
 
+
 class RandomForestBO:
 
-    def __init__(self, param_space: LitmusParamSpace, litmus_list, litmus_vec_path, can_perple_list, n_estimators=200,
-                 ):
+    def __init__(self, param_space: LitmusParamSpace, litmus_list, litmus_vec_path, can_perple_list, n_estimators=200):
         self.ps = param_space
         self.can_perple_list = can_perple_list
         self.model = RandomForestRegressor(
@@ -151,51 +151,108 @@ class RandomForestBO:
         self.litmus_run_count = defaultdict(int)
         self.max_runs_per_litmus = 150
 
+        # 用于记录期望的特征总长度，第一次 add 时确定
+        self.expected_dim = None
+
         # ===== 关键：加载 litmus 向量 =====
         self.litmus_to_vector_dict = self.load_litmus_vectors(litmus_vec_path)
+
+        # ===== 新增：检查 litmus 向量长度一致性 =====
+        first_vec_len = None
+        for name, vec in self.litmus_to_vector_dict.items():
+            if first_vec_len is None:
+                first_vec_len = len(vec)
+            elif len(vec) != first_vec_len:
+                # 如果发现向量长度不一致，抛出异常并打印名字
+                raise ValueError(
+                    f"Litmus Vector dimension mismatch! '{name}' has len {len(vec)}, expected {first_vec_len}")
+
+        if first_vec_len:
+            print(f"[Check Pass] All litmus vectors have length: {first_vec_len}")
 
         # ===== 一致性检查 =====
         missing_vecs = [l for l in self.litmus_list if l not in self.litmus_to_vector_dict]
 
         if missing_vecs:
-            # 过滤列表：只保留那些有向量的
             self.litmus_list = [l for l in self.litmus_list if l in self.litmus_to_vector_dict]
+
         for l in self.litmus_to_vector_dict:
             if l not in self.litmus_list:
-                raise ValueError(f"Missing vector for litmus: {l}")
+                # 这里的逻辑稍微有点怪，通常不需要删 vector_dict 里的，不过照旧保留你的逻辑
+                # raise ValueError(f"Missing vector for litmus: {l}")
+                pass  # 建议去掉这个报错，vector_dict 多余没关系
 
         self.logger = get_logger(LOG_NAME)
 
     def load_litmus_vectors(self, path):
         litmus_to_vec = {}
-
         with open(path, "r") as f:
             for line in f:
                 line = line.strip()
                 if not line or ":" not in line:
                     continue
-
                 name, vec_str = line.split(":", 1)
-                vec = eval(vec_str)  # 你这个文件是可信的
-                litmus_to_vec[name] = list(vec)
-
+                try:
+                    vec = eval(vec_str)
+                    litmus_to_vec[name] = list(vec)
+                except:
+                    continue
         return litmus_to_vec
 
-    # 加入训练数据
+    # 加入训练数据 [修改版：增加长度检查]
     def add(self, litmus_name, param_vec, score):
         self.logger.info(f"Adding Train {litmus_name} with {param_vec} with score {score}")
+
         litmus_vec = self.litmus_to_vector_dict[litmus_name]
-        self.X.append(list(param_vec)+list(litmus_vec))
+        combined_feature = list(param_vec) + list(litmus_vec)
+        current_len = len(combined_feature)
+
+        # 1. 第一次添加数据，锁定维度
+        if self.expected_dim is None:
+            self.expected_dim = current_len
+            print(
+                f"[Init] Setting feature dimension to {self.expected_dim} (Param: {len(param_vec)}, Litmus: {len(litmus_vec)})")
+
+        # 2. 后续添加数据，检查维度
+        elif current_len != self.expected_dim:
+            self.logger.error(f"Dimension Mismatch! Expected {self.expected_dim}, got {current_len}")
+            self.logger.error(
+                f"Details -> Litmus: {litmus_name}, ParamLen: {len(param_vec)}, VecLen: {len(litmus_vec)}")
+            # 这里可以选择跳过，或者报错。为了防止 crash，我们选择跳过不加入
+            return
+
+        self.X.append(combined_feature)
         self.y.append(score)
-        self.max_litmus_score[litmus_name] = max(self.max_litmus_score.get(litmus_name,0), score)
+        self.max_litmus_score[litmus_name] = max(self.max_litmus_score.get(litmus_name, 0), score)
 
     # 训练 RF
     def fit(self):
-        self.model.fit(np.array(self.X), np.array(self.y))
+        # 再次防御性检查，防止 self.X 为空
+        if not self.X:
+            return
 
+        # 使用 try-except 捕获 numpy 转换错误，方便调试
+        try:
+            X_arr = np.array(self.X)
+            y_arr = np.array(self.y)
+            self.model.fit(X_arr, y_arr)
+        except ValueError as e:
+            self.logger.error(f"Numpy conversion failed: {e}")
+            # 打印前几个样本的长度进行调试
+            lengths = [len(x) for x in self.X[:5]]
+            self.logger.error(f"Lengths of first 5 samples: {lengths}")
+            raise e
 
     def compute_ucb(self, candidate_vecs, beta=1.5):
+        if len(candidate_vecs) == 0:
+            return []
+
         C = np.array(candidate_vecs)
+
+        # 确保候选集维度也是对的
+        if C.shape[1] != self.expected_dim:
+            # 如果候选集生成逻辑有问题，这里也可能报错
+            self.logger.warning(f"Candidate dimension mismatch. Model expects {self.expected_dim}, got {C.shape[1]}")
 
         preds = np.array([
             est.predict(C) for est in self.model.estimators_
@@ -206,124 +263,69 @@ class RandomForestBO:
 
         return mu + beta * sigma
 
+    # ... (其他方法 sample_litmus, generate_candidates 等保持不变) ...
+    # 注意：generate_candidates 里生成 candidate 时也需要保证 list(p) + list(litmus_vector) 长度正确
+
     def sample_litmus(self, n_litmus):
-        """
-        随机采样 litmus test（不超过最大运行次数）
-        """
-        # 1. 过滤掉已经跑满的 litmus
         available = [
             l for l in self.litmus_list
             if self.litmus_run_count[l] < self.max_runs_per_litmus
         ]
-
         if not available:
             return []
-
-        # 2. 随机采样（不放回）
         k = min(n_litmus, len(available))
-        sampled = random.sample(available, k)
+        return random.sample(available, k)
 
-        return sampled
-
-    # 候选生成
     def generate_candidates(self, n_litmus=5, n_param=200):
         candidates = []
-
         litmus_names = self.sample_litmus(n_litmus)
-
         for litmus in litmus_names:
             litmus_vector = self.litmus_to_vector_dict[litmus]
-
             for _ in range(n_param):
                 can_perple = True if litmus in self.can_perple_list else False
+                p = self.ps.random_vector(can_perple=can_perple)
 
-                p = self.ps.random_vector(can_perple = can_perple)
-                candidates.append((litmus, list(p)+list(litmus_vector)))
+                # 验证生成的候选点维度
+                full_vec = list(p) + list(litmus_vector)
+                if self.expected_dim and len(full_vec) != self.expected_dim:
+                    continue  # 跳过维度不对的候选点
 
-
+                candidates.append((litmus, full_vec))
         return candidates
 
-
-
     def select_batch_next(self, batch_size=8):
-        """
-        一次性选出 batch_size 个最有希望的候选点
-        优化：批量计算 UCB，避免在循环中多次调用模型预测
-        """
         if len(self.X) == 0:
             return []
-
-        # 1. 确保模型是最新的
         self.fit()
-
-        # 2. 生成大量候选点
         n_sample_litmus = max(batch_size * 2, 10)
-        # cands 结构: List[(litmus_name, full_vector)]
         cands = self.generate_candidates(n_litmus=n_sample_litmus, n_param=1000)
-
         if not cands:
             return []
 
-        # ================= [优化开始] =================
-        # 3. 批量计算 UCB (Batch Compute)
-        # 不再按 litmus 分组计算，而是提取所有向量一次性计算
-
-        # 提取所有向量 (N, D)
         all_vecs = [item[1] for item in cands]
         X_all = np.array(all_vecs)
-
-        # 一次性计算所有点的 UCB
-        # 注意：UCB 只需要向量和 beta，不需要 litmus 名称
-        # 之前代码传入 litmus 给了 beta 参数是错误的
         all_ucb_scores = self.compute_ucb(X_all, beta=1.96)
 
-        # 4. 组装结果
         scored_candidates = []
         for i, (litmus, vec) in enumerate(cands):
             scored_candidates.append({
                 "litmus": litmus,
                 "vec": vec,
-                "ei": all_ucb_scores[i]  # 这里直接取对应的分数
+                "ei": all_ucb_scores[i]
             })
-        # ================= [优化结束] =================
-
-        # 5. 全局排序：按分数降序排列
         scored_candidates.sort(key=lambda x: x["ei"], reverse=True)
-
-        # 6. 去重选择 Top-K
         best_batch = []
         seen_litmus = set()
-
         for item in scored_candidates:
             if len(best_batch) >= batch_size:
                 break
-
             litmus_name = item["litmus"]
-
             if litmus_name in seen_litmus:
                 continue
-
             best_batch.append((litmus_name, item["vec"]))
             seen_litmus.add(litmus_name)
-
         self.logger.info(f"BO Batch Selected {len(best_batch)} unique candidates.")
         return best_batch
-
-    def self_check(self, vec, score):
-        X_sample = np.array(vec).reshape(1, -1)
-        preds = np.array([
-            est.predict(X_sample) for est in self.model.estimators_
-        ])
-
-        mu = preds.mean(axis=0)
-        self.fit()
-        preds = np.array([
-            est.predict(X_sample) for est in self.model.estimators_
-        ])
-
-        mu_after = preds.mean(axis=0)
-        self.logger.info(f"BO self check: {vec}, score: {score}, before: {mu}, after: {mu_after}")
-
 
 class LitmusRunnerForBayes(LitmusRunner):
     def __init__(
@@ -384,7 +386,7 @@ class LitmusRunnerForBayes(LitmusRunner):
         params = self.ps.vector_to_params(vec)
         params.set_riscv_gcc()
         # [关键] 把 vector 挂载到 params 上，方便结果回来时找回
-        params._temp_vec = vec
+        params._temp_vec = params.to_vector()
 
         litmus_file = f"{litmus_path}/{litmus}.litmus"
 
@@ -519,6 +521,26 @@ class LitmusRunnerForBayes(LitmusRunner):
 
         # stream_results 是个生成器，会阻塞等待结果
         for result in self.pipeline.stream_results():
+            if result is None:
+                if self.total_runs >= self.bo_iters:
+                    break
+                if self.total_runs < self.bo_iters:
+                    try:
+                        # 1. 训练模型并生成新任务 (一次生成8个)
+                        # 因为是 Warm Start，数据只会越来越多，BO 会越来越准
+                        new_batch = self.bo.select_batch_next(batch_size=SUBMIT_SIZE)
+
+                        # 2. 提交新任务
+                        for (nxt_litmus, nxt_vec) in new_batch:
+                            # 查重：如果 Cache 里已经有了，就没必要再跑了（虽然 select_batch 应该避免）
+                            if self.cache.get(nxt_litmus, nxt_vec) is None:
+                                self._submit_one(nxt_litmus, nxt_vec, self.perple_dict_list.get(nxt_litmus, None))
+
+                        self.logger.info(f"Submitted {len(new_batch)} new tasks.")
+
+                    except Exception as e:
+                        self.logger.error(f"BO Step Failed: {e}")
+                continue
 
             # === A. 处理结果 ===
             task = result['task']
@@ -533,7 +555,7 @@ class LitmusRunnerForBayes(LitmusRunner):
                 continue
 
             # 算分
-            _, score = self._parse_log_to_score(log_path, litmus_name, task.params.has_perple, self.mode)
+            _, score = self._parse_log_to_score(log_path, litmus_name, task.params.is_perple(), self.mode)
             self.logger.info(f"[FINISHED] {litmus_name} Score: {score:.4f}")
 
             # 存入数据 (Cache + BO)
@@ -635,6 +657,7 @@ if __name__ == "__main__":
         stat_log,
         can_perple_path,
         perple_dict_path,
+        standard_path= standard_path,
         pipeline_host=host,
         pipeline_user=username,
         pipeline_pass=password,

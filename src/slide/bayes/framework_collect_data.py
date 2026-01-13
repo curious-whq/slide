@@ -69,8 +69,15 @@ class RandomGridRunner(LitmusRunner):
 
         # 1. 预先生成固定的随机向量池
         self.logger.info(f"Generating {num_random_vectors} fixed random vectors...")
-        self.fixed_vectors = [self.ps.random_vector() for _ in range(num_random_vectors)]
-        self.fixed_vectors.extend(self.ps.get_bound_vector())
+        self.fixed_vectors = self.ps.get_bound_vector()
+        iter_num = 0
+        while True:
+            vector = self.ps.random_vector(can_perple = False)
+            if vector not in self.fixed_vectors:
+                self.fixed_vectors.add(vector)
+                iter_num += 1
+            if iter_num == num_random_vectors:
+                break
         # 2. 生成所有任务组合 (Litmus x Vector)
         self.todo_queue = []
         for litmus in litmus_list:

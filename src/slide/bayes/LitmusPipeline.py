@@ -76,16 +76,29 @@ class LitmusPipeline:
                 yield result
 
             except queue.Empty:
-                # 队列是空的，没事，继续下一轮循环，看看 running 是不是变成 False 了
-                # 如果所有任务都做完了，我们可以加入退出逻辑
-                if self.compile_queue.empty() and \
-                        self.upload_queue.empty() and \
-                        self.run_queue.empty() and \
-                        self.download_queue.empty() and \
-                        self.result_queue.empty():
-                    # 再次确认真的没任务了，且 worker 都不忙了（这里简化判断）
-                    # 在你的逻辑里，通常由主线程决定 break，所以这里 continue 就行
+                # === [修改点 1]：查看当前各队列积压情况 ===
+                # 获取各个队列的当前大小 (qsize 是近似值，但够用了)
+                c_q = self.compile_queue.qsize()
+                u_q = self.upload_queue.qsize()
+                r_q = self.run_queue.qsize()
+                d_q = self.download_queue.qsize()
+                res_q = self.result_queue.qsize()
+
+                # 打印状态（建议用 debug 或 info，这里用 print 为了直观）
+                # 只有当队列里还有东西，或者你觉得需要监控时才打日志，防止刷屏
+                # 但为了调试死锁，我们先无条件打印，或者只在全部为空时打印
+
+                # 你的需求：每次进入异常都看一下
+                print(f"[Pipeline Status] Compile:{c_q}, Upload:{u_q}, Run:{r_q}, Down:{d_q}, Result:{res_q}")
+
+                # === [修改点 2]：如果所有队列都空了，吐出 None ===
+                if c_q == 0 and u_q == 0 and r_q == 0 and d_q == 0 and res_q == 0:
+                    # 只有当真的没有任何任务在跑了，才通知主线程“我饿了/空闲了”
+                    # 这样主线程收到 None，就可以决定是否要补充随机任务，或者退出
                     continue
+
+                # 如果队列不为空（比如还有任务在 Run），那就继续等，不需要 yield None 干扰主线程
+                # (或者如果你希望主线程每秒都能动一下，无论是否空闲，都在这里 yield None 也可以)
                 continue
 
 

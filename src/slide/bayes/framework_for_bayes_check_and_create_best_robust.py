@@ -2,262 +2,377 @@ import json
 import logging
 import os
 import random
-import numpy as np
+import time
 from collections import defaultdict
-from sklearn.ensemble import RandomForestRegressor
+from xgboost import XGBRegressor
+from scipy.stats import norm, spearmanr
+
+# 引入评估指标
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+
 from src.slide.bayes.litmus_param_space import LitmusParamSpace
 from src.slide.bayes.logger_util import setup_logger, get_logger
 from src.slide.bayes.util import get_files
 
+import torch
+from sklearn.ensemble import RandomForestRegressor
+import numpy as np
+import json
+from tqdm import tqdm
 SEED = 2025
-LOG_NAME = "bayes_final_production"
-ALPHA = 1.0
+LOG_NAME = "bayes_eval"
 
 
-class RandomForestBO:
-    def __init__(self, param_space: LitmusParamSpace, litmus_names, n_estimators=200, litmus_vec_path=""):
-        self.ps = param_space
+# ================= 类定义 =================
 
-        self.model = RandomForestRegressor(
-            n_estimators=n_estimators,
-            n_jobs=-1,
-            max_features="sqrt",
-            max_depth=None,
-            min_samples_leaf=1,
-            random_state=SEED
-        )
-        self.X = []
-        self.y = []
-
-        # 加载特征辅助数据
-        self.litmus_to_vector_dict = self.load_litmus_vectors(litmus_vec_path)
-        self.litmus_id_map = {name: i for i, name in enumerate(litmus_names)}
-
-        # === 关键修复：自动计算向量维度 ===
-        if self.litmus_to_vector_dict:
-            # 取第一个向量的长度作为标准长度
-            self.vec_dim = len(next(iter(self.litmus_to_vector_dict.values())))
-        else:
-            self.vec_dim = 12  # 如果完全没加载到文件，才使用默认值
-
-        print(f"Detected Litmus Vector Dimension: {self.vec_dim}")
-
-        self.is_fitted = False
-
-    def load_litmus_vectors(self, path):
-        d = {}
+class ResultCache:
+    def __init__(self, path):
+        self.path = path
+        self.data = {}
         if os.path.exists(path):
             with open(path, "r") as f:
                 for line in f:
-                    if ":" in line:
-                        try:
-                            n, v = line.strip().split(":", 1)
-                            d[n] = eval(v)
-                        except:
-                            pass
-        return d
+                    if not line.strip(): continue
+                    obj = json.loads(line)
+                    key = self._make_key(obj["litmus"], obj["param"])
+                    self.data[key] = obj["score"]
+        self.f = open(path, "a")
 
-    def _get_features(self, litmus_name, param_vec):
-        # 1. Params (11)
-        feats = list(param_vec)
+    def _make_key(self, litmus, param_vec):
+        return f"{litmus}|" + ",".join(map(str, param_vec))
 
-        # 2. Vector (使用动态维度)
-        if litmus_name in self.litmus_to_vector_dict:
-            feats.extend(self.litmus_to_vector_dict[litmus_name])
-        else:
-            # 补0时使用检测到的维度，而不是写死 12
-            feats.extend([0] * self.vec_dim)
+    def get(self, litmus, param_vec):
+        return self.data.get(self._make_key(litmus, param_vec))
 
-        # 3. ID (1)
-        lid = self.litmus_id_map.get(litmus_name, -1)
-        feats.append(lid)
+    def add(self, litmus, param_vec, score):
+        pass
 
-        return feats
+
+class RandomForestBO:
+    def __init__(self, param_space: LitmusParamSpace, litmus_list, n_estimators=200,
+                 litmus_vec_path="/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector.log"):
+        self.ps = param_space
+        self.model = RandomForestRegressor(
+            n_estimators=n_estimators,
+            n_jobs=-1,  # 利用多核
+            min_samples_leaf=3,
+            random_state=SEED
+        )
+        # self.model = XGBRegressor(
+        #     n_estimators=n_estimators,
+        #     learning_rate=0.05,  # 学习率越低越稳，但需要更多 estimator
+        #     max_depth=6,  # 树深
+        #     subsample=0.8,  # 样本采样
+        #     colsample_bytree=0.8,  # 特征采样
+        #     n_jobs=-1,
+        #     random_state=SEED
+        # )
+        self.X = []
+        self.y = []
+        self.litmus_list = litmus_list
+        self.logger = get_logger(LOG_NAME)  # 获取 logger
+
+        # 加载向量
+        self.litmus_to_vector_dict = self.load_litmus_vectors(litmus_vec_path)
+
+    def load_litmus_vectors(self, path):
+        litmus_to_vec = {}
+        with open(path, "r") as f:
+            for line in f:
+                line = line.strip()
+                if not line or ":" not in line: continue
+                name, vec_str = line.split(":", 1)
+                vec = eval(vec_str)
+                litmus_to_vec[name] = list(vec)
+        return litmus_to_vec
 
     def add(self, litmus_name, param_vec, score):
-        if litmus_name not in self.litmus_id_map: return
-
-        feat = self._get_features(litmus_name, param_vec)
-        self.X.append(feat)
+        if litmus_name not in self.litmus_to_vector_dict:
+            return
+        litmus_vec = self.litmus_to_vector_dict[litmus_name]
+        self.X.append(list(param_vec) + list(litmus_vec))
         self.y.append(score)
 
     def fit(self):
-        if not self.X:
-            print("WARNING: No data to fit!")
-            return
+        self.logger.info(f"Start fitting...")
+        # ============ 关键修改 ============
+        # 使用 log1p (log(x+1)) 防止 x=0 报错，同时压缩数值
+        y_train_log = np.log1p(np.array(self.y))
+        self.model.fit(np.array(self.X), y_train_log)
 
-        X_arr = np.array(self.X)
-        y_arr = np.array(self.y)
+    def predict_one(self, litmus_name, param_vec):
+        if litmus_name not in self.litmus_to_vector_dict:
+            return None
+        litmus_vec = self.litmus_to_vector_dict[litmus_name]
+        feature = list(param_vec) + list(litmus_vec)
+        pred_log = self.model.predict([feature])[0]
+        # ============ 关键修改 ============
+        # 还原回去：exp(x) - 1
+        return np.expm1(pred_log)
 
-        # 再次确认维度一致性 (调试用)
-        if X_arr.shape[1] != (11 + self.vec_dim + 1):
-            print(f"WARNING: Feature dimension mismatch! Expected {11 + self.vec_dim + 1}, got {X_arr.shape[1]}")
+    def predict_batch(self, litmus_list, param_list):
+        """
+        批量预测方法
+        :param litmus_list: list of litmus names
+        :param param_list: list of param vectors
+        :return: predictions array, valid_indices (因为有些litmus可能没有vector)
+        """
+        X_batch = []
+        valid_indices = []
 
-        self.y_train_log = np.log1p(y_arr)
+        # 1. 构建特征矩阵
+        for i, (litmus, param) in enumerate(zip(litmus_list, param_list)):
+            if litmus in self.litmus_to_vector_dict:
+                litmus_vec = self.litmus_to_vector_dict[litmus]
+                X_batch.append(list(param) + list(litmus_vec))
+                valid_indices.append(i)
 
-        self.model.fit(X_arr, self.y_train_log)
-        self.is_fitted = True
+        if not X_batch:
+            return [], []
 
-    def predict_challenger(self, litmus_name, candidate_params_matrix, best_history_score_real):
-        if not self.is_fitted:
-            return 0, 0.0, 0.0, False
+        # 2. 批量预测 (一次性调用，速度极大提升)
+        # 注意: np.array(X_batch) 依然有开销，但比循环调用 predict 快得多
+        X_batch_np = np.array(X_batch)
+        pred_log = self.model.predict(X_batch_np)
 
-        n_candidates = len(candidate_params_matrix)
+        # 3. 还原对数
+        preds = np.expm1(pred_log)
 
-        # 1. 构造矩阵
-        X_base = candidate_params_matrix
+        return preds, valid_indices
 
-        # Vector
-        if litmus_name in self.litmus_to_vector_dict:
-            vec = self.litmus_to_vector_dict[litmus_name]
-        else:
-            # === 关键修复：使用 self.vec_dim ===
-            vec = [0] * self.vec_dim
+# ================= 主程序 =================
 
-        X_vec = np.tile(vec, (n_candidates, 1))
+# 配置路径
+litmus_path = "/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_naive"
+stat_log_base = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log"
+litmus_vec_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector4_two_tower_gt0.log"
+cache_file_path = stat_log_base + ".cache4_norm.jsonl"
 
-        # ID
-        lid = self.litmus_id_map.get(litmus_name, -1)
-        X_id = np.full((n_candidates, 1), lid)
 
-        # Concat
-        X_batch = np.hstack([X_base, X_vec, X_id])
+# ================= 修正后的核心选择类 =================
 
-        # 2. 预测
-        all_preds = []
-        for tree in self.model.estimators_:
-            all_preds.append(tree.predict(X_batch))
-        all_preds = np.array(all_preds)
+class RobustParamSelector:
+    def __init__(self, model, param_space, default_param=None):
+        """
+        :param model: 训练好的 sklearn RandomForestRegressor (注意：假设模型是在 log1p 空间训练的)
+        :param param_space: LitmusParamSpace 实例
+        :param default_param: 兜底参数，默认 [0,2,0,0,0,0,2,0,0,0,0]
+        """
+        self.model = model
+        self.ps = param_space
+        self.default_param = default_param if default_param else [0, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0]
 
-        # 3. Log 空间统计
-        mu_log = np.mean(all_preds, axis=0)
-        sigma_log = np.std(all_preds, axis=0)
+    def get_forest_uncertainty(self, X):
+        """
+        获取随机森林中每棵树的预测，计算 Mean 和 Std
+        注意：因为训练时用了 log1p，这里返回的也是 log 空间的 mean 和 std
+        """
+        # estimators_ 是 sklearn 随机森林存储所有决策树的列表
+        # 这一步计算量较大，对于大量候选集可能较慢
+        per_tree_pred = [tree.predict(X) for tree in self.model.estimators_]
+        per_tree_pred = np.stack(per_tree_pred)  # shape: (n_trees, n_samples)
 
-        # 4. LCB 决策
-        lcb_log = mu_log - (ALPHA * sigma_log)
+        means = np.mean(per_tree_pred, axis=0)
+        stds = np.std(per_tree_pred, axis=0)
 
-        best_idx = np.argmax(lcb_log)
-        best_lcb_val = lcb_log[best_idx]
+        return means, stds
 
-        # 5. 挑战判定
-        hist_best_log = np.log1p(best_history_score_real)
-        is_stronger = best_lcb_val > (hist_best_log + 1e-4)
+    def select_best_params(self, litmus_list, litmus_feature_map, alpha=2.0):
+        """
+        为列表中的每个 Litmus test 选择最佳参数
+        策略: Score_Log = Mean_Log - (alpha * Std_Log)
+        """
+        recommendations = {}
 
-        pred_mean_real = np.expm1(mu_log[best_idx])
+        # 1. 获取全量参数空间 (约 20k 个)
+        # 修正方法名: get_all_valid_vectors -> get_all_combinations
+        all_param_vectors = self.ps.get_all_combinations()
+        all_param_vectors = np.array(all_param_vectors)
+        n_params = len(all_param_vectors)
 
-        return best_idx, pred_mean_real, sigma_log[best_idx], is_stronger
+        print(f"Searching best params from {n_params} combinations per litmus (Alpha={alpha})...")
 
+        # 为了避免 tqdm 刷屏，我们只在总体循环上做进度条
+        for litmus in tqdm(litmus_list, desc="Robust Selection"):
+            if litmus not in litmus_feature_map:
+                continue
+
+            l_feat = np.array(litmus_feature_map[litmus])
+
+            # 2. 构造输入矩阵: (N_Params, Feat_Dim + Param_Dim)
+            # 广播 Litmus 特征
+            l_feat_repeated = np.tile(l_feat, (n_params, 1))
+            X_batch = np.hstack([all_param_vectors, l_feat_repeated])  # 注意拼接顺序：Param在前还是Feature在前？
+            # 检查 RandomForestBO 中的 add 方法: X.append(list(param_vec) + list(litmus_vec))
+            # 所以 Param 在前，Feature 在后。上面的代码顺序是正确的。
+
+            # 3. 获取 Log 空间的均值和方差
+            # 这里的 means 和 stds 都是 log(y+1) 尺度
+            means_log, stds_log = self.get_forest_uncertainty(X_batch)
+
+            # 4. 计算稳健分数 (LCB 策略)
+            # 我们在 Log 空间做减法是合理的 (惩罚不确定性)
+            robust_scores_log = means_log - (alpha * stds_log)
+
+            # 5. 找到最佳索引
+            best_idx = np.argmax(robust_scores_log)
+
+            best_mean_log = means_log[best_idx]
+            best_std_log = stds_log[best_idx]
+            best_vec = all_param_vectors[best_idx]
+
+            # 6. 还原数值并进行阈值判断
+            # 因为模型预测的是 log1p，所以要用 expm1 还原真实分数
+            predicted_real_score = np.expm1(best_mean_log)
+
+            final_vec = []
+            decision_type = ""
+
+            # 阈值判断：如果预测的真实分数 <= 1.0 (没有加速)，则回退到默认
+            if predicted_real_score > 1.0:
+                final_vec = best_vec.tolist()
+                decision_type = "optimized"
+            else:
+                final_vec = self.default_param
+                decision_type = "default (low_score)"
+
+            recommendations[litmus] = {
+                "param": final_vec,
+                "pred_score": float(predicted_real_score),  # 记录还原后的真实分数
+                "pred_std_log": float(best_std_log),  # 记录 Log 空间的方差供参考
+                "decision": decision_type
+            }
+
+        return recommendations
+
+
+# ================= 重写的 Main 函数 =================
 
 if __name__ == "__main__":
-    # 配置
-    litmus_path = "/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_naive"
-    stat_log_base = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log"
-    # 使用包含数据的 cache 文件
-    cache_file_path = stat_log_base + ".cache_sum_70_no_norm_for_graph.jsonl"
-    litmus_vec_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector4_dnn_gt0.log"
+    # 1. 基础设置
+    random.seed(SEED)
+    np.random.seed(SEED)
+    torch.manual_seed(SEED)  # 如果用到了torch
 
-    logger = setup_logger(f"{stat_log_base}.final.run.log", logging.INFO, LOG_NAME, True)
-    logger.info(f"=== Generating FINAL One-Shot Recommendations | Alpha={ALPHA} ===")
+    ts = time.strftime("%Y%m%d-%H%M%S")
+    log_file_name = f"{stat_log_base}.{ts}.robust_eval.log"
 
-    # 1. 准备 ID Map
+    logger = setup_logger(
+        log_file=log_file_name,
+        level=logging.INFO,
+        name=LOG_NAME,
+        stdout=True
+    )
+    logger.info(f"=== Start Robust Evaluation Run | Seed={SEED} ===")
+
+    # 2. 读取 Litmus 文件列表
+    logger.info("Reading litmus file list...")
     full_litmus_list = get_files(litmus_path)
-    # 去掉后缀
+    # 提取文件名作为 ID
     litmus_names = [path.split("/")[-1][:-7] for path in full_litmus_list]
+    logger.info(f"Found {len(litmus_names)} litmus files.")
 
+    # 3. 初始化 BO 和 参数空间
     param_space = LitmusParamSpace()
-    bo = RandomForestBO(param_space, litmus_names, n_estimators=200, litmus_vec_path=litmus_vec_path)
+    bo = RandomForestBO(
+        param_space,
+        litmus_names,
+        n_estimators=100,  # 稍微降低一点树的数量以加快 Robust 搜索速度，或者保持 200
+        litmus_vec_path=litmus_vec_path
+    )
 
-    # 2. 加载历史数据
-    logger.info(f"Loading history from {cache_file_path} ...")
-    incumbents = {}
-    valid_cnt = 0
-
+    # 4. 加载训练数据 (Cache)
+    logger.info(f"Loading training data from {cache_file_path} ...")
+    all_data = []
     if os.path.exists(cache_file_path):
         with open(cache_file_path, "r") as f:
             for line in f:
                 if line.strip():
                     try:
                         obj = json.loads(line)
-                        lname = obj["litmus"]
-
-                        # 过滤无效ID
-                        if lname not in bo.litmus_id_map: continue
-
-                        vec = obj["param"]
-                        sc = obj["score"]
-
-                        bo.add(lname, vec, sc)
-                        valid_cnt += 1
-
-                        if lname not in incumbents:
-                            incumbents[lname] = {'param': vec, 'score': sc}
-                        else:
-                            if sc > incumbents[lname]['score']:
-                                incumbents[lname] = {'param': vec, 'score': sc}
+                        all_data.append(obj)
                     except:
                         pass
     else:
-        logger.error("Cache file not found!")
+        logger.error("Cache file not found! Cannot train model.")
         exit(1)
 
-    logger.info(f"Loaded {valid_cnt} valid records.")
+    logger.info(f"Total records loaded: {len(all_data)}")
 
-    # 3. 训练
-    logger.info("Training Model...")
+    # 打乱并切分数据 (保留一部分用于评估模型精度)
+    random.shuffle(all_data)
+    split_idx = int(len(all_data) * 0.8)  # 80% 训练
+    train_data = all_data[:split_idx]
+    test_data = all_data[split_idx:]
+
+    logger.info(f"Train size: {len(train_data)} | Test size: {len(test_data)}")
+
+    # 5. 训练模型
+    logger.info("Building dataset and fitting model...")
+    for item in train_data:
+        bo.add(item["litmus"], item["param"], item["score"])
+
+    t_start = time.time()
     bo.fit()
+    logger.info(f"Model training finished in {time.time() - t_start:.2f}s")
 
-    # 4. 生成候选集
-    all_candidates = param_space.get_all_combinations()
-    X_base_params = np.array(all_candidates)
+    # 6. (可选) 快速评估模型精度
+    # 这一步是为了确认模型是否“靠谱”，如果 R2 很低，那后面的推荐也没意义
+    logger.info("--- Evaluating Model Accuracy on Test Set ---")
 
-    # 5. 决策循环
-    final_decisions = {}
-    stats = {"HIST": 0, "NEW": 0}
+    # 构建测试集特征
+    X_test = []
+    y_test_true = []
 
-    logger.info("Making decisions for all files...")
-    total = len(litmus_names)
-    count = 0
+    for item in test_data:
+        l_name = item["litmus"]
+        if l_name in bo.litmus_to_vector_dict:
+            vec = bo.litmus_to_vector_dict[l_name]
+            # 注意：RandomForestBO.add 是 param + vec
+            X_test.append(list(item["param"]) + list(vec))
+            y_test_true.append(item["score"])
 
-    for litmus in litmus_names:
-        count += 1
-        if count % 100 == 0: logger.info(f"Processing {count}/{total}...")
+    if X_test:
+        pred_log = bo.model.predict(np.array(X_test))
+        y_test_pred = np.expm1(pred_log)  # 还原
 
-        has_history = litmus in incumbents
-        if has_history:
-            hist_score = incumbents[litmus]['score']
-            hist_param = incumbents[litmus]['param']
-        else:
-            hist_score = -1.0
-            hist_param = None
+        r2 = r2_score(y_test_true, y_test_pred)
+        mae = mean_absolute_error(y_test_true, y_test_pred)
+        rho, _ = spearmanr(y_test_true, y_test_pred)
 
-        best_idx, pred_mean, pred_sigma, is_stronger = bo.predict_challenger(
-            litmus, X_base_params, hist_score
-        )
+        logger.info(f"Model R^2: {r2:.4f}")
+        logger.info(f"Model MAE: {mae:.4f}")
+        logger.info(f"Model Rho: {rho:.4f}")
+    else:
+        logger.warning("No valid test data found (missing vectors?).")
 
-        # 决策逻辑
-        if not has_history:
-            final_param = all_candidates[best_idx]
-            source = "NEW (No Hist)"
-            stats["NEW"] += 1
-        elif is_stronger:
-            final_param = all_candidates[best_idx]
-            source = "NEW (Better)"
-            stats["NEW"] += 1
-        else:
-            final_param = hist_param
-            source = "HIST"
-            stats["HIST"] += 1
-
-        final_decisions[litmus] = {
-            "param": final_param,
-            "source": source,
-            "pred_score": float(pred_mean)
-        }
-
-    out_file = "best_params_final.json"
-    with open(out_file, "w") as f:
-        json.dump(final_decisions, f, indent=4)
-
+    # 7. 执行稳健参数推荐 (Robust Recommendation)
     logger.info("=" * 60)
-    logger.info(f"Saved to {out_file}")
-    logger.info(f"Stats: {stats}")
+    logger.info("Starting Robust Parameter Selection...")
+
+    # 实例化选择器
+    # alpha=1.0 表示减去 1倍标准差，兼顾性能和稳定性
+    # 如果希望更保守，可以将 alpha 设为 2.0
+    selector = RobustParamSelector(bo.model, param_space, default_param=[0, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0])
+
+    # 使用 feature_map (即 bo.litmus_to_vector_dict)
+    recommendations = selector.select_best_params(
+        litmus_list=litmus_names,
+        litmus_feature_map=bo.litmus_to_vector_dict,
+        alpha=1.0
+    )
+
+    # 8. 统计与保存结果
+    optimized_count = sum(1 for v in recommendations.values() if v['decision'] == 'optimized')
+    default_count = len(recommendations) - optimized_count
+
+    logger.info(f"Selection Finished.")
+    logger.info(f"  - Optimized: {optimized_count}")
+    logger.info(f"  - Default (Safety Fallback): {default_count}")
+
+    output_file = "best_params_recommendation_robust.json"
+    with open(output_file, "w") as f:
+        json.dump(recommendations, f, indent=4)
+
+    logger.info(f"Recommendations saved to: {output_file}")
+    logger.info("=== Done ===")
