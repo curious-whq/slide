@@ -12,6 +12,7 @@ from src.slide.bayes.framework import LitmusRunner
 from src.slide.bayes.litmus_param_space import LitmusParamSpace
 from src.slide.bayes.logger_util import setup_logger, get_logger
 from src.slide.bayes.util import get_files, parse_log_by_mode_perple, parse_log_by_mode
+from src.slide.utils.cmd_util import run_cmd
 
 SEED = 2025
 LOG_NAME = "random_grid"
@@ -68,7 +69,17 @@ class RandomGridRunner(LitmusRunner):
     ):
         super().__init__(litmus_list, [], stat_log, mode)
         self.ps = param_space
-        self.logger = get_logger(LOG_NAME)
+        self.log_dir = f"{dir_path}_{pipeline_host}"
+        run_cmd(f"mkdir -p {self.log_dir}")
+        unique_logger_name = f"runner_{pipeline_host}"
+        self.logger = setup_logger(
+            log_file=stat_log,
+            level=logging.INFO,
+            name=unique_logger_name,
+            stdout=True  # 建议设为 False，只看文件；设为 True 则控制台也会输出
+        )
+
+        # self.logger = get_logger(LOG_NAME)
         self.resource_manager = resource_manager
         # 1. 预先生成固定的随机向量池
         self.logger.info(f"Generating {num_random_vectors} fixed random vectors...")
@@ -120,7 +131,7 @@ class RandomGridRunner(LitmusRunner):
             litmus_path=litmus_file,
             params=params,
             litmus_dir_path=litmus_dir_path,
-            log_dir_path=dir_path,
+            log_dir_path=self.log_dir,
             run_time=100000
         )
 
@@ -240,26 +251,28 @@ username = "sipeed"
 password = "sipeed"
 remote_path = "/home/sipeed/test"
 BOARDS = [
-    {"host": "192.168.1.101", "port": 22, "user": "sipeed", "pass": "licheepi"},
-    {"host": "192.168.1.102", "port": 22, "user": "sipeed", "pass": "licheepi"},
-    {"host": "192.168.1.108", "port": 22, "user": "sipeed", "pass": "licheepi"},
-    {"host": "192.168.1.108", "port": 22, "user": "sipeed", "pass": "licheepi"},
-    {"host": "192.168.1.108", "port": 22, "user": "sipeed", "pass": "licheepi"},
-    {"host": "192.168.1.108", "port": 22, "user": "sipeed", "pass": "licheepi"},
-    {"host": "192.168.1.108", "port": 22, "user": "sipeed", "pass": "licheepi"},
-    {"host": "192.168.1.108", "port": 22, "user": "sipeed", "pass": "licheepi"},
+    {"host": "10.42.0.28", "port": 22, "user": "sipeed", "pass": "licheepi"},
+    {"host": "10.42.0.46", "port": 22, "user": "sipeed", "pass": "licheepi"},
+    {"host": "10.42.0.48", "port": 22, "user": "sipeed", "pass": "licheepi"},
+    {"host": "10.42.0.58", "port": 22, "user": "sipeed", "pass": "licheepi"},
+    {"host": "10.42.0.61", "port": 22, "user": "sipeed", "pass": "licheepi"},
+    {"host": "10.42.0.112", "port": 22, "user": "sipeed", "pass": "licheepi"},
+    {"host": "10.42.0.139", "port": 22, "user": "sipeed", "pass": "licheepi"},
+    {"host": "10.42.0.228", "port": 22, "user": "sipeed", "pass": "licheepi"},
 ]
 
 
 def launch_board_runner(board_config, litmus_list, param_space, global_manager, shared_vectors):
     host = board_config["host"]
-
+    port = board_config["port"]
+    username = board_config["user"]
+    password = board_config["pass"]
     my_stat_log = f"{stat_log}/log_record_{host}.log"
 
     runner = RandomGridRunner(
         litmus_list,
         param_space,
-        stat_log,
+        my_stat_log,
         resource_manager=global_manager,
         fixed_vectors = shared_vectors,
         num_random_vectors=50,  # <--- 这里控制向量数量
