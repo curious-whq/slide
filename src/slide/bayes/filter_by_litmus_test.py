@@ -81,7 +81,7 @@ if __name__ == "__main__":
 
     # 2. 你想找的 Litmus 名字 (请修改这里)
     # 例如你想找 prompt 中最后一条那个分数很高的
-    target_name = "SB+rfi-ctrlfencei+rfi-ctrl-rfi"
+    target_name = "SB+po+pos-po-addrs"
 
     # 3. 运行过滤
     # 如果文件不存在，你可以先创建一个假文件测试

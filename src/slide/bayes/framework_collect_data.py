@@ -74,7 +74,7 @@ class RandomGridRunner(LitmusRunner):
         while True:
             vector = self.ps.random_vector(can_perple = False)
             if vector not in self.fixed_vectors:
-                self.fixed_vectors.add(vector)
+                self.fixed_vectors.append(vector)
                 iter_num += 1
             if iter_num == num_random_vectors:
                 break
@@ -116,7 +116,7 @@ class RandomGridRunner(LitmusRunner):
             params=params,
             litmus_dir_path=litmus_dir_path,
             log_dir_path=dir_path,
-            run_time=1000
+            run_time=100000
         )
 
     def _parse_log_to_score(self, log_path, litmus_name, has_perple, mode):

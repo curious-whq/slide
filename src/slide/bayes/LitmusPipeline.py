@@ -1,10 +1,15 @@
 import os
+import shutil
 import time
 import uuid
 import threading
 import queue
+from collections import defaultdict
+
 import paramiko
 from dataclasses import dataclass
+
+from filelock import FileLock
 
 from src.slide.perple.trans_cpp import filter_Thread
 from src.slide.utils.cmd_util import run_cmd
@@ -31,8 +36,41 @@ class LitmusTask:
     perp_dict: dict = None
 
 
+class SharedResourceManager:
+    def __init__(self, total_consumers):
+        """
+        total_consumers: 总共有多少个板子在跑 (例如 8)
+        """
+        self.total = total_consumers
+        self.finished_counts = defaultdict(int)  # 记录每个文件夹有多少人跑完了
+        self.lock = threading.Lock()  # 线程锁，保证计数安全
+
+    def mark_done(self, folder_path):
+        """
+        调用此方法表示：有一个板子已经用完这个文件夹了
+        """
+        should_delete = False
+        with self.lock:
+            self.finished_counts[folder_path] += 1
+            current_count = self.finished_counts[folder_path]
+
+            # 如果跑完的数量 >= 总板子数，说明没人用了，可以删
+            if current_count >= self.total:
+                should_delete = True
+                # 从字典里移除，防止字典无限膨胀
+                del self.finished_counts[folder_path]
+
+        if should_delete:
+            if os.path.exists(folder_path):
+                print(f"[Manager] All {self.total} boards finished. Deleting: {folder_path}")
+                try:
+                    shutil.rmtree(folder_path)
+                except Exception as e:
+                    print(f"[Manager] Delete failed: {e}")
+
+
 class LitmusPipeline:
-    def __init__(self, host, port, username, password, remote_work_dir="/tmp/litmus_work"):
+    def __init__(self, host, port, username, password, resource_manager = None, remote_work_dir="/tmp/litmus_work"):
         self.host = host
         self.port = port
         self.username = username
@@ -45,6 +83,7 @@ class LitmusPipeline:
         self.download_queue = queue.Queue()
         self.result_queue = queue.Queue()
         self.running = True
+        self.resource_manager = resource_manager
 
         # 为了防止大量并发连接瞬间把 SSH Server 冲垮，这里加一个连接数的信号量限制
         # 比如限制同时最多 10 个 SSH 连接
@@ -166,18 +205,23 @@ class LitmusPipeline:
             exe_path = os.path.join(litmus_dir, "run.exe")
             task.litmus_dir = litmus_dir
             # 模拟检查或生成逻辑
-            if not os.path.exists(exe_path):
-                # 1. 生成代码 (假设这是单线程极快操作)
-                run_cmd(task.params.to_litmus7_format(task.litmus_path, litmus_dir))
+            run_cmd(f"mkdir -p {litmus_dir}")
+            lock_path = os.path.join(litmus_dir, "build.lock")
+            with FileLock(lock_path):
+                if not os.path.exists(exe_path):
+                    # 1. 生成代码 (假设这是单线程极快操作)
+                    run_cmd(task.params.to_litmus7_format(task.litmus_path, litmus_dir))
 
-                if task.params.is_perple():
-                    filter_Thread(f"{litmus_dir}/{litmus_name}.c", f"{litmus_dir}/{litmus_name}.c", task.litmus_path, task.prep_dict)
-                # 2. 核心修改点：使用 -j 参数并行编译
-                # 这里的 run_cmd 需要是你封装好的能够执行 shell 的函数
-                # 加上 > /dev/null 减少控制台 IO 输出，提高速度
-                build_cmd = f"cd {litmus_dir}; make -j{make_jobs} > /dev/null 2>&1"
-                os.system(build_cmd)
-
+                    if task.params.is_perple():
+                        filter_Thread(f"{litmus_dir}/{litmus_name}.c", f"{litmus_dir}/{litmus_name}.c", task.litmus_path, task.prep_dict)
+                    # 2. 核心修改点：使用 -j 参数并行编译
+                    # 这里的 run_cmd 需要是你封装好的能够执行 shell 的函数
+                    # 加上 > /dev/null 减少控制台 IO 输出，提高速度
+                    build_cmd = f"cd {litmus_dir}; make -j{make_jobs} > /dev/null 2>&1"
+                    os.system(build_cmd)
+                else:
+                    print(f"[Compiler] Cache Hit for {task.litmus_path}")
+                    pass
                 # 设置路径
             task.local_exe_path = exe_path
             task.remote_exe_path = os.path.join(self.remote_work_dir, f"run_{task.unique_id}.exe")
@@ -468,7 +512,15 @@ class LitmusPipeline:
                                 pass  # 文件不存在就算了
 
                             # 本地清理和输出结果
-                            os.system(f"rm -rf {task.litmus_dir}")  # 慎用 system，建议用 shutil.rmtree
+                            if self.resource_manager:
+                                self.resource_manager.mark_done(task.litmus_dir)
+                            else:
+                                # 如果没有 manager (单机模式)，还是保持原来的直接删除
+                                # 建议用 shutil 而不是 os.system，更安全
+                                import shutil
+                                if os.path.exists(task.litmus_dir):
+                                    shutil.rmtree(task.litmus_dir)
+                            # os.system(f"rm -rf {task.litmus_dir}")  # 慎用 system，建议用 shutil.rmtree
 
                             # 放入结果队列
                             self.result_queue.put({'task': task, 'log_path': task.local_log_path})
@@ -501,7 +553,7 @@ class LitmusPipeline:
                     if sftp_client: sftp_client.close()
                     if ssh_client: ssh_client.close()
 
-    def start(self, compiler_thread_count=4, downloader_thread_count=2):  # <--- 新增参数
+    def start(self, compiler_thread_count=2, downloader_thread_count=2):  # <--- 新增参数
         threads = []
 
         print(f"Starting {compiler_thread_count} compiler threads...")

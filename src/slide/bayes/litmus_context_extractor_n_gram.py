@@ -161,11 +161,12 @@ def extract_context_for_litmus(litmus_path):
     return exe_str
 
 if __name__ == "__main__":
-    litmus_dir_path = '/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_naive'
-    litmus_vector_log = os.path.join(litmus_dir_path, 'litmus_vector3.log')
+    # litmus_dir_path = '/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_naive'
+    litmus_dir_path = '/home/whq/Desktop/code_list/slide/src/slide/bayes/make_new_litmus/litmus_output'
+    litmus_vector_log = os.path.join(litmus_dir_path, 'litmus_vector_new_n_gram.log')
     litmus_paths = get_files(litmus_dir_path)
 
-    litmus_paths = litmus_paths[79:]
+    litmus_paths = litmus_paths[:]
     litmus_dict = {}
     # with open(litmus_vector_log, 'w') as f:
     #     pass

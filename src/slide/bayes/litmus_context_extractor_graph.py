@@ -47,7 +47,7 @@ def get_vector_by_inst(inst):
             elif inst.flag == MoFlag.Release:
                 vector[5] = 1
     return vector
-json_path = "/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_naive/litmus_vector.json"
+json_path = "/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_naive/litmus_vector_new_litmus.json"
 
 
 def save_compact_json(data, filename):
@@ -270,11 +270,12 @@ def extract_context_for_litmus(litmus_path):
     return ""
 
 if __name__ == "__main__":
-    litmus_dir_path = '/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_naive'
-    litmus_vector_log = os.path.join(litmus_dir_path, 'litmus_vector5.log')
+    # litmus_dir_path = '/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_naive'
+    litmus_dir_path = '/home/whq/Desktop/code_list/slide/src/slide/bayes/make_new_litmus/litmus_output'
+    litmus_vector_log = os.path.join(litmus_dir_path, 'litmus_vector11.log')
     litmus_paths = get_files(litmus_dir_path, ".litmus")
 
-    litmus_paths = litmus_paths[18:19]
+    litmus_paths = litmus_paths[:]
     litmus_dict = {}
     # with open(litmus_vector_log, 'w') as f:
     #     pass
