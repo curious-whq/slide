@@ -13,7 +13,7 @@ from filelock import FileLock
 
 from src.slide.perple.trans_cpp import filter_Thread
 from src.slide.utils.cmd_util import run_cmd
-
+import logging
 
 # 假设 params 和 run_cmd 等外部依赖已经定义
 # from your_module import LitmusParams, run_cmd, ...
@@ -70,13 +70,13 @@ class SharedResourceManager:
 
 
 class LitmusPipeline:
-    def __init__(self, host, port, username, password, resource_manager = None, remote_work_dir="/tmp/litmus_work"):
+    def __init__(self, host, port, username, password, resource_manager = None, logger=None, remote_work_dir="/tmp/litmus_work"):
         self.host = host
         self.port = port
         self.username = username
         self.password = password
         self.remote_work_dir = remote_work_dir
-
+        self.logger = logger
         self.compile_queue = queue.Queue()
         self.upload_queue = queue.Queue()
         self.run_queue = queue.Queue()
@@ -84,10 +84,44 @@ class LitmusPipeline:
         self.result_queue = queue.Queue()
         self.running = True
         self.resource_manager = resource_manager
-
+        self.clean_remote_env()
         # 为了防止大量并发连接瞬间把 SSH Server 冲垮，这里加一个连接数的信号量限制
         # 比如限制同时最多 10 个 SSH 连接
         self.ssh_semaphore = threading.Semaphore(10)
+
+    def clean_remote_env(self):
+        """
+        在流水线启动前，强制清空远程工作目录。
+        """
+        self.logger.info(f"[Pipeline] Cleaning remote directory: {self.remote_work_dir} ...")
+        ssh = None
+        try:
+            # 建立一个临时连接用于清理
+            ssh = self._get_fresh_ssh()
+
+            # 执行清空命令：
+            # 1. rm -rf 删除整个目录 (防止里面有上次残留的只读文件等)
+            # 2. mkdir -p 重新创建目录
+            # 注意：这会删除 remote_work_dir 下的所有内容，请确保路径配置正确！
+            cmd = f"rm -rf {self.remote_work_dir} && mkdir -p {self.remote_work_dir}"
+
+            stdin, stdout, stderr = ssh.exec_command(cmd)
+
+            # 等待命令执行完成，确保目录真的重建好了再继续
+            exit_status = stdout.channel.recv_exit_status()
+
+            if exit_status == 0:
+                self.logger.info(f"[Pipeline] Remote environment ready.")
+            else:
+                self.logger.info(f"[Pipeline] Warning: Clean command exited with status {exit_status}")
+
+        except Exception as e:
+            self.logger.info(f"[Pipeline] Critical Error cleaning remote env: {e}")
+            # 如果连环境都清空不了，可能需要抛出异常终止程序，或者视情况而定
+            raise e
+        finally:
+            if ssh:
+                ssh.close()
 
     def _get_fresh_ssh(self):
         """辅助函数：创建一个全新的 SSH 连接"""
@@ -123,12 +157,12 @@ class LitmusPipeline:
                 d_q = self.download_queue.qsize()
                 res_q = self.result_queue.qsize()
 
-                # 打印状态（建议用 debug 或 info，这里用 print 为了直观）
+                # 打印状态（建议用 debug 或 info，这里用 self.logger.info 为了直观）
                 # 只有当队列里还有东西，或者你觉得需要监控时才打日志，防止刷屏
                 # 但为了调试死锁，我们先无条件打印，或者只在全部为空时打印
 
                 # 你的需求：每次进入异常都看一下
-                print(f"[Pipeline Status] Compile:{c_q}, Upload:{u_q}, Run:{r_q}, Down:{d_q}, Result:{res_q}")
+                self.logger.info(f"[Pipeline Status] Compile:{c_q}, Upload:{u_q}, Run:{r_q}, Down:{d_q}, Result:{res_q}")
 
                 # === [修改点 2]：如果所有队列都空了，吐出 None ===
                 if c_q == 0 and u_q == 0 and r_q == 0 and d_q == 0 and res_q == 0:
@@ -155,7 +189,7 @@ class LitmusPipeline:
         # 如果 Runner 很慢，Compile Queue 会迅速堆积。
         if q_size > max_size:
             discard_count = q_size - max_size
-            print(f"[Pipeline] System congested. Discarding {discard_count} stale tasks from COMPILE queue...")
+            self.logger.info(f"[Pipeline] System congested. Discarding {discard_count} stale tasks from COMPILE queue...")
 
             for _ in range(discard_count):
                 try:
@@ -164,7 +198,7 @@ class LitmusPipeline:
 
                     # 直接丢弃，不做任何处理
                     # 也不需要删文件，因为文件根本还没生成！
-                    print(f"   -> Dropped task {task.unique_id} (Saved compile time)")
+                    self.logger.info(f"   -> Dropped task {task.unique_id} (Saved compile time)")
 
                     self.compile_queue.task_done()
                 except queue.Empty:
@@ -198,7 +232,7 @@ class LitmusPipeline:
             except queue.Empty:
                 continue
 
-            print(f"[Compiler] Building {task.litmus_path}...")
+            self.logger.info(f"[Compiler] Building {task.litmus_path}...")
 
             litmus_name = task.litmus_path.split("/")[-1][:-7]
             litmus_dir = os.path.join(task.litmus_dir_path, f"{litmus_name}_{str(task.params)}")
@@ -220,7 +254,7 @@ class LitmusPipeline:
                     build_cmd = f"cd {litmus_dir}; make -j{make_jobs} > /dev/null 2>&1"
                     os.system(build_cmd)
                 else:
-                    print(f"[Compiler] Cache Hit for {task.litmus_path}")
+                    self.logger.info(f"[Compiler] Cache Hit for {task.litmus_path}")
                     pass
                 # 设置路径
             task.local_exe_path = exe_path
@@ -237,7 +271,7 @@ class LitmusPipeline:
     #         except queue.Empty:
     #             continue
     #
-    #         print(f"[Uploader] Connecting & Uploading {task.unique_id}...")
+    #         self.logger.info(f"[Uploader] Connecting & Uploading {task.unique_id}...")
     #
     #         # 使用 semaphore 控制并发连接数，防止 "Max Startups" 报错
     #         with self.ssh_semaphore:
@@ -260,7 +294,7 @@ class LitmusPipeline:
     #                 self.run_queue.put(task)
     #
     #             except Exception as e:
-    #                 print(f"[Uploader] Error on {task.unique_id}: {e}")
+    #                 self.logger.info(f"[Uploader] Error on {task.unique_id}: {e}")
     #                 # 失败了可以选择重试或者记录错误，这里简单处理
     #             finally:
     #                 # 【重要】用完必须关，否则文件句柄泄露
@@ -291,7 +325,7 @@ class LitmusPipeline:
             except queue.Empty:
                 continue  # 如果超时还没等到第一个任务，重新循环
 
-            print(f"[Uploader] Processing batch of {len(batch_tasks)} tasks...")
+            self.logger.info(f"[Uploader] Processing batch of {len(batch_tasks)} tasks...")
 
             # --- 2. 建立一次连接，处理一批任务 ---
             with self.ssh_semaphore:
@@ -305,7 +339,7 @@ class LitmusPipeline:
                     # === 循环处理任务 ===
                     for task in batch_tasks:
                         try:
-                            print(f"  -> Uploading {task.unique_id}...")
+                            self.logger.info(f"  -> Uploading {task.unique_id}...")
 
                             # 传输文件
                             sftp_client.put(task.local_exe_path, task.remote_exe_path)
@@ -317,7 +351,7 @@ class LitmusPipeline:
 
                         except Exception as e_inner:
                             # 单个任务失败，不要打断整个循环，记录错误即可
-                            print(f"[Uploader] Failed task {task.unique_id}: {e_inner}")
+                            self.logger.info(f"[Uploader] Failed task {task.unique_id}: {e_inner}")
                             # 这里可以做一些重试逻辑，或者把 task 丢回 upload_queue
                         finally:
                             # 标记该任务在 upload_queue 中已完成
@@ -325,7 +359,7 @@ class LitmusPipeline:
 
                 except Exception as e_outer:
                     # 如果是连接层面的大崩溃（比如 SSH 连不上），这批任务都需要处理
-                    print(f"[Uploader] Connection Error: {e_outer}")
+                    self.logger.info(f"[Uploader] Connection Error: {e_outer}")
                     # 策略：因为还没上传成功，理论上应该把这批 batch_tasks 重新放回队列
                     for task in batch_tasks:
                         # 注意：这里需要防止死循环，实际工程中可能需要计数器
@@ -344,7 +378,7 @@ class LitmusPipeline:
     #         except queue.Empty:
     #             continue
     #
-    #         print(f"[Runner] >>> Running {task.unique_id}...")
+    #         self.logger.info(f"[Runner] >>> Running {task.unique_id}...")
     #
     #         with self.ssh_semaphore:
     #             ssh_client = None
@@ -364,10 +398,10 @@ class LitmusPipeline:
     #                     self.download_queue.put(task)
     #                 else:
     #                     self.download_queue.put(task)
-    #                     print(f"[Runner] Failed {task.unique_id} status {exit_status}")
+    #                     self.logger.info(f"[Runner] Failed {task.unique_id} status {exit_status}")
     #
     #             except Exception as e:
-    #                 print(f"[Runner] Error: {e}")
+    #                 self.logger.info(f"[Runner] Error: {e}")
     #             finally:
     #                 if ssh_client: ssh_client.close()
     #
@@ -394,7 +428,7 @@ class LitmusPipeline:
             except queue.Empty:
                 continue
 
-            print(f"[Runner] Processing batch of {len(batch_tasks)} tasks...")
+            self.logger.info(f"[Runner] Processing batch of {len(batch_tasks)} tasks...")
 
             # --- 2. 建立连接并批量执行 ---
             with self.ssh_semaphore:
@@ -407,7 +441,7 @@ class LitmusPipeline:
 
                     for task in batch_tasks:
                         try:
-                            print(f"  -> Running {task.unique_id}...")
+                            self.logger.info(f"  -> Running {task.unique_id}...")
 
                             cmd = f"timeout 10s {task.remote_exe_path} -s {task.run_time} > {task.remote_log_path} 2>&1"
 
@@ -419,7 +453,7 @@ class LitmusPipeline:
                             exit_status = stdout.channel.recv_exit_status()
 
                             if exit_status != 0:
-                                print(f"[Runner] Task {task.unique_id} finished with status {exit_status}")
+                                self.logger.info(f"[Runner] Task {task.unique_id} finished with status {exit_status}")
 
                             # 无论成功失败，都算运行完了，交给下载器去拉日志
                             self.download_queue.put(task)
@@ -430,7 +464,7 @@ class LitmusPipeline:
                         except Exception as e_inner:
                             # 如果是 SSH 连接断开了，后面的任务就没法跑了
                             if isinstance(e_inner, (paramiko.SSHException, OSError)):
-                                print(f"[Runner] Connection lost at {task.unique_id}: {e_inner}")
+                                self.logger.info(f"[Runner] Connection lost at {task.unique_id}: {e_inner}")
                                 # 标记当前这个失败了，需要重试
                                 tasks_to_requeue.append(task)
                                 # 剩下的还没跑的任务也都要重试
@@ -439,7 +473,7 @@ class LitmusPipeline:
                                 break  # 跳出循环
                             else:
                                 # 如果只是普通的逻辑错误，记录一下，不要卡住后面的
-                                print(f"[Runner] Logic Error on {task.unique_id}: {e_inner}")
+                                self.logger.info(f"[Runner] Logic Error on {task.unique_id}: {e_inner}")
                                 self.run_queue.task_done()
 
                     # 如果有因为断连需要重试的任务，重新放回队列
@@ -452,7 +486,7 @@ class LitmusPipeline:
                         self.run_queue.task_done()
 
                 except Exception as e_outer:
-                    print(f"[Runner] Critical Batch Error: {e_outer}")
+                    self.logger.info(f"[Runner] Critical Batch Error: {e_outer}")
                     # 极端情况：连 SSH 都连不上，所有任务回滚
                     for t in batch_tasks:
                         self.run_queue.put(t)
@@ -478,7 +512,7 @@ class LitmusPipeline:
             except queue.Empty:
                 continue
 
-            print(f"[Downloader] Processing batch of {len(batch_tasks)} tasks...")
+            self.logger.info(f"[Downloader] Processing batch of {len(batch_tasks)} tasks...")
 
             # --- 2. 批量下载 ---
             with self.ssh_semaphore:
@@ -501,7 +535,7 @@ class LitmusPipeline:
                             )
 
                             # 执行下载
-                            # print(f"  -> Downloading {task.unique_id}...")
+                            # self.logger.info(f"  -> Downloading {task.unique_id}...")
                             sftp_client.get(task.remote_log_path, task.local_log_path)
 
                             # 清理远程文件 (这也是 IO 操作，放这里顺手做了)
@@ -530,13 +564,13 @@ class LitmusPipeline:
                         except Exception as e_inner:
                             # 同样处理连接中断的情况
                             if isinstance(e_inner, (paramiko.SSHException, OSError)):
-                                print(f"[Downloader] Connection lost at {task.unique_id}: {e_inner}")
+                                self.logger.info(f"[Downloader] Connection lost at {task.unique_id}: {e_inner}")
                                 tasks_to_requeue.append(task)
                                 remaining_index = batch_tasks.index(task) + 1
                                 tasks_to_requeue.extend(batch_tasks[remaining_index:])
                                 break
                             else:
-                                print(f"[Downloader] Error on {task.unique_id}: {e_inner}")
+                                self.logger.info(f"[Downloader] Error on {task.unique_id}: {e_inner}")
                                 self.download_queue.task_done()
 
                     # 重试逻辑
@@ -545,7 +579,7 @@ class LitmusPipeline:
                         self.download_queue.task_done()
 
                 except Exception as e_outer:
-                    print(f"[Downloader] Critical Batch Error: {e_outer}")
+                    self.logger.info(f"[Downloader] Critical Batch Error: {e_outer}")
                     for t in batch_tasks:
                         self.download_queue.put(t)
                         self.download_queue.task_done()
@@ -556,7 +590,7 @@ class LitmusPipeline:
     def start(self, compiler_thread_count=2, downloader_thread_count=2):  # <--- 新增参数
         threads = []
 
-        print(f"Starting {compiler_thread_count} compiler threads...")
+        self.logger.info(f"Starting {compiler_thread_count} compiler threads...")
         for _ in range(compiler_thread_count):
             t = threading.Thread(target=self.worker_compiler, daemon=True)
             t.start()
@@ -574,7 +608,7 @@ class LitmusPipeline:
         threads.append(t)
 
         # Downloader (动态配置)
-        print(f"Starting {downloader_thread_count} downloader threads...")
+        self.logger.info(f"Starting {downloader_thread_count} downloader threads...")
         for _ in range(downloader_thread_count):
             t = threading.Thread(target=self.worker_downloader, daemon=True)
             t.start()
@@ -589,7 +623,7 @@ class LitmusPipeline:
         self.run_queue.join()
         self.download_queue.join()
         self.running = False
-        print("All tasks completed.")
+        self.logger.info("All tasks completed.")
 
 
 # --- 使用示例 ---

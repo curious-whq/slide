@@ -114,6 +114,7 @@ class RandomGridRunner(LitmusRunner):
             port=pipeline_port,
             username=pipeline_user,
             password=pipeline_pass,
+            logger = self.logger,
             resource_manager=self.resource_manager,
             remote_work_dir=remote_path
         )
