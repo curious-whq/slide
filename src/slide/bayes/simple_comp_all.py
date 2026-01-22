@@ -106,10 +106,12 @@ def compare_logs(log1_data, log2_data):
                     zero1 += 1
             elif score1 > score2 and score2 != 0 and score2 != -1:
                 not_pass.append((test_name, score1, score2))
+                summary.append(score2 / score1)
                 times2 = times2 + 3 / score2
                 times1 = times1 + 3 / score1
                 not_zero += 1
             elif score2 == score1 and score2 != 0 and score2 != -1:
+                summary.append(score2 / score1)
                 times2 = times2 + 3 / score2
                 times1 = times1 + 3 / score1
                 not_zero += 1
@@ -178,3 +180,107 @@ print(f"times1:{times1}")
 print(f"times2:{times2}")
 print(f"times1/times2:{times1/times2}")
 print(f"exp:{exp}")
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+import numpy as np
+
+# ==========================================
+# 1. 数据筛选与计算
+# ==========================================
+common_tests = set(data1.keys()) & set(data2.keys())
+ratios = []
+
+for test in common_tests:
+    s1 = data1[test]
+    s2 = data2[test]
+
+    if s1 > 0:
+        r = s2 / s1
+        if r >= 1.0:  # 只看非退步的
+            ratios.append(r)
+
+# ==========================================
+# 2. 定义区间 (标签改为全英文，避开字体问题)
+# ==========================================
+bins = [1.0, 1.05, 1.1, 1.2, 1.5, 2.0, 5.0, 10.0, 10000]
+
+# 使用英文标签，避免 Linux 字体报错
+labels = [
+    '1.0 - 1.05x\n',  # 微幅
+    '1.05 - 1.1x\n',  # 小幅
+    '1.1 - 1.2x\n',  # 稳健
+    '1.2 - 1.5x\n',  # 显著
+    '1.5 - 2.0x\n',  # 高效
+    '2.0 - 5.0x\n',  # 飞跃
+    '5.0 - 10x\n',  # 质变
+    '> 10x\n(Extreme)'  # 极速
+]
+
+df_ratios = pd.DataFrame({'ratio': ratios})
+df_ratios['category'] = pd.cut(df_ratios['ratio'], bins=bins, labels=labels, right=False)
+counts = df_ratios['category'].value_counts().sort_index()
+
+# ==========================================
+# 3. 绘图设置 (修复字体报错)
+# ==========================================
+# plt.style.use('dark_background')
+
+# 【关键修改】指定 Linux 必有的通用字体
+plt.rcParams['font.family'] = 'sans-serif'
+plt.rcParams['font.sans-serif'] = ['DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', 'sans-serif']
+
+plt.rcParams['text.color'] = 'white'
+plt.rcParams['axes.labelcolor'] = 'white'
+plt.rcParams['xtick.color'] = 'white'
+plt.rcParams['ytick.color'] = 'white'
+
+fig, ax = plt.subplots(figsize=(11, 6), dpi=200)
+# 预览背景色 (保存时会透明)
+fig.patch.set_facecolor('#001f3f')
+ax.set_facecolor('#001f3f')
+
+# ==========================================
+# 4. 配色设计 (适配深蓝 PPT 的高亮色)
+# ==========================================
+palette = [
+    '#7FDBFF',  # Minimal
+    '#39CCCC',  # Slight
+    '#2ECC40',  # Steady
+    '#01FF70',  # Significant
+    '#FFDC00',  # High
+    '#FF851B',  # Rapid
+    '#FF4136',  # Breakthrough
+    '#F012BE'  # Extreme
+]
+
+# 绘制
+bars = sns.barplot(x=counts.index, y=counts.values, palette=palette, edgecolor='white', linewidth=0.8)
+
+# ==========================================
+# 5. 细节修饰
+# ==========================================
+for p in bars.patches:
+    height = p.get_height()
+    if height > 0:
+        ax.annotate(f'{int(height)}',
+                    (p.get_x() + p.get_width() / 2., height),
+                    ha='center', va='bottom',
+                    fontsize=14, fontweight='bold', color='white',
+                    xytext=(0, 5), textcoords='offset points')
+
+ax.set_title("Optimization Speedup Distribution(310/467)", fontsize=18, fontweight='bold', pad=20, color='white')
+ax.set_ylabel("Number of Test Cases", fontsize=14, color='white')
+ax.set_xlabel("Speedup Ratio Range", fontsize=14, color='white', labelpad=10)
+
+ax.grid(axis='y', linestyle='--', alpha=0.2, color='white')
+sns.despine(top=True, right=True, left=False, bottom=False)
+
+plt.xticks(rotation=0)
+plt.tight_layout()
+
+# 保存透明图片
+plt.savefig("blue_ppt_chart_fixed.png", transparent=True, dpi=300)
+print("图表已生成 (英文标签版): blue_ppt_chart_fixed.png")
+plt.show()

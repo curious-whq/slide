@@ -148,9 +148,10 @@ class RandomForestBO:
 litmus_path = "/home/whq/Desktop/code_list/perple_test/all_allow_litmus_C910_naive"
 stat_log_base = "/home/whq/Desktop/code_list/perple_test/bayes_stat/log_record_bayes.log"
 litmus_vec_path = "/home/whq/Desktop/code_list/perple_test/bayes_stat/litmus_vector4_two_tower_gt0.log"
-cache_file_path = stat_log_base + ".cache4_norm_filter_same.jsonl"
+# cache_file_path = stat_log_base + ".cache4_norm_filter_same.jsonl"
+# cache_file_path = stat_log_base + ".cache_sum_70_no_norm_gt_0_for_graph.jsonl"
 
-
+cache_file_path = "./log/cache_norm.jsonl"
 def analyze_ranking_quality(groups_data, output_dir="./analysis_plots"):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
