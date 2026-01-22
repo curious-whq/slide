@@ -55,49 +55,59 @@ class ResultCache:
 
 
 # ================= 任务执行类 =================
-class TaskBasedRunner(LitmusRunner):
+class RandomGridRunner(LitmusRunner):
     def __init__(
             self,
-            shared_todo_queue,  # 共享的任务队列 [(litmus, vec), ...]
+            shared_todo_queue,
             param_space,
             stat_log,
-            resource_manager,
+            resource_manager=None,
             mode="time",
-            pipeline_host="127.0.0.1",
+            pipeline_host="192.168.1.105",
             pipeline_user="root",
-            pipeline_pass="root",
+            pipeline_pass="riscv",
             pipeline_port=22,
-            litmus_path_base="",
-            litmus_dir_path="",
-            remote_work_dir=""
+            litmus_path_base=None,
+            litmus_dir_path=None,
+            remote_work_dir=None
     ):
-        super().__init__([], [], stat_log, mode)  # litmus_list 传空，因为我们用队列
-        self.shared_queue = shared_todo_queue
-        self.ps = param_space
+        super().__init__([], [], stat_log, mode)
         self.litmus_path_base = litmus_path_base
         self.litmus_dir_path = litmus_dir_path
+        self.remote_work_dir = remote_work_dir
 
-        self.log_dir = f"{os.path.dirname(stat_log)}/bayes_log_{pipeline_host}"
+        self.ps = param_space
+        self.log_dir = f"{litmus_dir_path}_{pipeline_host}"
         run_cmd(f"mkdir -p {self.log_dir}")
-
+        unique_logger_name = f"runner_{pipeline_host}"
         self.logger = setup_logger(
             log_file=stat_log,
             level=logging.INFO,
-            name=f"runner_{pipeline_host}",
-            stdout=True
+            name=unique_logger_name,
+            stdout=True  # 建议设为 False，只看文件；设为 True 则控制台也会输出
         )
+
+        # self.logger = get_logger(LOG_NAME)
         self.resource_manager = resource_manager
 
-        # 本地 Cache，避免重复提交
+        self.todo_queue = shared_todo_queue
+
+        # 打乱顺序，避免同一个 litmus 连续跑导致板子过热或其他偏差（可选）
+        # random.shuffle(self.todo_queue)
+
+        # self.logger.info(
+        #     f"Total tasks generated: {len(self.todo_queue)} (Litmus files: {len(litmus_list)} * Vectors: {num_random_vectors})")
+
         self.cache = ResultCache(stat_log + ".cache.jsonl")
 
-        # 初始化 Pipeline
+        # 初始化流水线
+        self.logger.info("Initializing Async Pipeline...")
         self.pipeline = LitmusPipeline(
             host=pipeline_host,
             port=pipeline_port,
             username=pipeline_user,
             password=pipeline_pass,
-            logger=self.logger,
+            logger = self.logger,
             resource_manager=self.resource_manager,
             remote_work_dir=remote_work_dir
         )
@@ -106,7 +116,9 @@ class TaskBasedRunner(LitmusRunner):
     def _submit_one(self, litmus, vec):
         params = self.ps.vector_to_params(vec)
         params.set_riscv_gcc()
+        # 把 vector 挂载到 params 上，方便结果回来时找回
         params._temp_vec = vec
+
         litmus_file = f"{self.litmus_path_base}/{litmus}.litmus"
 
         self.pipeline.submit_task(
@@ -128,80 +140,86 @@ class TaskBasedRunner(LitmusRunner):
             return -1
 
     def run(self):
-        MAX_IN_FLIGHT = 10
-        active_count = 0
+        self.logger.info("=== Starting Robust Random Grid Execution Loop ===")
 
+        # === 关键配置 ===
+        # Pipeline 里的 keep_fresh 默认阈值是 20。
+        # 我们必须让 SUBMIT_LIMIT < 20。
+        # 否则 Pipeline 可能会静默丢弃任务，导致我们这边收不到结果，计数器无法归零，程序卡死。
+        MAX_IN_FLIGHT = 16
+
+        # 计数器
+        active_count = 0  # 当前在 Pipeline 处理中的任务数
+        finished_count = 0  # 已完成并拿到结果的任务数
+        skipped_count = 0  # 命中 Cache 跳过的任务数
+        # 辅助函数：填充流水线
         def try_fill_pipeline():
             nonlocal active_count
-            # 从共享队列获取任务 (线程安全)
-            while active_count < MAX_IN_FLIGHT:
-                try:
-                    # 非阻塞获取，或者带超时
-                    task_item = self.shared_queue.pop(0)  # 这是一个简单的 list pop，多线程不安全，需加锁
-                except IndexError:
-                    break  # 队列空了
+            # 只要 1. 还有待办任务 且 2. 流水线没塞满
+            while len(self.todo_queue) > 0 and active_count < MAX_IN_FLIGHT:
+                litmus, vec = self.todo_queue.pop(0)
 
-                litmus, vec = task_item
-
-                # Check cache
+                # A. 查重 (Cache Hit)
+                # 如果之前跑过，就不发给 Pipeline 了，直接跳过
                 if self.cache.get(litmus, vec) is not None:
+                    # self.logger.info(f"[SKIP] {litmus} already cached.") # 日志太多可注释掉
+                    nonlocal skipped_count
+                    skipped_count += 1
                     continue
 
+                # B. 提交任务
                 self._submit_one(litmus, vec)
                 active_count += 1
 
-        # 加锁处理 list pop 的简易封装
-        def safe_pop():
-            # 注意：在多线程环境中直接 pop(0) 可能有竞争，Python 的 list 操作通常是原子的，但为了稳妥建议用 Queue
-            # 这里为保持代码结构简单，假设外部传入的是线程安全的 Queue 或者我们在 pop 时加锁
-            try:
-                return self.shared_queue.pop(0)
-            except IndexError:
-                return None
+        # --- 1. 初始启动 ---
+        # 先塞满 MAX_IN_FLIGHT 个任务，让 Pipeline 动起来
+        self.logger.info(f"Initial filling (Target flight size: {MAX_IN_FLIGHT})...")
+        try_fill_pipeline()
 
-        # 重新定义 try_fill (Thread Safe Version)
-        def try_fill_pipeline_safe():
-            nonlocal active_count
-            while active_count < MAX_IN_FLIGHT:
-                # 简单粗暴的锁 (虽然 Python GIL 会帮忙，但 list pop(0) 性能较差，这里假设 list 不大)
-                # 更好的方式是使用 queue.Queue
-                item = None
-                try:
-                    item = self.shared_queue.get_nowait()
-                except:
-                    break
-
-                if item:
-                    litmus, vec = item
-                    if self.cache.get(litmus, vec) is not None:
-                        continue
-                    self._submit_one(litmus, vec)
-                    active_count += 1
-
-        try_fill_pipeline_safe()
-
-        if active_count == 0 and self.shared_queue.empty():
-            self.logger.info("Nothing to do.")
-            self.pipeline.wait_completion()
+        if active_count == 0 and len(self.todo_queue) == 0:
+            self.logger.info("Nothing to run (All cached or empty queue).")
             return
 
+        # --- 2. 事件循环 (基于 Generator) ---
+        # stream_results 会阻塞等待，直到有结果产生
         for result in self.pipeline.stream_results():
-            active_count -= 1
+
+            # === A. 处理结果 ===
+            active_count -= 1  # 关键：收到一个结果，飞行数减一
+            finished_count += 1
+
             task = result['task']
             log_path = result['log_path']
             litmus_name = task.litmus_path.split("/")[-1][:-7]
 
             if hasattr(task.params, '_temp_vec'):
+                param_vec = task.params._temp_vec
+                # 算分
                 score = self._parse_log_to_score(log_path, litmus_name, task.params.is_perple(), self.mode)
-                self.logger.info(f"[DONE] {litmus_name} | Score: {score:.2f}")
-                self.cache.add(litmus_name, task.params._temp_vec, score)
+                self.logger.info(
+                    f"[DONE] {litmus_name} | Score: {score:.4f} | In-flight: {active_count} | Rem: {len(self.todo_queue)}")
 
-            try_fill_pipeline_safe()
+                # 存 Cache
+                self.cache.add(litmus_name, param_vec, score)
+            else:
+                self.logger.error("Lost vector info in task result!")
 
-            if self.shared_queue.empty() and active_count == 0:
+            # === B. 补充新任务 (Refill) ===
+            # 因为刚才腾出了一个位置 (active_count -= 1)，所以尝试补货
+            try_fill_pipeline()
+
+            # === C. 退出检查 ===
+            # 如果待办队列空了，且流水线里也没任务了，说明全部做完
+            if len(self.todo_queue) == 0 and active_count == 0:
+                self.logger.info("Queue empty and Pipeline drained. Exiting loop.")
                 break
 
+        # --- 3. 收尾 ---
+        self.logger.info(f"Run Finished. Total Processed: {finished_count}, Skipped (Cached): {skipped_count}")
+
+        # 通知 Pipeline 停止内部线程
         self.pipeline.wait_completion()
+
 
 
 # ================= 入口函数 =================
@@ -244,7 +262,7 @@ def main_collector(task_list, board_configs, base_config, iter):
         # 每个板子单独的 stat log
         board_stat_log = f"{base_config['stat_log_dir']}/log_record_{board['host']}-{iter}.log"
 
-        runner = TaskBasedRunner(
+        runner = RandomGridRunner(
             shared_todo_queue=task_queue,
             param_space=param_space,
             stat_log=board_stat_log,
